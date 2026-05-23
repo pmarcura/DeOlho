@@ -25,6 +25,7 @@ Trabalho em andamento:
 
 - [#7 - Configurar repositório público, licença, README e CONTRIBUTING](https://github.com/pmarcura/DeOlho/issues/7)
 - [#22 - Scaffold técnico Next/Postgres/Drizzle](https://github.com/pmarcura/DeOlho/issues/22)
+- [#24 - Implementar design system shadcn social-cívico](https://github.com/pmarcura/DeOlho/issues/24)
 - [#8 - Criar CI inicial com lint, typecheck, test e build](https://github.com/pmarcura/DeOlho/issues/8)
 
 O próximo bloco técnico deve criar o scaffold antes do CI completo, porque ainda não há `package.json` nem scripts para `lint`, `typecheck`, `test` e `build`.
@@ -58,6 +59,7 @@ Versões exatas devem ser verificadas no momento do scaffold. A arquitetura do C
 - [.planning/PROJECT.md](.planning/PROJECT.md) - fonte principal de produto, requisitos e limites.
 - [.planning/config.json](.planning/config.json) - configuração GSD deixada pelo Claude.
 - [.planning/OBSIDIAN.md](.planning/OBSIDIAN.md) - ponte entre Obsidian, `.planning/` e GitHub.
+- [.planning/DESIGN_SYSTEM.md](.planning/DESIGN_SYSTEM.md) - fundação shadcn/ui e componentes cívicos próprios.
 - [.planning/research/STACK.md](.planning/research/STACK.md) - pesquisa de stack.
 - [.planning/research/FEATURES.md](.planning/research/FEATURES.md) - pesquisa de features e ordem recomendada.
 - [.planning/HANDOFF.md](.planning/HANDOFF.md) - handoff curto para Codex, Claude e próximos agentes.
@@ -80,9 +82,10 @@ Este projeto será construído com Codex, Claude Code e GSD trabalhando sobre o 
 1. `.planning/PROJECT.md`
 2. `.planning/config.json`
 3. `.planning/OBSIDIAN.md`
-4. A issue GitHub ativa
-5. `AGENTS.md`
-6. `.planning/HANDOFF.md`
+4. `.planning/DESIGN_SYSTEM.md`, quando a tarefa tocar UI ou experiência de usuário
+5. A issue GitHub ativa
+6. `AGENTS.md`
+7. `.planning/HANDOFF.md`
 
 Trabalhe em branch curta por issue, deixe handoff claro e não versione `.claude/`.
 

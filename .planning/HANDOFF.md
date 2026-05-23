@@ -10,6 +10,7 @@
 - Milestone atual: `M0 - Fundação aberta`
 - Issue atual: [#7 - Configurar repositório público, licença, README e CONTRIBUTING](https://github.com/pmarcura/DeOlho/issues/7)
 - Próxima issue preparada: [#22 - Scaffold técnico Next/Postgres/Drizzle](https://github.com/pmarcura/DeOlho/issues/22)
+- Issue de UI preparada: [#24 - Implementar design system shadcn social-cívico](https://github.com/pmarcura/DeOlho/issues/24)
 
 ## O que este pacote entrega
 
@@ -18,6 +19,7 @@
 - Licença MIT para o código.
 - Instruções compartilhadas para Codex, Claude Code e GSD.
 - Ponte Obsidian local -> `.planning/` -> GitHub documentada.
+- Fundação de design system shadcn/ui documentada em `.planning/DESIGN_SYSTEM.md`.
 - Ponte explícita para scaffold técnico antes do CI completo.
 
 ## Decisões preservadas do Claude
@@ -28,6 +30,7 @@
 - Next.js + PostgreSQL + Drizzle é a arquitetura base.
 - IA não pode inventar fatos, acusar ou substituir evidência oficial.
 - Obsidian continua como camada de pensamento; `.planning/` é o contexto versionado para execução.
+- Interface deve seguir o design system social-cívico: eventos públicos, páginas de entidade, evidência, fonte e confiança.
 - `.claude/` fica fora do versionamento.
 
 ## Obsidian
@@ -46,3 +49,5 @@ git switch -c codex/issue-22-scaffold-tecnico
 ```
 
 O scaffold deve criar os scripts que a issue #8 usará no CI.
+
+Ao criar `apps/web` e `packages/ui`, seguir `.planning/DESIGN_SYSTEM.md` para estrutura de pastas, componentes shadcn base e componentes cívicos.

@@ -13,9 +13,10 @@ Antes de implementar qualquer coisa, leia nesta ordem:
 1. `.planning/PROJECT.md`
 2. `.planning/config.json`
 3. `.planning/OBSIDIAN.md`
-4. A issue GitHub ativa
-5. `.planning/research/STACK.md` e `.planning/research/FEATURES.md`, quando a tarefa tocar stack, arquitetura ou produto
-6. `.planning/HANDOFF.md`, quando existir
+4. `.planning/DESIGN_SYSTEM.md`, quando a tarefa tocar UI ou experiência de usuário
+5. A issue GitHub ativa
+6. `.planning/research/STACK.md` e `.planning/research/FEATURES.md`, quando a tarefa tocar stack, arquitetura ou produto
+7. `.planning/HANDOFF.md`, quando existir
 
 Não ignore o trabalho do Claude. A arquitetura e a ordem de build atuais vêm da pesquisa em `.planning/research/`.
 
@@ -28,6 +29,7 @@ Não ignore o trabalho do Claude. A arquitetura e a ordem de build atuais vêm d
 - IA pode resumir, explicar e sugerir perguntas; não pode inventar fatos ou acusar.
 - Dados de pessoa física comum estão fora do escopo.
 - Português do Brasil é o idioma padrão da interface e da documentação pública.
+- A unidade social-cívica principal é evento público ou atualização de entidade, nunca post.
 
 ## Fluxo de trabalho
 
@@ -72,3 +74,9 @@ Preserve a arquitetura pesquisada pelo Claude:
 - Zod para validação de payloads externos
 
 Versões exatas devem ser verificadas no npm no momento do scaffold. Trocas de stack precisam de justificativa e registro.
+
+## UI e design system
+
+Para qualquer mudança de UI, siga `.planning/DESIGN_SYSTEM.md`. A interface pode ter familiaridade de app social moderno, mas deve continuar cívica, verificável e não sensacionalista.
+
+Use shadcn/ui como base em `packages/ui/src/components/ui` e componha componentes próprios em `packages/ui/src/components/deolho`. Não coloque lógica de produto nos componentes base do shadcn.
