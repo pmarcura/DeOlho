@@ -2,6 +2,23 @@
 
 Fundação de UI para uma experiência social-cívica moderna com shadcn/ui. A referência de familiaridade é a navegação fluida de apps sociais mobile-first, mas o DeOlho não é rede social: a unidade principal é **evento público** ou **atualização de entidade**, sempre orientada por evidência, fonte e confiança.
 
+## Documentação operacional
+
+Este arquivo registra a direção de produto e arquitetura do design system. A documentação pública e operacional fica em:
+
+- `docs/design-system/index.md`
+- `docs/components/base.md`
+- `docs/components/civicos.md`
+- `docs/patterns/telas.md`
+- `docs/patterns/navegacao.md`
+- `docs/patterns/estados.md`
+- `docs/patterns/conteudo-linguagem.md`
+- `docs/patterns/acessibilidade.md`
+- `docs/agents/regras.md`
+- `docs/agents/checklist-pr-ui.md`
+
+Agentes devem consultar esses arquivos antes de alterar UI, componentes, navegação ou linguagem.
+
 ## Vocabulário de produto
 
 | Evitar | Usar |
