@@ -11,10 +11,11 @@ Toda informação que chega à interface, API, exportação ou documentação p�
 ## Antes de começar
 
 1. Leia `.planning/PROJECT.md`.
-2. Leia `AGENTS.md`.
-3. Escolha uma issue no GitHub.
-4. Crie uma branch curta a partir de `main`.
-5. Confirme que `.claude/` continua fora do versionamento.
+2. Leia `.planning/OBSIDIAN.md` para entender a ponte com o vault local.
+3. Leia `AGENTS.md`.
+4. Escolha uma issue no GitHub.
+5. Crie uma branch curta a partir de `main`.
+6. Confirme que `.claude/` continua fora do versionamento.
 
 Exemplo:
 
@@ -88,6 +89,15 @@ IA não pode:
 - Seja direto, profissional e verificável.
 - Prefira exemplos concretos.
 - Registre decisões relevantes em documentação ou issues.
+
+## Obsidian e `.planning/`
+
+O Obsidian continua conectado ao projeto como camada de pensamento. Porém, agentes e contribuidores devem implementar a partir de contexto versionado.
+
+- Use o vault local para rascunhos, exploração e notas em formação.
+- Promova decisões estáveis para `.planning/` antes de abrir issue ou implementar.
+- Não versione `.obsidian/`, plugins, temas ou configurações pessoais.
+- Se uma informação existir apenas no Obsidian, trate como contexto não operacional até ser registrada em `.planning/`.
 
 ## Relatando problemas
 

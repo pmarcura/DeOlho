@@ -57,10 +57,21 @@ Versões exatas devem ser verificadas no momento do scaffold. A arquitetura do C
 
 - [.planning/PROJECT.md](.planning/PROJECT.md) - fonte principal de produto, requisitos e limites.
 - [.planning/config.json](.planning/config.json) - configuração GSD deixada pelo Claude.
+- [.planning/OBSIDIAN.md](.planning/OBSIDIAN.md) - ponte entre Obsidian, `.planning/` e GitHub.
 - [.planning/research/STACK.md](.planning/research/STACK.md) - pesquisa de stack.
 - [.planning/research/FEATURES.md](.planning/research/FEATURES.md) - pesquisa de features e ordem recomendada.
 - [.planning/HANDOFF.md](.planning/HANDOFF.md) - handoff curto para Codex, Claude e próximos agentes.
 - [AGENTS.md](AGENTS.md) - regras compartilhadas para agentes.
+
+## Obsidian
+
+O projeto mantém a conexão com Obsidian como camada de pensamento. O fluxo atual é:
+
+```text
+Obsidian vault local -> .planning/ versionado -> GitHub issues/PRs
+```
+
+O vault local não é o repositório central e configurações `.obsidian/` não devem ser versionadas. Decisões que orientam implementação precisam ser promovidas para `.planning/` antes de virar código ou issue. Veja [.planning/OBSIDIAN.md](.planning/OBSIDIAN.md).
 
 ## Colaboração com agentes
 
@@ -68,9 +79,10 @@ Este projeto será construído com Codex, Claude Code e GSD trabalhando sobre o 
 
 1. `.planning/PROJECT.md`
 2. `.planning/config.json`
-3. A issue GitHub ativa
-4. `AGENTS.md`
-5. `.planning/HANDOFF.md`
+3. `.planning/OBSIDIAN.md`
+4. A issue GitHub ativa
+5. `AGENTS.md`
+6. `.planning/HANDOFF.md`
 
 Trabalhe em branch curta por issue, deixe handoff claro e não versione `.claude/`.
 

@@ -17,6 +17,7 @@
 - Regras de contribuição e conduta.
 - Licença MIT para o código.
 - Instruções compartilhadas para Codex, Claude Code e GSD.
+- Ponte Obsidian local -> `.planning/` -> GitHub documentada.
 - Ponte explícita para scaffold técnico antes do CI completo.
 
 ## Decisões preservadas do Claude
@@ -26,7 +27,12 @@
 - PNCP é a primeira fonte de dados.
 - Next.js + PostgreSQL + Drizzle é a arquitetura base.
 - IA não pode inventar fatos, acusar ou substituir evidência oficial.
+- Obsidian continua como camada de pensamento; `.planning/` é o contexto versionado para execução.
 - `.claude/` fica fora do versionamento.
+
+## Obsidian
+
+Leia `.planning/OBSIDIAN.md` antes de mexer em decisões de produto ou arquitetura vindas de notas locais. O vault Obsidian atual não foi detectado dentro deste repositório; por isso, não há configuração `.obsidian/` versionada.
 
 ## Próximo passo recomendado
 
