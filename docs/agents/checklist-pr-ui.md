@@ -41,6 +41,7 @@ Use este checklist em todo PR que altera UI, componentes, docs de design system 
 - [ ] Não há componente duplicado.
 - [ ] Componentes base shadcn não receberam regra de produto sem justificativa.
 - [ ] Componentes cívicos ficam em `packages/ui/src/components/deolho`.
+- [ ] `docs/design-system/shadcn.md` foi seguido quando a mudança toca shadcn, `components.json`, tokens ou `packages/ui`.
 - [ ] Stories foram criadas ou atualizadas para componente novo.
 - [ ] Exemplos usam dados sintéticos marcados.
 

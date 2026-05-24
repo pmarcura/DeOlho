@@ -42,3 +42,7 @@ Não duplicar conteúdo manualmente em `apps/docs`. O app deve importar ou rende
 ## Referências externas
 
 As referências usadas para estruturar a maturidade do sistema estão em `docs/design-system/referencias.md`. Elas incluem Carbon, Fluent, Figma, USWDS, GOV.UK, Atlassian, Primer, Spectrum e Polaris.
+
+## shadcn/ui
+
+O contrato operacional de shadcn/ui está em `docs/design-system/shadcn.md`. O site de docs deve expor esse conteúdo quando migrar de HTML estático para Next.js, porque ele define onde a CLI instala componentes, como `components.json` deve funcionar e como agentes devem evitar duplicação.

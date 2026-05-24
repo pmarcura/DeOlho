@@ -1,0 +1,66 @@
+{
+  "$schema": "https://deolho.local/design-system/tokens.schema.json",
+  "name": "DeOlho Interface System Tokens",
+  "version": "0.1.0",
+  "status": "draft",
+  "description": "Tokens iniciais para UI civica, fonte, evidencia, confianca e estados obrigatorios.",
+  "color": {
+    "background": {
+      "page": { "value": "#f7f7f3", "role": "fundo principal" },
+      "surface": { "value": "#ffffff", "role": "cards e paineis" },
+      "surfaceMuted": { "value": "#fbfaf6", "role": "zonas secundarias" }
+    },
+    "text": {
+      "primary": { "value": "#171a1f", "role": "texto principal" },
+      "muted": { "value": "#5c6470", "role": "texto auxiliar" },
+      "inverse": { "value": "#ffffff", "role": "texto em fundos escuros" }
+    },
+    "border": {
+      "default": { "value": "#d9ddd7", "role": "borda padrao" },
+      "strong": { "value": "#b6beb6", "role": "borda interativa" }
+    },
+    "semantic": {
+      "official": { "value": "#0b6b56", "label": "Fato oficial" },
+      "source": { "value": "#1d5f8f", "label": "Fonte" },
+      "ai": { "value": "#4a4f9f", "label": "Explicacao por IA" },
+      "attention": { "value": "#9b4d16", "label": "Sinal de atencao" },
+      "review": { "value": "#6f4a00", "label": "Revisao manual" },
+      "danger": { "value": "#a12a2a", "label": "Erro operacional" }
+    }
+  },
+  "informationType": {
+    "official_fact": { "label": "Fato oficial", "component": "TipoInformacaoBadge" },
+    "ai_explanation": { "label": "Explicacao por IA", "component": "BlocoExplicacaoIA" },
+    "attention_signal": { "label": "Sinal de atencao", "component": "SinalAtencaoCard" },
+    "news": { "label": "Noticia", "component": "TipoInformacaoBadge" },
+    "user_opinion": { "label": "Opiniao de usuario", "component": "TipoInformacaoBadge", "mvp": false },
+    "manual_review": { "label": "Revisao manual", "component": "TipoInformacaoBadge" },
+    "incomplete_data": { "label": "Dado incompleto", "component": "BlocoLimitacaoDado" }
+  },
+  "trustLevel": {
+    "official_source": { "label": "Fonte oficial", "requiresEvidence": true },
+    "verified_copy": { "label": "Copia verificada", "requiresEvidence": true },
+    "pending_review": { "label": "Verificacao pendente", "requiresEvidence": true },
+    "delayed_source": { "label": "Fonte atrasada", "requiresEvidence": true },
+    "incomplete": { "label": "Incompleto", "requiresLimitation": true },
+    "conflicting": { "label": "Contraditorio", "requiresMultipleSources": true }
+  },
+  "sourceState": {
+    "fresh": { "label": "Atualizada", "requiresCollectedAt": true },
+    "delayed": { "label": "Fonte atrasada", "requiresCollectedAt": true },
+    "unavailable": { "label": "Fonte indisponivel", "requiresLimitation": true },
+    "partial": { "label": "Fonte parcial", "requiresLimitation": true },
+    "synthetic": { "label": "Dados sinteticos", "requiresVisibleBadge": true }
+  },
+  "radius": {
+    "sm": "6px",
+    "md": "8px",
+    "lg": "12px",
+    "xl": "16px"
+  },
+  "density": {
+    "compact": { "gap": "12px", "padding": "12px" },
+    "comfortable": { "gap": "16px", "padding": "16px" },
+    "editorial": { "gap": "24px", "padding": "24px" }
+  }
+}

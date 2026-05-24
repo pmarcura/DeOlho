@@ -63,6 +63,8 @@ Versões exatas devem ser verificadas no momento do scaffold. A arquitetura do C
 - [apps/docs/index.html](apps/docs/index.html) - página HTML estática inicial do DeOlho Interface System.
 - [docs/design-system/index.md](docs/design-system/index.md) - documentação operacional do DeOlho Interface System.
 - [docs/design-system/referencias.md](docs/design-system/referencias.md) - referências externas usadas para amadurecer o design system.
+- [docs/design-system/shadcn.md](docs/design-system/shadcn.md) - contrato de uso de shadcn/ui no monorepo.
+- [docs/components/matriz-shadcn.md](docs/components/matriz-shadcn.md) - matriz de composição entre shadcn base e componentes cívicos.
 - [docs/components/civicos.md](docs/components/civicos.md) - contrato de uso dos componentes cívicos.
 - [docs/patterns/telas.md](docs/patterns/telas.md) - padrões de tela e checklists de UI.
 - [docs/agents/regras.md](docs/agents/regras.md) - regras de UI para Codex, Claude, GSD e contribuidores.

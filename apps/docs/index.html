@@ -665,6 +665,112 @@
         color: var(--attention);
       }
 
+      .code-panel {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #12161d;
+        color: #f6f7f9;
+      }
+
+      .code-panel header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 12px 14px;
+      }
+
+      .code-panel header span {
+        color: rgba(255, 255, 255, 0.66);
+        font-family: var(--mono);
+        font-size: 0.76rem;
+      }
+
+      .code-panel pre {
+        margin: 0;
+        overflow: auto;
+        padding: 16px;
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        white-space: pre-wrap;
+      }
+
+      .anatomy {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 14px;
+      }
+
+      .anatomy-stack {
+        display: grid;
+        gap: 10px;
+      }
+
+      .anatomy-part {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        padding: 14px;
+      }
+
+      .anatomy-part strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .anatomy-part p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .maturity {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .maturity-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        padding: 16px;
+      }
+
+      .maturity-card small {
+        display: inline-flex;
+        margin-bottom: 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        padding: 3px 7px;
+      }
+
+      .decision-table {
+        display: grid;
+        gap: 8px;
+      }
+
+      .decision-row {
+        display: grid;
+        grid-template-columns: 210px minmax(0, 1fr) 260px;
+        gap: 12px;
+        align-items: start;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        padding: 14px;
+      }
+
+      .decision-row p {
+        margin: 0;
+        color: var(--muted);
+      }
+
       footer {
         max-width: 1440px;
         margin: 0 auto;
@@ -677,7 +783,8 @@
         .hero,
         .doctrine,
         .token-board,
-        .screen-map {
+        .screen-map,
+        .anatomy {
           grid-template-columns: 1fr;
         }
 
@@ -726,7 +833,9 @@
         .grid.cols-2,
         .grid.cols-3,
         .grid.cols-4,
-        .component-row {
+        .component-row,
+        .decision-row,
+        .maturity {
           grid-template-columns: 1fr;
         }
 
@@ -809,9 +918,12 @@
         <a href="#doutrina">Doutrina cívica</a>
         <a href="#arquitetura">Arquitetura</a>
         <a href="#tokens">Tokens</a>
+        <a href="#shadcn">shadcn/ui</a>
+        <a href="#anatomia">Anatomia cívica</a>
         <a href="#componentes">Componentes</a>
         <a href="#padroes">Padrões de tela</a>
         <a href="#estados">Estados obrigatórios</a>
+        <a href="#maturidade">Maturidade</a>
         <a href="#governanca">Governança</a>
         <a href="#checklist">Checklist</a>
       </aside>
@@ -1069,6 +1181,144 @@
           </div>
         </section>
 
+        <section id="shadcn" aria-labelledby="shadcn-title">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">shadcn/ui</span>
+                <h2 id="shadcn-title">Código próprio, composto com rigor cívico</h2>
+              </div>
+              <p>
+                O DeOlho usa shadcn/ui como distribuição de código, não como caixa fechada. O componente base entra
+                no repositório, recebe tokens do DeOlho e é composto em componentes cívicos revisáveis.
+              </p>
+            </div>
+
+            <div class="grid cols-3">
+              <article class="card">
+                <h3>Open code</h3>
+                <p>Agentes e humanos leem o componente real, revisam acessibilidade e ajustam comportamento sem wrapper frágil.</p>
+              </article>
+              <article class="card">
+                <h3>Monorepo consciente</h3>
+                <p>`apps/web` consome `@workspace/ui`; shadcn base mora em `packages/ui`; features ficam no app.</p>
+              </article>
+              <article class="card">
+                <h3>Registry depois</h3>
+                <p>Registro shadcn próprio só entra quando componentes cívicos tiverem Storybook, docs e uso real.</p>
+              </article>
+            </div>
+
+            <div class="grid cols-2" style="margin-top: 14px">
+              <div class="code-panel">
+                <header>
+                  <strong>Scaffold futuro</strong>
+                  <span>#22</span>
+                </header>
+                <pre><code>npx shadcn@latest init -d --monorepo --base radix
+cd apps/web
+npx shadcn@latest add button badge card avatar tooltip skeleton alert
+npx shadcn@latest add command dialog drawer sheet sidebar tabs table scroll-area</code></pre>
+              </div>
+              <div class="code-panel">
+                <header>
+                  <strong>Contrato de instalação</strong>
+                  <span>components.json</span>
+                </header>
+                <pre><code>apps/web/components.json
+  ui: "@workspace/ui/components"
+  utils: "@workspace/ui/lib/utils"
+
+packages/ui/components.json
+  ui: "@workspace/ui/components"
+  css: "src/styles/globals.css"
+
+Regra: mesmo style, iconLibrary e baseColor.</code></pre>
+              </div>
+            </div>
+
+            <div class="callout" style="margin-top: 14px">
+              <strong>Regra para agentes</strong>
+              Antes de rodar `npx shadcn`, leia `docs/design-system/shadcn.md`. Não instalar componente base fora de
+              `packages/ui` sem justificar no PR.
+            </div>
+
+            <div class="decision-table" style="margin-top: 14px">
+              <div class="decision-row">
+                <strong>Base ou cívico?</strong>
+                <p>Se a interface mostra dado público, use a matriz `docs/components/matriz-shadcn.md` para escolher o componente cívico correto.</p>
+                <code>shadcn -> DeOlho</code>
+              </div>
+              <div class="decision-row">
+                <strong>Componente novo?</strong>
+                <p>Crie primeiro o contrato em docs, depois Storybook, depois código. A UI não nasce direto em rota de produto.</p>
+                <code>docs first</code>
+              </div>
+            </div>
+          </section>
+
+        <section id="anatomia" aria-labelledby="anatomia-title">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">Anatomia</span>
+                <h2 id="anatomia-title">Todo componente cívico tem uma anatomia verificável</h2>
+              </div>
+              <p>
+                Componentes que mostram dado público precisam carregar estrutura de confiança, não apenas aparência.
+                Esta anatomia deve orientar `EventoPublicoCard`, `ContratoCard`, `EntidadeCard` e páginas de entidade.
+              </p>
+            </div>
+
+            <div class="anatomy">
+              <div class="wireframe">
+                <h3>Card cívico modelo</h3>
+                <div class="wireframe-stack" style="margin-top: 12px">
+                  <div class="wire strong">Cabeçalho: tipo de informação + entidade afetada</div>
+                  <div class="wire">Resumo neutro, sem acusação e sem inferência sem fonte</div>
+                  <div class="wire">Badges: fonte, confiança, estado da coleta</div>
+                  <div class="wire">Limitação explícita quando campo faltar ou fonte atrasar</div>
+                  <div class="wire">Ações: ver evidência, acompanhar, citar, exportar</div>
+                </div>
+              </div>
+
+              <div class="anatomy-stack">
+                <div class="anatomy-part">
+                  <strong>1. Identidade semântica</strong>
+                  <p>O usuário vê se é fato oficial, IA, sinal, notícia, opinião ou revisão manual antes da conclusão.</p>
+                </div>
+                <div class="anatomy-part">
+                  <strong>2. Proveniência</strong>
+                  <p>Fonte, data publicada, data coletada e link de evidência ficam no fluxo principal.</p>
+                </div>
+                <div class="anatomy-part">
+                  <strong>3. Confiança e limitação</strong>
+                  <p>Baixa confiança, dado incompleto, fonte atrasada e contradição têm linguagem própria.</p>
+                </div>
+                <div class="anatomy-part">
+                  <strong>4. Ação segura</strong>
+                  <p>Ação contextual não abre post, like ou comentário livre. Ela leva a evidência, correção ou exportação.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="decision-table" style="margin-top: 14px">
+              <div class="decision-row">
+                <strong>Precisa mostrar documento?</strong>
+                <p>Use `EvidenciaLink` dentro de `PainelEvidencia`, com fonte e datas.</p>
+                <code>nunca apenas tooltip</code>
+              </div>
+              <div class="decision-row">
+                <strong>Precisa explicar com IA?</strong>
+                <p>Use `BlocoExplicacaoIA`, com fontes usadas e limitação. IA não entra como fato oficial.</p>
+                <code>label obrigatório</code>
+              </div>
+              <div class="decision-row">
+                <strong>Precisa chamar atenção?</strong>
+                <p>Use `SinalAtencaoCard`, com método, evidência, limitação e aviso de não irregularidade.</p>
+                <code>sem ranking moral</code>
+              </div>
+            </div>
+        </section>
+
         <section id="componentes" aria-labelledby="componentes-title">
           <div class="section-head">
             <div>
@@ -1192,6 +1442,60 @@
             </article>
           </div>
         </section>
+
+        <section id="maturidade" aria-labelledby="maturidade-title">
+            <div class="section-head">
+              <div>
+                <span class="eyebrow">Maturidade</span>
+                <h2 id="maturidade-title">Componentes têm ciclo de vida público</h2>
+              </div>
+              <p>
+                Um design system confiável não trata todo componente como estável. Cada peça precisa dizer se é
+                rascunho, candidata, estável ou depreciada.
+              </p>
+            </div>
+
+            <div class="maturity">
+              <article class="maturity-card">
+                <small>draft</small>
+                <h3>Rascunho</h3>
+                <p>Existe para explorar. Pode mudar sem aviso. Só usa dados sintéticos e não bloqueia produto.</p>
+              </article>
+              <article class="maturity-card">
+                <small>candidate</small>
+                <h3>Candidato</h3>
+                <p>Tem API proposta, Storybook mínimo, estados principais e documentação inicial.</p>
+              </article>
+              <article class="maturity-card">
+                <small>stable</small>
+                <h3>Estável</h3>
+                <p>Tem uso em tela, acessibilidade revisada, exemplos completos e checklist de confiança cumprido.</p>
+              </article>
+              <article class="maturity-card">
+                <small>deprecated</small>
+                <h3>Depreciado</h3>
+                <p>Tem substituto documentado, plano de remoção e bloqueio contra novo uso.</p>
+              </article>
+            </div>
+
+            <div class="decision-table" style="margin-top: 14px">
+              <div class="decision-row">
+                <strong>Promover para candidate</strong>
+                <p>Exige props documentadas, dados sintéticos, loading, vazio, erro e fonte atrasada quando aplicável.</p>
+                <code>docs + Storybook</code>
+              </div>
+              <div class="decision-row">
+                <strong>Promover para stable</strong>
+                <p>Exige uso real em tela, revisão de acessibilidade, revisão de linguagem e teste de regressão.</p>
+                <code>PR checklist</code>
+              </div>
+              <div class="decision-row">
+                <strong>Alterar componente stable</strong>
+                <p>Exige changelog, justificativa, análise de impacto e screenshots desktop/mobile.</p>
+                <code>sem mudança silenciosa</code>
+              </div>
+            </div>
+          </section>
 
         <section id="governanca" aria-labelledby="governanca-title">
           <div class="section-head">

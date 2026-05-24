@@ -8,6 +8,7 @@ Este arquivo registra a direção de produto e arquitetura do design system. A d
 
 - `docs/design-system/index.md`
 - `docs/design-system/referencias.md`
+- `docs/design-system/shadcn.md`
 - `docs/components/base.md`
 - `docs/components/civicos.md`
 - `docs/patterns/telas.md`
@@ -18,6 +19,7 @@ Este arquivo registra a direção de produto e arquitetura do design system. A d
 - `docs/agents/regras.md`
 - `docs/agents/checklist-pr-ui.md`
 - `apps/docs/index.html`
+- `packages/ui/src/tokens/deolho.tokens.json`
 
 Agentes devem consultar esses arquivos antes de alterar UI, componentes, navegação ou linguagem.
 

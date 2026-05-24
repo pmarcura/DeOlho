@@ -25,3 +25,7 @@ packages/ui/
 - Todo componente cívico novo precisa ter Storybook e documentação em `docs/components`.
 - Props devem ser explícitas para tipo de informação, fonte, confiança, evidência e limitação quando aplicável.
 - Dados de exemplo devem ser sintéticos e marcados como tal.
+
+## shadcn/ui
+
+Antes de rodar a CLI, leia `docs/design-system/shadcn.md`. O DeOlho deve usar shadcn como código próprio em monorepo: componentes base em `src/components/ui`, componentes cívicos em `src/components/deolho` e tokens em `src/tokens`.

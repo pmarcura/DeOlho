@@ -302,7 +302,8 @@ npm install @anthropic-ai/sdk
 npm install pg-boss bottleneck p-retry fast-xml-parser csv-parse pg-copy-streams zod
 
 # UI (shadcn inicializado via CLI, não npm install)
-npx shadcn@latest init
+# Em execução por agente, usar modo não interativo e seguir docs/design-system/shadcn.md
+npx shadcn@latest init -d --monorepo --base radix
 npm install @tanstack/react-table @tanstack/react-query nuqs date-fns lucide-react recharts
 
 # Auth (escolher um)

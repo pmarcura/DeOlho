@@ -2,6 +2,8 @@
 
 Tokens são contratos visuais e semânticos. Eles devem morar em `packages/ui/src/tokens` quando o pacote for implementado.
 
+A primeira versão estruturada está em `packages/ui/src/tokens/deolho.tokens.json`. Ela ainda é draft, mas já define o vocabulário mínimo para Figma futuro, Storybook e componentes React.
+
 ## Cores base
 
 | Token | Uso | Regra |

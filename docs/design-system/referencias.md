@@ -15,6 +15,7 @@ Este documento registra referências externas usadas para amadurecer o **DeOlho 
 | [GitHub Primer](https://primer.style/) | Separação entre Product UI, Brand UI, acessibilidade, ícones e primitives/tokens. | Separar `packages/ui` de identidade pública e manter componentes cívicos independentes de marketing. |
 | [Adobe Spectrum](https://spectrum.adobe.com/) | Componentes, ferramentas, diretrizes de uso e coerência entre produtos. | Documentar intenção, comportamento, estados e acessibilidade como parte do contrato de cada componente. |
 | [Shopify Polaris](https://polaris-react.shopify.com/) | Foundations, design, content, patterns, components, tokens, icons e contribuição para produto operacional. | Manter linguagem de produto, conteúdo e padrões de tela lado a lado com os componentes. |
+| [shadcn/ui](https://ui.shadcn.com/docs) | Componentes acessíveis como código aberto no projeto, CLI, monorepo, registry, theming e Figma. | Usar como camada de implementação e distribuição do DeOlho Interface System, com componentes base e cívicos versionados no repositório. |
 
 ## Síntese para o DeOlho
 
@@ -24,6 +25,7 @@ O DeOlho deve combinar quatro camadas:
 2. **Componentes**: shadcn/ui como base e componentes cívicos em `packages/ui`.
 3. **Padrões**: telas, navegação, estados obrigatórios e fluxos de evidência.
 4. **Governança**: regras para agentes, checklist de PR, Storybook e documentação web.
+5. **Distribuição**: shadcn registry futuro apenas quando componentes cívicos estiverem estáveis.
 
 ## Diferença central do DeOlho
 

@@ -14,7 +14,7 @@ Antes de implementar qualquer coisa, leia nesta ordem:
 2. `.planning/config.json`
 3. `.planning/OBSIDIAN.md`
 4. `.planning/DESIGN_SYSTEM.md`, quando a tarefa tocar UI ou experiência de usuário
-5. `docs/design-system/index.md`, `docs/design-system/referencias.md`, `docs/components/civicos.md` e `docs/agents/regras.md`, quando a tarefa tocar UI ou experiência de usuário
+5. `docs/design-system/index.md`, `docs/design-system/referencias.md`, `docs/design-system/shadcn.md`, `docs/components/matriz-shadcn.md`, `docs/components/civicos.md` e `docs/agents/regras.md`, quando a tarefa tocar UI ou experiência de usuário
 6. A issue GitHub ativa
 7. `.planning/research/STACK.md` e `.planning/research/FEATURES.md`, quando a tarefa tocar stack, arquitetura ou produto
 8. `.planning/HANDOFF.md`, quando existir
@@ -83,3 +83,5 @@ Para qualquer mudança de UI, siga `.planning/DESIGN_SYSTEM.md` e a documentaç�
 Use shadcn/ui como base em `packages/ui/src/components/ui` e componha componentes próprios em `packages/ui/src/components/deolho`. Não coloque lógica de produto nos componentes base do shadcn.
 
 Antes de abrir PR de UI, valide `docs/agents/checklist-pr-ui.md`. Ao criar ou alterar componente cívico, atualize `docs/components/civicos.md` e crie Storybook quando o scaffold existir.
+
+Antes de rodar `npx shadcn`, leia `docs/design-system/shadcn.md`. Não instalar componentes base fora de `packages/ui` sem justificar.

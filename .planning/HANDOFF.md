@@ -23,6 +23,8 @@
 - Documentação operacional do DeOlho Interface System criada em `docs/design-system`, `docs/components`, `docs/patterns` e `docs/agents`.
 - Página HTML estática inicial do DeOlho Interface System criada em `apps/docs/index.html`.
 - Referências externas de maturidade registradas em `docs/design-system/referencias.md`.
+- Contrato operacional de shadcn/ui para monorepo registrado em `docs/design-system/shadcn.md`.
+- Tokens iniciais estruturados em `packages/ui/src/tokens/deolho.tokens.json`.
 - Estrutura inicial de `apps/docs` e `packages/ui` preparada para o scaffold futuro.
 - Ponte explícita para scaffold técnico antes do CI completo.
 
@@ -54,4 +56,4 @@ git switch -c codex/issue-22-scaffold-tecnico
 
 O scaffold deve criar os scripts que a issue #8 usará no CI.
 
-Ao criar `apps/web` e `packages/ui`, seguir `.planning/DESIGN_SYSTEM.md`, `docs/design-system/index.md` e a referência visual em `apps/docs/index.html` para estrutura de pastas, componentes shadcn base, componentes cívicos, estados obrigatórios e regras de agentes.
+Ao criar `apps/web` e `packages/ui`, seguir `.planning/DESIGN_SYSTEM.md`, `docs/design-system/index.md`, `docs/design-system/shadcn.md` e a referência visual em `apps/docs/index.html` para estrutura de pastas, componentes shadcn base, componentes cívicos, estados obrigatórios e regras de agentes.

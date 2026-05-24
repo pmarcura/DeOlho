@@ -39,17 +39,25 @@ Todo agente deve tratar este sistema como fonte operacional para UI. Quando houv
 2. [Princípios de UI](principios-ui.md)
 3. [Tokens](tokens.md)
 4. [Referências de design systems](referencias.md)
-5. [Componentes cívicos](../components/civicos.md)
-6. [Padrões de tela](../patterns/telas.md)
-7. [Estados obrigatórios](../patterns/estados.md)
-8. [Regras para agentes](../agents/regras.md)
-9. [Checklist de PR de UI](../agents/checklist-pr-ui.md)
+5. [shadcn/ui no DeOlho](shadcn.md)
+6. [Matriz shadcn -> DeOlho](../components/matriz-shadcn.md)
+7. [Componentes cívicos](../components/civicos.md)
+8. [Padrões de tela](../patterns/telas.md)
+9. [Estados obrigatórios](../patterns/estados.md)
+10. [Regras para agentes](../agents/regras.md)
+11. [Checklist de PR de UI](../agents/checklist-pr-ui.md)
 
 ## Página HTML inicial
 
 A primeira versão navegável da documentação está em `apps/docs/index.html`. Ela é um protótipo estático e pode ser aberta diretamente no navegador enquanto o scaffold de `apps/docs` ainda não existe.
 
 O HTML não substitui os arquivos Markdown. Ele deve ser tratado como a face pública inicial do conteúdo versionado em `docs/`.
+
+## Contrato shadcn
+
+O DeOlho usa shadcn/ui como base de código próprio, não como biblioteca fechada. Componentes base entram em `packages/ui/src/components/ui`; componentes cívicos entram em `packages/ui/src/components/deolho`; composição de produto fica em `apps/web`.
+
+Veja [shadcn/ui no DeOlho](shadcn.md) antes de rodar CLI, criar `components.json`, alterar tokens ou instalar componentes.
 
 ## Regra central
 
