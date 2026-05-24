@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Eye, Search, FileText, Building2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -21,8 +22,8 @@ export default function HomePage() {
             <Search className="w-4 h-4" />
             Buscar contrato
           </Button>
-          <Button variant="outline" size="lg">
-            Ver Americana — SP
+          <Button variant="outline" size="lg" asChild>
+            <Link href="/financas">Ver Americana — SP</Link>
           </Button>
         </div>
       </div>
