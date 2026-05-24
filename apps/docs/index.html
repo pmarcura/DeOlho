@@ -3,11 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DeOlho Interface System</title>
-    <meta
-      name="description"
-      content="Documentação operacional de UI/UX do DeOlho para humanos, Codex, Claude e GSD."
-    />
+    <title>DeOlho × Americana — Interface System</title>
+    <meta name="description" content="Design system completo do DeOlho para o piloto em Americana, SP." />
     <style>
       :root {
         color-scheme: light;
@@ -18,6 +15,7 @@
         --muted: #5c6470;
         --line: #d9ddd7;
         --line-strong: #b6beb6;
+        /* informação */
         --official: #0b6b56;
         --official-soft: #e5f5ef;
         --ai: #4a4f9f;
@@ -30,865 +28,327 @@
         --review-soft: #fff7d6;
         --danger: #a12a2a;
         --danger-soft: #ffebeb;
+        /* política */
+        --political: #1a3561;
+        --political-soft: #e8edf8;
+        --vote-sim: #0a5c36;
+        --vote-sim-soft: #e0f2ea;
+        --vote-nao: #8b1a1a;
+        --vote-nao-soft: #fdecea;
+        --vote-abs: #5c4a00;
+        --vote-abs-soft: #fef9e0;
+        /* território */
+        --territorial: #2d5016;
+        --territorial-soft: #eaf2e0;
+        /* layout */
         --radius: 8px;
-        --shadow: 0 18px 50px rgba(24, 31, 42, 0.10);
+        --shadow: 0 18px 50px rgba(24,31,42,.10);
         --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
         --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
       body {
         margin: 0;
         overflow-x: hidden;
         background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(247, 247, 243, 0.94)),
-          repeating-linear-gradient(90deg, rgba(23, 26, 31, 0.035) 0 1px, transparent 1px 96px);
+          linear-gradient(180deg,rgba(255,255,255,.76),rgba(247,247,243,.94)),
+          repeating-linear-gradient(90deg,rgba(23,26,31,.035) 0 1px,transparent 1px 96px);
         color: var(--ink);
         font-family: var(--sans);
         line-height: 1.55;
       }
-
-      a {
-        color: inherit;
-        text-decoration-color: rgba(29, 95, 143, 0.42);
-        text-decoration-thickness: 1px;
-        text-underline-offset: 3px;
-      }
-
-      a:hover {
-        text-decoration-color: currentColor;
-      }
-
-      a:focus-visible,
-      button:focus-visible {
-        outline: 3px solid #2a7fcb;
-        outline-offset: 3px;
-      }
-
-      .skip-link {
-        position: absolute;
-        left: 16px;
-        top: 12px;
-        z-index: 20;
-        transform: translateY(-140%);
-        background: var(--ink);
-        color: white;
-        padding: 10px 14px;
-        border-radius: var(--radius);
-      }
-
-      .skip-link:focus {
-        transform: translateY(0);
-      }
-
-      .topbar {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        border-bottom: 1px solid var(--line);
-        background: rgba(247, 247, 243, 0.92);
-        backdrop-filter: blur(12px);
-      }
-
-      .topbar-inner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        max-width: 1440px;
-        margin: 0 auto;
-        padding: 14px 24px;
-      }
-
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-width: 0;
-        text-decoration: none;
-      }
-
-      .brand-mark {
-        display: grid;
-        width: 36px;
-        height: 36px;
-        place-items: center;
-        border: 1px solid var(--line-strong);
-        border-radius: var(--radius);
-        background: var(--paper);
-        color: var(--official);
-        font-weight: 800;
-        letter-spacing: 0;
-      }
-
-      .brand-title {
-        display: grid;
-        gap: 1px;
-      }
-
-      .brand-title strong {
-        font-size: 0.95rem;
-      }
-
-      .brand-title span {
-        color: var(--muted);
-        font-size: 0.78rem;
-      }
-
-      .top-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .button {
-        display: inline-flex;
-        min-height: 36px;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--line-strong);
-        border-radius: var(--radius);
-        background: var(--paper);
-        color: var(--ink);
-        font-weight: 700;
-        padding: 8px 12px;
-        text-decoration: none;
-      }
-
-      .button.primary {
-        border-color: var(--official);
-        background: var(--official);
-        color: white;
-      }
-
-      .layout {
-        display: grid;
-        grid-template-columns: 280px minmax(0, 1fr);
-        gap: 28px;
-        max-width: 1440px;
-        margin: 0 auto;
-        padding: 28px 24px 64px;
-      }
-
-      .side-nav {
-        position: sticky;
-        top: 78px;
-        align-self: start;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: rgba(255, 255, 255, 0.82);
-        padding: 14px;
-        box-shadow: 0 12px 34px rgba(24, 31, 42, 0.06);
-      }
-
-      .side-nav h2 {
-        margin: 4px 8px 12px;
-        color: var(--muted);
-        font-size: 0.76rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .side-nav a {
-        display: block;
-        border-radius: 6px;
-        padding: 8px;
-        color: var(--muted);
-        font-size: 0.9rem;
-        text-decoration: none;
-      }
-
-      .side-nav a:hover {
-        background: var(--paper-soft);
-        color: var(--ink);
-      }
-
-      main {
-        min-width: 0;
-      }
-
-      section {
-        scroll-margin-top: 96px;
-        margin-top: 28px;
-      }
-
-      .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
-        gap: 22px;
-        align-items: stretch;
-      }
-
-      .hero-copy,
-      .hero-preview,
-      .panel {
-        min-width: 0;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: rgba(255, 255, 255, 0.88);
-        box-shadow: var(--shadow);
-      }
-
-      .hero-copy {
-        padding: clamp(24px, 4vw, 48px);
-      }
-
-      .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: var(--paper-soft);
-        color: var(--muted);
-        font-size: 0.78rem;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        padding: 6px 10px;
-        text-transform: uppercase;
-      }
-
-      h1,
-      h2,
-      h3 {
-        letter-spacing: 0;
-        line-height: 1.08;
-      }
-
-      h1 {
-        max-width: 780px;
-        margin: 22px 0 18px;
-        font-size: clamp(2.25rem, 4.8vw, 4.9rem);
-        overflow-wrap: break-word;
-      }
-
-      h2 {
-        margin: 0 0 10px;
-        font-size: clamp(1.75rem, 3vw, 3rem);
-      }
-
-      h3 {
-        margin: 0;
-        font-size: 1.02rem;
-      }
-
-      .lead {
-        max-width: 760px;
-        color: var(--muted);
-        font-size: clamp(1rem, 1.5vw, 1.22rem);
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 28px;
-      }
-
-      .hero-preview {
-        overflow: hidden;
-        min-height: 560px;
-        padding: 18px;
-      }
-
-      .phone-shell {
-        max-width: 380px;
-        min-height: 520px;
-        margin: 0 auto;
-        border: 1px solid var(--line-strong);
-        border-radius: 28px;
-        background: #10141a;
-        padding: 12px;
-      }
-
-      .phone-screen {
-        display: grid;
-        grid-template-rows: auto auto 1fr auto;
-        min-height: 494px;
-        overflow: hidden;
-        border-radius: 20px;
-        background: #fbfaf6;
-      }
-
-      .phone-top,
-      .phone-bottom {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        border-bottom: 1px solid var(--line);
-        padding: 12px;
-      }
-
-      .phone-bottom {
-        border-top: 1px solid var(--line);
-        border-bottom: 0;
-        color: var(--muted);
-        font-size: 0.74rem;
-      }
-
-      .search-pill {
-        max-width: 62%;
-        overflow: hidden;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: white;
-        color: var(--muted);
-        padding: 7px 10px;
-        font-size: 0.78rem;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .territory-row {
-        display: flex;
-        gap: 8px;
-        overflow: hidden;
-        border-bottom: 1px solid var(--line);
-        padding: 10px 12px;
-      }
-
-      .chip,
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        width: fit-content;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: white;
-        color: var(--muted);
-        font-size: 0.75rem;
-        font-weight: 800;
-        padding: 5px 8px;
-        white-space: nowrap;
-      }
-
-      .chip.active {
-        border-color: var(--official);
-        background: var(--official-soft);
-        color: var(--official);
-      }
-
-      .phone-feed {
-        display: grid;
-        gap: 10px;
-        align-content: start;
-        padding: 12px;
-      }
-
-      .event-card {
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: white;
-        padding: 12px;
-      }
-
-      .event-card strong {
-        display: block;
-        margin: 8px 0 4px;
-        font-size: 0.98rem;
-      }
-
-      .event-card p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 0.82rem;
-      }
-
-      .badge-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 10px;
-      }
-
-      .badge.official {
-        border-color: rgba(11, 107, 86, 0.28);
-        background: var(--official-soft);
-        color: var(--official);
-      }
-
-      .badge.ai {
-        border-color: rgba(74, 79, 159, 0.25);
-        background: var(--ai-soft);
-        color: var(--ai);
-      }
-
-      .badge.attention {
-        border-color: rgba(155, 77, 22, 0.28);
-        background: var(--attention-soft);
-        color: var(--attention);
-      }
-
-      .section-head {
-        display: flex;
-        align-items: end;
-        justify-content: space-between;
-        gap: 18px;
-        margin-bottom: 14px;
-      }
-
-      .section-head p {
-        max-width: 760px;
-        margin: 0;
-        color: var(--muted);
-      }
-
-      .grid {
-        display: grid;
-        gap: 14px;
-      }
-
-      .grid.cols-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .grid.cols-3 {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .grid.cols-4 {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-
-      .card,
-      .reference-card,
-      .component-row,
-      .state-card {
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: rgba(255, 255, 255, 0.88);
-        padding: 18px;
-      }
-
-      .card p,
-      .reference-card p,
-      .state-card p {
-        margin: 10px 0 0;
-        color: var(--muted);
-      }
-
-      .reference-card {
-        display: grid;
-        min-height: 180px;
-        align-content: space-between;
-      }
-
-      .reference-card span {
-        color: var(--muted);
-        font-family: var(--mono);
-        font-size: 0.76rem;
-      }
-
-      .doctrine {
-        display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 14px;
-      }
-
-      .rule-list {
-        display: grid;
-        gap: 10px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .rule-list li {
-        border-left: 4px solid var(--official);
-        background: var(--paper);
-        border-radius: 0 var(--radius) var(--radius) 0;
-        padding: 12px 14px;
-      }
-
-      .token-board {
-        display: grid;
-        grid-template-columns: 0.9fr 1.1fr;
-        gap: 14px;
-      }
-
-      .swatches {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-      }
-
-      .swatch {
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--paper);
-        overflow: hidden;
-      }
-
-      .swatch-color {
-        height: 58px;
-      }
-
-      .swatch div:last-child {
-        padding: 10px;
-        color: var(--muted);
-        font-family: var(--mono);
-        font-size: 0.75rem;
-      }
-
-      .component-list {
-        display: grid;
-        gap: 8px;
-      }
-
-      .component-row {
-        display: grid;
-        grid-template-columns: 240px minmax(0, 1fr) 220px;
-        gap: 12px;
-        align-items: start;
-        padding: 14px;
-      }
-
-      .component-row p {
-        margin: 0;
-        color: var(--muted);
-      }
-
-      .component-row code,
-      code {
-        border: 1px solid var(--line);
-        border-radius: 6px;
-        background: var(--paper-soft);
-        color: #3f4350;
-        font-family: var(--mono);
-        font-size: 0.78em;
-        padding: 2px 5px;
-      }
-
-      .screen-map {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 320px;
-        gap: 14px;
-      }
-
-      .wireframe {
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--paper);
-        padding: 14px;
-      }
-
-      .wireframe-stack {
-        display: grid;
-        gap: 10px;
-      }
-
-      .wire {
-        border: 1px dashed var(--line-strong);
-        border-radius: 6px;
-        background: var(--paper-soft);
-        color: var(--muted);
-        padding: 10px;
-        font-size: 0.86rem;
-      }
-
-      .wire.strong {
-        border-style: solid;
-        background: var(--official-soft);
-        color: var(--official);
-        font-weight: 800;
-      }
-
-      .timeline {
-        display: grid;
-        gap: 12px;
-        counter-reset: step;
-      }
-
-      .timeline-item {
-        display: grid;
-        grid-template-columns: 42px minmax(0, 1fr);
-        gap: 12px;
-        align-items: start;
-      }
-
-      .timeline-item::before {
-        counter-increment: step;
-        content: counter(step);
-        display: grid;
-        width: 36px;
-        height: 36px;
-        place-items: center;
-        border-radius: 999px;
-        background: var(--ink);
-        color: white;
-        font-weight: 800;
-      }
-
-      .checklist {
-        display: grid;
-        gap: 10px;
-      }
-
-      .check {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--paper);
-        padding: 12px;
-      }
-
-      .check::before {
-        content: "";
-        flex: 0 0 18px;
-        height: 18px;
-        border: 2px solid var(--official);
-        border-radius: 4px;
-        margin-top: 2px;
-      }
-
-      .callout {
-        border: 1px solid rgba(155, 77, 22, 0.32);
-        border-radius: var(--radius);
-        background: var(--attention-soft);
-        padding: 18px;
-      }
-
-      .callout strong {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--attention);
-      }
-
-      .code-panel {
-        overflow: hidden;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: #12161d;
-        color: #f6f7f9;
-      }
-
-      .code-panel header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-        padding: 12px 14px;
-      }
-
-      .code-panel header span {
-        color: rgba(255, 255, 255, 0.66);
-        font-family: var(--mono);
-        font-size: 0.76rem;
-      }
-
-      .code-panel pre {
-        margin: 0;
-        overflow: auto;
-        padding: 16px;
-        font-family: var(--mono);
-        font-size: 0.82rem;
-        line-height: 1.65;
-        white-space: pre-wrap;
-      }
-
-      .anatomy {
-        display: grid;
-        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-        gap: 14px;
-      }
-
-      .anatomy-stack {
-        display: grid;
-        gap: 10px;
-      }
-
-      .anatomy-part {
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--paper);
-        padding: 14px;
-      }
-
-      .anatomy-part strong {
-        display: block;
-        margin-bottom: 4px;
-      }
-
-      .anatomy-part p {
-        margin: 0;
-        color: var(--muted);
-      }
-
-      .maturity {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-      }
-
-      .maturity-card {
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--paper);
-        padding: 16px;
-      }
-
-      .maturity-card small {
-        display: inline-flex;
-        margin-bottom: 10px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        color: var(--muted);
-        font-family: var(--mono);
-        font-size: 0.72rem;
-        padding: 3px 7px;
-      }
-
-      .decision-table {
-        display: grid;
-        gap: 8px;
-      }
-
-      .decision-row {
-        display: grid;
-        grid-template-columns: 210px minmax(0, 1fr) 260px;
-        gap: 12px;
-        align-items: start;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--paper);
-        padding: 14px;
-      }
-
-      .decision-row p {
-        margin: 0;
-        color: var(--muted);
-      }
-
-      footer {
-        max-width: 1440px;
-        margin: 0 auto;
-        padding: 0 24px 44px;
-        color: var(--muted);
-      }
-
+      a { color: inherit; text-decoration-color: rgba(29,95,143,.42); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+      a:hover { text-decoration-color: currentColor; }
+      a:focus-visible, button:focus-visible { outline: 3px solid #2a7fcb; outline-offset: 3px; }
+      .skip-link { position: absolute; left: 16px; top: 12px; z-index: 20; transform: translateY(-140%); background: var(--ink); color: white; padding: 10px 14px; border-radius: var(--radius); }
+      .skip-link:focus { transform: translateY(0); }
+
+      /* topbar */
+      .topbar { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--line); background: rgba(247,247,243,.92); backdrop-filter: blur(12px); }
+      .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; max-width: 1440px; margin: 0 auto; padding: 12px 24px; }
+      .brand { display: flex; align-items: center; gap: 12px; min-width: 0; text-decoration: none; }
+      .brand-mark { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--paper); color: var(--official); font-weight: 800; font-size: .9rem; }
+      .brand-title { display: grid; gap: 1px; }
+      .brand-title strong { font-size: .92rem; }
+      .brand-title span { color: var(--muted); font-size: .76rem; }
+      .city-tag { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--political-soft); color: var(--political); padding: 6px 10px; font-size: .8rem; font-weight: 700; }
+      .city-tag img { width: 22px; height: 15px; object-fit: cover; border-radius: 2px; border: 1px solid var(--line); }
+      .top-actions { display: flex; align-items: center; gap: 10px; }
+      .button { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--paper); color: var(--ink); font-weight: 700; font-size: .84rem; padding: 7px 12px; text-decoration: none; }
+      .button.primary { border-color: var(--official); background: var(--official); color: white; }
+
+      /* layout */
+      .layout { display: grid; grid-template-columns: 260px minmax(0,1fr); gap: 28px; max-width: 1440px; margin: 0 auto; padding: 28px 24px 80px; }
+      .side-nav { position: sticky; top: 72px; align-self: start; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.82); padding: 12px; box-shadow: 0 12px 34px rgba(24,31,42,.06); max-height: calc(100vh - 90px); overflow-y: auto; }
+      .side-nav h2 { margin: 4px 8px 8px; color: var(--muted); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
+      .side-nav hr { border: 0; border-top: 1px solid var(--line); margin: 8px 0; }
+      .side-nav a { display: block; border-radius: 6px; padding: 7px 8px; color: var(--muted); font-size: .86rem; text-decoration: none; }
+      .side-nav a:hover { background: var(--paper-soft); color: var(--ink); }
+      main { min-width: 0; }
+      section { scroll-margin-top: 82px; margin-top: 32px; }
+
+      /* typography */
+      h1, h2, h3 { letter-spacing: 0; line-height: 1.08; }
+      h1 { max-width: 780px; margin: 20px 0 16px; font-size: clamp(2.1rem,4.2vw,4.4rem); overflow-wrap: break-word; }
+      h2 { margin: 0 0 10px; font-size: clamp(1.6rem,2.8vw,2.8rem); }
+      h3 { margin: 0; font-size: 1rem; }
+      .lead { max-width: 760px; color: var(--muted); font-size: clamp(.98rem,1.4vw,1.18rem); }
+      .eyebrow { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper-soft); color: var(--muted); font-size: .76rem; font-weight: 800; letter-spacing: .04em; padding: 5px 10px; text-transform: uppercase; }
+      code { border: 1px solid var(--line); border-radius: 5px; background: var(--paper-soft); color: #3f4350; font-family: var(--mono); font-size: .78em; padding: 2px 5px; }
+
+      /* grids */
+      .grid { display: grid; gap: 12px; }
+      .grid.cols-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .grid.cols-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+      .grid.cols-4 { grid-template-columns: repeat(4,minmax(0,1fr)); }
+
+      /* cards */
+      .card, .panel, .state-card, .reference-card { border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.88); padding: 18px; }
+      .card p, .state-card p, .reference-card p { margin: 8px 0 0; color: var(--muted); }
+      .reference-card { display: grid; min-height: 160px; align-content: space-between; }
+      .reference-card span { color: var(--muted); font-family: var(--mono); font-size: .74rem; }
+
+      /* hero */
+      .hero { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(320px,.9fr); gap: 20px; align-items: stretch; }
+      .hero-copy { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.88); box-shadow: var(--shadow); padding: clamp(20px,4vw,44px); }
+      .hero-preview { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.88); box-shadow: var(--shadow); overflow: hidden; padding: 16px; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+      /* phone shell */
+      .phone-shell { max-width: 340px; margin: 0 auto; border: 1px solid var(--line-strong); border-radius: 24px; background: #10141a; padding: 10px; }
+      .phone-screen { display: grid; grid-template-rows: auto auto 1fr auto; border-radius: 17px; background: #fbfaf6; overflow: hidden; }
+      .phone-top, .phone-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 12px; border-bottom: 1px solid var(--line); }
+      .phone-bottom { border-top: 1px solid var(--line); border-bottom: 0; color: var(--muted); font-size: .72rem; }
+      .phone-feed { display: grid; gap: 8px; padding: 10px; }
+      .search-pill { border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--muted); padding: 6px 10px; font-size: .76rem; max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .territory-row { display: flex; gap: 6px; overflow: hidden; border-bottom: 1px solid var(--line); padding: 8px 12px; }
+
+      /* badges & chips */
+      .chip, .badge { display: inline-flex; align-items: center; gap: 5px; width: fit-content; border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--muted); font-size: .73rem; font-weight: 800; padding: 4px 8px; white-space: nowrap; }
+      .chip.active { border-color: var(--official); background: var(--official-soft); color: var(--official); }
+      .badge.official { border-color: rgba(11,107,86,.28); background: var(--official-soft); color: var(--official); }
+      .badge.ai { border-color: rgba(74,79,159,.25); background: var(--ai-soft); color: var(--ai); }
+      .badge.attention { border-color: rgba(155,77,22,.28); background: var(--attention-soft); color: var(--attention); }
+      .badge.political { border-color: rgba(26,53,97,.25); background: var(--political-soft); color: var(--political); }
+      .badge.territorial { border-color: rgba(45,80,22,.25); background: var(--territorial-soft); color: var(--territorial); }
+      .badge.source { border-color: rgba(29,95,143,.25); background: var(--source-soft); color: var(--source); }
+      .badge-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+
+      /* section heads */
+      .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+      .section-head p { max-width: 760px; margin: 0; color: var(--muted); }
+      .resource-subhead { margin: 22px 0 10px; }
+      .resource-subhead strong { font-size: 1.02rem; }
+      .resource-subhead p { margin: 4px 0 0; color: var(--muted); font-size: .88rem; }
+
+      /* event card (radar) */
+      .event-card { border: 1px solid var(--line); border-radius: var(--radius); background: white; padding: 11px; }
+      .event-card strong { display: block; margin: 7px 0 3px; font-size: .96rem; }
+      .event-card p { margin: 0; color: var(--muted); font-size: .8rem; }
+
+      /* component list rows */
+      .component-list { display: grid; gap: 6px; }
+      .component-row { display: grid; grid-template-columns: 220px minmax(0,1fr) 200px; gap: 12px; align-items: start; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.88); padding: 13px; }
+      .component-row p { margin: 0; color: var(--muted); }
+      .decision-table { display: grid; gap: 7px; }
+      .decision-row { display: grid; grid-template-columns: 200px minmax(0,1fr) 220px; gap: 12px; align-items: start; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 13px; }
+      .decision-row p { margin: 0; color: var(--muted); }
+
+      /* tokens / swatches */
+      .swatches { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+      .swatch { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); overflow: hidden; }
+      .swatch-color { height: 54px; }
+      .swatch div:last-child { padding: 8px; color: var(--muted); font-family: var(--mono); font-size: .73rem; }
+      .token-board { display: grid; grid-template-columns: .9fr 1.1fr; gap: 12px; }
+
+      /* code panels */
+      .code-panel { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #12161d; color: #f6f7f9; }
+      .code-panel header { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(255,255,255,.12); padding: 11px 14px; }
+      .code-panel header span { color: rgba(255,255,255,.55); font-family: var(--mono); font-size: .74rem; }
+      .code-panel pre { margin: 0; overflow: auto; padding: 14px; font-family: var(--mono); font-size: .8rem; line-height: 1.65; white-space: pre-wrap; }
+
+      /* callout */
+      .callout { border: 1px solid rgba(155,77,22,.32); border-radius: var(--radius); background: var(--attention-soft); padding: 16px; }
+      .callout strong { display: block; margin-bottom: 5px; color: var(--attention); }
+      .callout.political { border-color: rgba(26,53,97,.28); background: var(--political-soft); }
+      .callout.political strong { color: var(--political); }
+
+      /* rule list */
+      .rule-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+      .rule-list li { border-left: 4px solid var(--official); background: var(--paper); border-radius: 0 var(--radius) var(--radius) 0; padding: 10px 12px; font-size: .88rem; }
+
+      /* wireframe */
+      .wireframe { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 14px; }
+      .wireframe-stack { display: grid; gap: 8px; margin-top: 10px; }
+      .wire { border: 1px dashed var(--line-strong); border-radius: 6px; background: var(--paper-soft); color: var(--muted); padding: 9px; font-size: .84rem; }
+      .wire.strong { border-style: solid; background: var(--official-soft); color: var(--official); font-weight: 800; }
+      .wire.political { border-style: solid; background: var(--political-soft); color: var(--political); }
+      .wire.territorial { border-style: solid; background: var(--territorial-soft); color: var(--territorial); }
+
+      /* checklist */
+      .checklist { display: grid; gap: 8px; }
+      .check { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 11px; font-size: .88rem; }
+      .check::before { content: ""; flex: 0 0 17px; height: 17px; border: 2px solid var(--official); border-radius: 4px; margin-top: 2px; }
+
+      /* maturity */
+      .maturity { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+      .maturity-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 14px; }
+      .maturity-card small { display: inline-flex; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-family: var(--mono); font-size: .7rem; padding: 2px 7px; }
+
+      /* timeline */
+      .timeline { display: grid; gap: 10px; counter-reset: step; }
+      .timeline-item { display: grid; grid-template-columns: 38px minmax(0,1fr); gap: 10px; align-items: start; }
+      .timeline-item::before { counter-increment: step; content: counter(step); display: grid; width: 34px; height: 34px; place-items: center; border-radius: 999px; background: var(--ink); color: white; font-weight: 800; font-size: .86rem; }
+
+      /* icons demo */
+      .icon-demo { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+      .icon-item { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 50px; padding: 8px 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-soft); color: var(--ink); }
+      .icon-item svg { width: 20px; height: 20px; }
+      .icon-item span { font-size: .6rem; color: var(--muted); text-align: center; line-height: 1.2; word-break: break-all; }
+      .icon-name-tag { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; background: var(--paper-soft); color: var(--muted); font-family: var(--mono); font-size: .7rem; padding: 2px 6px; }
+      .resource-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; align-items: center; }
+
+      /* ===================== POLITICAL LAYER ===================== */
+      .vereador-card {
+        display: grid; grid-template-columns: 40px minmax(0,1fr) auto;
+        gap: 12px; align-items: start;
+        border: 1px solid var(--line); border-radius: var(--radius);
+        background: var(--paper); padding: 14px;
+      }
+      .vereador-card + .vereador-card { margin-top: 8px; }
+      .vereador-avatar {
+        width: 40px; height: 40px; display: grid; place-items: center;
+        border-radius: 999px; background: var(--political-soft);
+        border: 1px solid rgba(26,53,97,.2); color: var(--political);
+        font-weight: 800; font-size: .82rem; flex-shrink: 0;
+      }
+      .vereador-name { font-weight: 700; font-size: .96rem; line-height: 1.2; }
+      .vereador-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+      .vereador-stats { text-align: right; }
+      .vereador-stats .stat { font-size: .78rem; color: var(--muted); white-space: nowrap; }
+      .vereador-stats .stat strong { display: block; font-size: .96rem; color: var(--ink); }
+
+      .voto-pill {
+        display: inline-flex; align-items: center; gap: 5px;
+        border-radius: 999px; padding: 3px 9px;
+        font-size: .72rem; font-weight: 800; border: 1px solid transparent;
+      }
+      .voto-pill.sim { background: var(--vote-sim-soft); color: var(--vote-sim); border-color: rgba(10,92,54,.25); }
+      .voto-pill.nao { background: var(--vote-nao-soft); color: var(--vote-nao); border-color: rgba(139,26,26,.25); }
+      .voto-pill.abs { background: var(--vote-abs-soft); color: var(--vote-abs); border-color: rgba(92,74,0,.25); }
+
+      .sessao-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); overflow: hidden; }
+      .sessao-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); background: var(--political-soft); }
+      .sessao-header strong { color: var(--political); font-size: .96rem; }
+      .sessao-body { padding: 12px 14px; }
+      .sessao-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 10px; }
+      .sessao-stat { border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; text-align: center; }
+      .sessao-stat strong { display: block; font-size: 1.3rem; color: var(--ink); line-height: 1; }
+      .sessao-stat span { font-size: .72rem; color: var(--muted); }
+
+      .vote-grid { display: grid; gap: 6px; }
+      .vote-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper-soft); }
+      .vote-row-name { font-size: .88rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .vote-row-party { font-size: .72rem; color: var(--muted); white-space: nowrap; }
+
+      .projeto-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 14px; }
+      .projeto-numero { font-family: var(--mono); font-size: .74rem; color: var(--muted); margin-bottom: 4px; }
+      .projeto-title { font-weight: 700; font-size: .96rem; line-height: 1.3; margin: 4px 0; }
+      .projeto-status { display: inline-flex; border-radius: 999px; padding: 3px 9px; font-size: .72rem; font-weight: 800; }
+      .projeto-status.em-votacao { background: var(--source-soft); color: var(--source); border: 1px solid rgba(29,95,143,.25); }
+      .projeto-status.aprovado { background: var(--vote-sim-soft); color: var(--vote-sim); border: 1px solid rgba(10,92,54,.25); }
+      .projeto-status.arquivado { background: var(--paper-soft); color: var(--muted); border: 1px solid var(--line); }
+      .projeto-status.em-discussao { background: var(--attention-soft); color: var(--attention); border: 1px solid rgba(155,77,22,.25); }
+
+      /* ===================== TERRITORIAL LAYER ===================== */
+      .bairro-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 16px; }
+      .bairro-name { font-weight: 700; font-size: 1.02rem; }
+      .bairro-loc { font-size: .8rem; color: var(--muted); margin: 2px 0 8px; }
+      .bairro-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-top: 10px; }
+      .bairro-stat { border: 1px solid var(--line); border-radius: 6px; padding: 7px 8px; text-align: center; }
+      .bairro-stat strong { display: block; font-size: 1.1rem; color: var(--ink); }
+      .bairro-stat span { font-size: .68rem; color: var(--muted); }
+      .bairro-tag { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(45,80,22,.25); border-radius: 999px; background: var(--territorial-soft); color: var(--territorial); font-size: .74rem; font-weight: 800; padding: 3px 9px; }
+
+      .rua-list { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); overflow: hidden; }
+      .rua-list-header { padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--territorial-soft); }
+      .rua-list-header strong { color: var(--territorial); font-size: .88rem; }
+      .rua-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--line); font-size: .88rem; }
+      .rua-item:last-child { border-bottom: 0; }
+      .rua-tipo { font-size: .72rem; color: var(--muted); }
+
+      .territorio-nav { display: flex; align-items: center; gap: 8px; padding: 9px 13px; background: var(--paper-soft); border: 1px solid var(--line); border-radius: var(--radius); font-size: .84rem; }
+      .territorio-nav strong { color: var(--ink); }
+      .territorio-sep { color: var(--line-strong); font-size: .9rem; }
+
+      /* ===================== PREFEITURA LAYER ===================== */
+      .contrato-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 15px; }
+      .contrato-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+      .contrato-numero { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+      .contrato-object { font-weight: 700; font-size: .96rem; line-height: 1.3; margin: 3px 0; }
+      .contrato-value { font-size: 1.1rem; font-weight: 800; color: var(--ink); white-space: nowrap; }
+      .contrato-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; font-size: .82rem; }
+      .contrato-meta-item { border: 1px solid var(--line); border-radius: 5px; padding: 7px 9px; }
+      .contrato-meta-item span { display: block; font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+      .contrato-meta-item strong { color: var(--ink); }
+
+      .obra-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); overflow: hidden; }
+      .obra-status-bar { height: 4px; background: var(--line); }
+      .obra-status-bar .progress { height: 100%; background: var(--official); border-radius: 2px; }
+      .obra-body { padding: 13px 15px; }
+      .obra-name { font-weight: 700; font-size: .96rem; margin-bottom: 4px; }
+      .obra-loc { font-size: .8rem; color: var(--muted); margin-bottom: 8px; }
+
+      /* ===================== SCRAPER LAYER ===================== */
+      .scraper-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 14px; }
+      .scraper-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+      .scraper-row:last-child { border-bottom: 0; }
+      .status-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+      .status-dot.ativo { background: #22c55e; }
+      .status-dot.atrasado { background: #f59e0b; }
+      .status-dot.erro { background: #ef4444; }
+      .status-dot.pendente { background: var(--line-strong); }
+      .scraper-name { flex: 1; font-size: .88rem; }
+      .scraper-freq { font-size: .72rem; color: var(--muted); white-space: nowrap; }
+      .scraper-last { font-size: .72rem; color: var(--muted); white-space: nowrap; font-family: var(--mono); }
+
+      /* screen map */
+      .screen-map { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 12px; }
+      .anatomy { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 12px; }
+      .anatomy-stack { display: grid; gap: 8px; }
+      .anatomy-part { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 13px; }
+      .anatomy-part strong { display: block; margin-bottom: 3px; }
+      .anatomy-part p { margin: 0; color: var(--muted); font-size: .86rem; }
+
+      /* footer */
+      footer { max-width: 1440px; margin: 0 auto; padding: 0 24px 44px; color: var(--muted); font-size: .86rem; }
+
+      /* ===================== RESPONSIVE ===================== */
       @media (max-width: 1180px) {
-        .layout,
-        .hero,
-        .doctrine,
-        .token-board,
-        .screen-map,
-        .anatomy {
-          grid-template-columns: 1fr;
-        }
-
-        .side-nav {
-          position: static;
-          order: 2;
-        }
-
-        .grid.cols-4,
-        .grid.cols-3 {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+        .layout, .hero, .token-board, .screen-map, .anatomy { grid-template-columns: 1fr; }
+        .side-nav { position: static; order: 2; max-height: none; }
+        .grid.cols-4, .grid.cols-3 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+        .component-row, .decision-row { grid-template-columns: 1fr; }
+        .sessao-stats, .bairro-stats { grid-template-columns: repeat(3,1fr); }
       }
-
       @media (max-width: 760px) {
-        .topbar-inner,
-        .layout {
-          max-width: 100%;
-          padding-left: 16px;
-          padding-right: 16px;
-        }
-
-        .layout {
-          display: block;
-        }
-
-        .side-nav {
-          display: none;
-        }
-
-        .topbar-inner,
-        .section-head {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-
-        .top-actions {
-          width: 100%;
-          flex-direction: column;
-        }
-
-        .button {
-          width: 100%;
-        }
-
-        .grid.cols-2,
-        .grid.cols-3,
-        .grid.cols-4,
-        .component-row,
-        .decision-row,
-        .maturity {
-          grid-template-columns: 1fr;
-        }
-
-        main,
-        section,
-        .hero,
-        .hero-copy,
-        .hero-preview {
-          max-width: 100%;
-          width: 100%;
-        }
-
-        .hero {
-          display: block;
-        }
-
-        .hero-copy,
-        .hero-preview {
-          max-width: calc(100vw - 32px);
-          overflow: hidden;
-          width: calc(100vw - 32px);
-        }
-
-        .hero-preview {
-          margin-top: 22px;
-        }
-
-        .lead,
-        .hero-copy p {
-          max-width: 100%;
-          overflow-wrap: break-word;
-        }
-
-        h1 {
-          font-size: clamp(2rem, 8vw, 2.35rem);
-        }
-
-        .hero-preview {
-          min-height: auto;
-        }
-
-        .phone-shell {
-          max-width: 340px;
-          min-width: 0;
-          width: 100%;
-        }
+        .topbar-inner, .layout { padding-left: 16px; padding-right: 16px; }
+        .layout { display: block; }
+        .side-nav { display: none; }
+        .grid.cols-2, .grid.cols-3, .grid.cols-4 { grid-template-columns: 1fr; }
+        .maturity { grid-template-columns: repeat(2,minmax(0,1fr)); }
+        .contrato-meta { grid-template-columns: 1fr; }
+        .sessao-stats, .bairro-stats { grid-template-columns: repeat(3,1fr); }
+        h1 { font-size: clamp(1.9rem,7.5vw,2.3rem); }
+        .hero { display: block; }
+        .hero-copy, .hero-preview { max-width: calc(100vw - 32px); overflow: hidden; }
+        .hero-preview { margin-top: 20px; }
+        .city-tag span { display: none; }
+        .vereador-card { grid-template-columns: 38px minmax(0,1fr); }
+        .vereador-stats { display: none; }
       }
-
-      @media (prefers-reduced-motion: reduce) {
-        html {
-          scroll-behavior: auto;
-        }
-      }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
     </style>
   </head>
   <body>
@@ -896,682 +356,1315 @@
 
     <header class="topbar">
       <div class="topbar-inner">
-        <a class="brand" href="#inicio" aria-label="Ir para o início do DeOlho Interface System">
+        <a class="brand" href="#inicio" aria-label="DeOlho Interface System — início">
           <span class="brand-mark" aria-hidden="true">D</span>
           <span class="brand-title">
             <strong>DeOlho Interface System</strong>
-            <span>UI cívica, verificável e orientada a evidência</span>
+            <span>UI cívica orientada a evidência</span>
           </span>
         </a>
+        <div class="city-tag" aria-label="Cidade piloto: Americana, SP">
+          <img src="https://raw.githubusercontent.com/bgeneto/bandeiras-br/master/imagens/SP.png"
+               alt="Bandeira de São Paulo" loading="lazy"
+               onerror="this.style.display='none'" />
+          <span>Americana — SP · piloto</span>
+        </div>
         <nav class="top-actions" aria-label="Ações rápidas">
-          <a class="button" href="../../docs/design-system/index.md">Docs Markdown</a>
-          <a class="button primary" href="../../docs/agents/checklist-pr-ui.md">Checklist de PR</a>
+          <a class="button" href="../../docs/design-system/index.md">Docs MD</a>
+          <a class="button primary" href="../../docs/agents/checklist-pr-ui.md">Checklist PR</a>
         </nav>
       </div>
     </header>
 
     <div class="layout">
-      <aside class="side-nav" aria-label="Navegação da documentação">
-        <h2>Nesta página</h2>
-        <a href="#inicio">Visão geral</a>
-        <a href="#referencias">Referências</a>
+      <aside class="side-nav" aria-label="Navegação">
+        <h2>Visão geral</h2>
+        <a href="#inicio">Missão</a>
+        <a href="#americana">Americana — piloto</a>
+        <a href="#fontes">Fontes e scrapers</a>
+        <hr />
+        <h2>Fundações</h2>
         <a href="#doutrina">Doutrina cívica</a>
-        <a href="#arquitetura">Arquitetura</a>
         <a href="#tokens">Tokens</a>
         <a href="#shadcn">shadcn/ui</a>
-        <a href="#anatomia">Anatomia cívica</a>
-        <a href="#componentes">Componentes</a>
-        <a href="#padroes">Padrões de tela</a>
+        <a href="#icones">Ícones</a>
+        <a href="#bandeiras">Bandeiras</a>
+        <hr />
+        <h2>Componentes</h2>
+        <a href="#civicos">Camada cívica</a>
+        <a href="#politico">Camada política</a>
+        <a href="#territorio">Camada territorial</a>
+        <a href="#prefeitura">Camada prefeitura</a>
+        <hr />
+        <h2>Padrões</h2>
+        <a href="#padroes">Telas</a>
         <a href="#estados">Estados obrigatórios</a>
+        <hr />
+        <h2>Governança</h2>
         <a href="#maturidade">Maturidade</a>
-        <a href="#governanca">Governança</a>
-        <a href="#checklist">Checklist</a>
+        <a href="#governanca">Processo</a>
+        <a href="#checklist">Checklist PR</a>
       </aside>
 
       <main id="conteudo">
+
+        <!-- ===== HERO ===== -->
         <section class="hero" id="inicio" aria-labelledby="hero-title">
           <div class="hero-copy">
-            <span class="eyebrow">Documentação web inicial</span>
-            <h1 id="hero-title">Um design system para confiança pública, não para engajamento vazio.</h1>
+            <span class="eyebrow">Design System · v0 · Piloto Americana</span>
+            <h1 id="hero-title">Transparência cívica começa por uma cidade. Depois o país.</h1>
             <p class="lead">
-              O DeOlho Interface System define como construir interfaces brasileiras de observabilidade cívica:
-              evidência antes de opinião, fonte antes de conclusão, IA sempre identificada e sinal de atenção sem acusação.
+              O DeOlho parte de Americana, SP — 21 vereadores, centenas de bairros, milhares de contratos públicos.
+              Este sistema define como cada dado público vira interface verificável: fonte, confiança, limitação e evidência visíveis antes da conclusão.
             </p>
             <div class="hero-actions">
-              <a class="button primary" href="#componentes">Ver componentes cívicos</a>
-              <a class="button" href="#referencias">Ver referências usadas</a>
+              <a class="button primary" href="#politico">Componentes políticos</a>
+              <a class="button" href="#territorio">Componentes territoriais</a>
+              <a class="button" href="#fontes">Fontes e scrapers</a>
             </div>
           </div>
-
-          <div class="hero-preview" aria-label="Prévia sintética de tela mobile do DeOlho">
+          <div class="hero-preview" aria-label="Prévia mobile do radar de Americana">
             <div class="phone-shell">
               <div class="phone-screen">
                 <div class="phone-top">
-                  <strong>DeOlho</strong>
-                  <span class="search-pill">Buscar fonte, contrato, cidade</span>
+                  <strong style="font-size:.88rem">DeOlho · Americana</strong>
+                  <span class="search-pill">Buscar vereador, contrato, bairro…</span>
                 </div>
-                <div class="territory-row" aria-label="Camadas territoriais sintéticas">
-                  <span class="chip active">Brasil</span>
-                  <span class="chip">SP sintético</span>
-                  <span class="chip">Cidade sintética</span>
-                  <span class="chip">Saúde</span>
+                <div class="territory-row">
+                  <span class="chip active">Americana</span>
+                  <span class="chip">Centro</span>
+                  <span class="chip">Monte Libano</span>
+                  <span class="chip">Câmara</span>
                 </div>
                 <div class="phone-feed">
                   <article class="event-card">
-                    <span class="badge official">Fato oficial</span>
-                    <strong>Contrato sintético atualizado</strong>
-                    <p>Valor publicado na fonte foi atualizado. Esta prévia usa dados sintéticos.</p>
+                    <span class="badge political">Sessão ordinária</span>
+                    <strong>Câmara aprovou PL 023/2024</strong>
+                    <p>Projeto de lei sobre iluminação pública no Jardim Brasil. 15 votos SIM, 4 NÃO, 2 abstenções.</p>
                     <div class="badge-row">
-                      <span class="badge official">PNCP sintético</span>
-                      <span class="badge">Fonte e coleta visíveis</span>
+                      <span class="badge official">Fato oficial</span>
+                      <span class="badge source">Câmara Municipal</span>
+                    </div>
+                  </article>
+                  <article class="event-card">
+                    <span class="badge territorial">Monte Libano</span>
+                    <strong>Contrato de pavimentação atualizado</strong>
+                    <p>Valor aditado em R$ 120 mil. Prazo estendido até março de 2025.</p>
+                    <div class="badge-row">
+                      <span class="badge official">PNCP</span>
+                      <span class="badge">Fonte oficial</span>
                     </div>
                   </article>
                   <article class="event-card">
                     <span class="badge attention">Sinal de atenção</span>
-                    <strong>Campo relevante ausente</strong>
-                    <p>Sinal de atenção não indica irregularidade. A fonte não informa território impactado.</p>
+                    <strong>Empresa com contrato em CEIS</strong>
+                    <p>Sinal de atenção não indica irregularidade. A fonte não informa escopo da sanção.</p>
                     <div class="badge-row">
                       <span class="badge">Dado incompleto</span>
-                      <span class="badge">Ver evidência</span>
+                      <span class="badge">Portal da Transparência</span>
                     </div>
                   </article>
-                  <article class="event-card">
-                    <span class="badge ai">Explicação por IA</span>
-                    <strong>Resumo em português simples</strong>
-                    <p>Gerado a partir dos campos oficiais disponíveis. Não substitui o documento original.</p>
-                  </article>
                 </div>
-                <div class="phone-bottom" aria-label="Navegação inferior mobile">
-                  <span>Início</span>
-                  <span>Radar</span>
-                  <strong>+</strong>
-                  <span>Explorar</span>
-                  <span>Mapa</span>
+                <div class="phone-bottom">
+                  <span>Início</span><span>Radar</span><strong>+</strong><span>Câmara</span><span>Mapa</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="referencias" aria-labelledby="referencias-title">
+        <!-- ===== AMERICANA PILOTO ===== -->
+        <section id="americana" aria-labelledby="americana-title">
           <div class="section-head">
             <div>
-              <span class="eyebrow">Benchmark</span>
-              <h2 id="referencias-title">Referências usadas sem copiar identidade</h2>
+              <span class="eyebrow">Piloto</span>
+              <h2 id="americana-title">Americana, SP — escopo do MVP</h2>
             </div>
-            <p>
-              Sistemas maduros documentam princípios, componentes, padrões, tokens, acessibilidade, contribuição e
-              ferramentas. O DeOlho acrescenta uma camada própria: governança de evidência pública.
-            </p>
+            <p>Começamos por uma cidade. Quando o modelo funcionar aqui, replicar é configuração, não reengenharia.</p>
           </div>
 
           <div class="grid cols-4">
-            <article class="reference-card">
-              <span>IBM</span>
-              <h3><a href="https://carbondesignsystem.com/">Carbon Design System</a></h3>
-              <p>Open source, modular, com código, design kits, guidelines, comunidade e princípios de inclusão.</p>
+            <article class="card">
+              <h3>Câmara Municipal</h3>
+              <p style="font-size:2rem;font-weight:800;color:var(--political);margin:8px 0 0">21</p>
+              <p>vereadores eleitos em outubro de 2024. Mandato até 2028.</p>
             </article>
-            <article class="reference-card">
-              <span>Microsoft</span>
-              <h3><a href="https://fluent2.microsoft.design/">Fluent 2</a></h3>
-              <p>Organização por plataformas, recursos de acessibilidade, kits Figma e documentação para desenvolvimento.</p>
+            <article class="card">
+              <h3>Bairros oficiais</h3>
+              <p style="font-size:2rem;font-weight:800;color:var(--territorial);margin:8px 0 0">90+</p>
+              <p>bairros e loteamentos com logradouros identificados pelo IBGE e Prefeitura.</p>
             </article>
-            <article class="reference-card">
-              <span>Figma</span>
-              <h3><a href="https://www.figma.com/design-systems/">Design Systems</a></h3>
-              <p>Bibliotecas compartilhadas, variáveis, modos, tokens, analytics e ponte entre componente e código.</p>
+            <article class="card">
+              <h3>Contratos ativos</h3>
+              <p style="font-size:2rem;font-weight:800;color:var(--official);margin:8px 0 0">∞</p>
+              <p>contratos indexados via PNCP, Portal da Transparência e Diário Oficial municipal.</p>
             </article>
-            <article class="reference-card">
-              <span>USWDS</span>
-              <h3><a href="https://designsystem.digital.gov/">U.S. Web Design System</a></h3>
-              <p>Componentes, padrões, tokens e acessibilidade para serviços públicos mobile-friendly.</p>
+            <article class="card">
+              <h3>Desde quando</h3>
+              <p style="font-size:2rem;font-weight:800;color:var(--ink);margin:8px 0 0">Out/24</p>
+              <p>eleição municipal. Coletamos tudo a partir do resultado oficial do TSE.</p>
             </article>
-            <article class="reference-card">
-              <span>GOV.UK</span>
-              <h3><a href="https://design-system.service.gov.uk/">Design System</a></h3>
-              <p>Orientação de uso, exemplos codificados e consistência para serviços governamentais.</p>
-            </article>
-            <article class="reference-card">
-              <span>Atlassian</span>
-              <h3><a href="https://atlassian.design/">Atlassian Design</a></h3>
-              <p>Linguagem unificada, tokens, conteúdo e colaboração em escala entre design e engenharia.</p>
-            </article>
-            <article class="reference-card">
-              <span>GitHub</span>
-              <h3><a href="https://primer.style/">Primer</a></h3>
-              <p>Separação entre Product UI, Brand UI, acessibilidade, ícones e primitives de design.</p>
-            </article>
-            <article class="reference-card">
-              <span>Adobe e Shopify</span>
-              <h3><a href="https://spectrum.adobe.com/">Spectrum</a> / <a href="https://polaris-react.shopify.com/">Polaris</a></h3>
-              <p>Componentes, ferramentas, guidelines, conteúdo, padrões e tokens para produtos operacionais.</p>
-            </article>
+          </div>
+
+          <div style="margin-top:14px">
+            <div class="decision-table">
+              <div class="decision-row">
+                <strong>O que monitoramos</strong>
+                <p>Sessões da Câmara, votações, projetos de lei, presença de vereadores, contratos da Prefeitura, licitações, obras, despesas por secretaria, diário oficial municipal.</p>
+                <code>v1 — tudo desde out/2024</code>
+              </div>
+              <div class="decision-row">
+                <strong>O que vem depois</strong>
+                <p>Dados de outras cidades. Americana valida o modelo; a estrutura já nasce preparada para receber novas cidades sem reengenharia de esquema.</p>
+                <code>multi-cidade v2</code>
+              </div>
+              <div class="decision-row">
+                <strong>Código IBGE</strong>
+                <p>Americana, SP: <code>3501608</code>. Usado para filtrar PNCP, IBGE localidades e malhas geográficas.</p>
+                <code>3501608</code>
+              </div>
+            </div>
           </div>
         </section>
 
+        <!-- ===== FONTES E SCRAPERS ===== -->
+        <section id="fontes" aria-labelledby="fontes-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Dados</span>
+              <h2 id="fontes-title">Fontes e arquitetura de scrapers</h2>
+            </div>
+            <p>Todo dado exibido no DeOlho tem origem rastreável. Este mapa define de onde vem cada informação e como é coletada.</p>
+          </div>
+
+          <div class="grid cols-3">
+            <article class="scraper-card">
+              <h3 style="margin-bottom:10px">Câmara Municipal de Americana</h3>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Vereadores e mandatos</span>
+                <span class="scraper-freq">estático / eleição</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Sessões e pautas</span>
+                <span class="scraper-freq">diário</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Votações nominais</span>
+                <span class="scraper-freq">por sessão</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Projetos de lei</span>
+                <span class="scraper-freq">diário</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Presença e faltas</span>
+                <span class="scraper-freq">por sessão</span>
+              </div>
+              <div class="resource-meta" style="margin-top:10px">
+                <span class="badge">Playwright</span>
+                <span class="badge attention">scraping</span>
+              </div>
+            </article>
+
+            <article class="scraper-card">
+              <h3 style="margin-bottom:10px">Prefeitura de Americana</h3>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Contratos — PNCP</span>
+                <span class="scraper-freq">diário</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Licitações</span>
+                <span class="scraper-freq">diário</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Despesas — Portal Transp.</span>
+                <span class="scraper-freq">semanal</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Obras públicas</span>
+                <span class="scraper-freq">semanal</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Diário Oficial municipal</span>
+                <span class="scraper-freq">diário</span>
+              </div>
+              <div class="resource-meta" style="margin-top:10px">
+                <span class="badge official">API PNCP</span>
+                <span class="badge">Playwright</span>
+              </div>
+            </article>
+
+            <article class="scraper-card">
+              <h3 style="margin-bottom:10px">Fontes nacionais</h3>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">PNCP — API pública</span>
+                <span class="scraper-freq">diário</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Portal Transparência CGU</span>
+                <span class="scraper-freq">semanal</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">Sanções CEIS / CNEP</span>
+                <span class="scraper-freq">semanal</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">IBGE — localidades e malhas</span>
+                <span class="scraper-freq">mensal</span>
+              </div>
+              <div class="scraper-row">
+                <span class="status-dot pendente"></span>
+                <span class="scraper-name">TSE — eleição 2024</span>
+                <span class="scraper-freq">estático</span>
+              </div>
+              <div class="resource-meta" style="margin-top:10px">
+                <span class="badge official">API pública</span>
+                <span class="badge">dados abertos</span>
+              </div>
+            </article>
+          </div>
+
+          <div class="grid cols-2" style="margin-top:12px">
+            <div class="code-panel">
+              <header><strong>PNCP — contratos de Americana</strong><span>GET</span></header>
+              <pre><code>GET https://pncp.gov.br/api/pncp/v1/contratos
+  ?codigoMunicipio=3501608
+  &dataInicial=2024-01-01
+  &pagina=1
+
+# Rate limit: sem autenticação necessária
+# Paginação: &itensPorPagina=50
+# Filtro por CNPJ da prefeitura tbm disponível</code></pre>
+            </div>
+            <div class="code-panel">
+              <header><strong>Stack de scrapers</strong><span>Python</span></header>
+              <pre><code>scrapers/
+  americana/
+    camara/
+      sessoes.py       # Playwright
+      votacoes.py      # Playwright
+      projetos.py      # Playwright
+    prefeitura/
+      contratos.py     # PNCP API
+      licitacoes.py    # Playwright
+      diario.py        # Querido Diário / PDF
+  shared/
+    pipeline.py        # coleta → limpa → banco
+    rate_limiter.py
+    models.py          # Pydantic schemas</code></pre>
+            </div>
+          </div>
+
+          <div class="callout" style="margin-top:12px">
+            <strong>Regra de rastreabilidade</strong>
+            Cada linha de dado no banco deve ter: <code>fonte_url</code>, <code>coletado_em</code>, <code>publicado_em</code> e <code>hash_conteudo</code>. Sem esses quatro campos, o dado não entra.
+          </div>
+        </section>
+
+        <!-- ===== DOUTRINA ===== -->
         <section id="doutrina" aria-labelledby="doutrina-title">
           <div class="section-head">
             <div>
               <span class="eyebrow">Princípios</span>
               <h2 id="doutrina-title">Doutrina cívica da interface</h2>
             </div>
-            <p>
-              Antes de parecer moderno, o DeOlho precisa ser confiável. A interface deve reduzir ambiguidade,
-              não aumentar engajamento por tensão.
-            </p>
+            <p>Antes de parecer moderno, o DeOlho precisa ser confiável. A interface reduz ambiguidade, não aumenta engajamento por tensão.</p>
           </div>
-
-          <div class="doctrine">
-            <div class="panel card">
-              <h3>Seis regras de experiência</h3>
+          <div class="grid cols-2">
+            <div class="card">
+              <h3 style="margin-bottom:10px">Seis regras de experiência</h3>
               <ul class="rule-list">
                 <li><strong>Clareza antes de densidade.</strong> Volume só entra quando a hierarquia estiver clara.</li>
                 <li><strong>Fonte antes de conclusão.</strong> O usuário precisa ver de onde veio a afirmação.</li>
                 <li><strong>Evidência antes de opinião.</strong> Interpretação nunca pesa mais que documento.</li>
                 <li><strong>IA sempre identificada.</strong> Explicação por IA não parece fato oficial.</li>
                 <li><strong>Sinal não é acusação.</strong> Atenção sugere verificação, não culpa.</li>
-                <li><strong>Voltar ao documento.</strong> Toda leitura relevante precisa caminho para evidência.</li>
+                <li><strong>Vereador não é herói nem vilão.</strong> O dado mostra o que aconteceu — não julga.</li>
               </ul>
             </div>
-            <div class="panel card">
+            <div class="card">
               <h3>Separação obrigatória</h3>
-              <p>A UI precisa distinguir visual e textualmente:</p>
-              <div class="badge-row">
+              <p style="margin:8px 0">A UI distingue visualmente:</p>
+              <div class="badge-row" style="margin-top:10px">
                 <span class="badge official">Fato oficial</span>
-                <span class="badge ai">Explicação por IA</span>
+                <span class="badge ai">Explicação IA</span>
                 <span class="badge attention">Sinal estatístico</span>
+                <span class="badge political">Ato político</span>
+                <span class="badge territorial">Dado territorial</span>
                 <span class="badge">Notícia</span>
-                <span class="badge">Opinião de usuário</span>
                 <span class="badge">Revisão manual</span>
               </div>
-              <div class="callout" style="margin-top: 16px">
-                <strong>Regra de produto</strong>
-                Sem fonte, sem afirmação pública. Sem evidência, sem conclusão. Sem contexto, sem sinal de atenção.
+              <div class="callout" style="margin-top:14px">
+                <strong>Regra absoluta</strong>
+                Sem fonte, sem afirmação pública. Voto de vereador é fato oficial; interpretação do voto é explicação de IA — nunca confundir os dois.
               </div>
             </div>
           </div>
         </section>
 
-        <section id="arquitetura" aria-labelledby="arquitetura-title">
-          <div class="section-head">
-            <div>
-              <span class="eyebrow">Arquitetura</span>
-              <h2 id="arquitetura-title">Camadas do sistema</h2>
-            </div>
-            <p>
-              A documentação HTML é a porta pública. Os documentos Markdown continuam sendo fonte operacional até o
-              scaffold de Next.js e Storybook existir.
-            </p>
-          </div>
-
-          <div class="grid cols-4">
-            <article class="card">
-              <h3>Fundações</h3>
-              <p>Princípios, tokens, linguagem, acessibilidade e regras anti-sensacionalismo.</p>
-            </article>
-            <article class="card">
-              <h3>Componentes</h3>
-              <p>shadcn/ui como base e componentes cívicos próprios em `packages/ui`.</p>
-            </article>
-            <article class="card">
-              <h3>Padrões</h3>
-              <p>Home, radar, entidade, contrato, busca, painel de fonte, erro e página sem dados.</p>
-            </article>
-            <article class="card">
-              <h3>Governança</h3>
-              <p>Checklist de PR, regras para agentes, Storybook e atualização contínua da documentação.</p>
-            </article>
-          </div>
-        </section>
-
+        <!-- ===== TOKENS ===== -->
         <section id="tokens" aria-labelledby="tokens-title">
           <div class="section-head">
             <div>
               <span class="eyebrow">Tokens</span>
-              <h2 id="tokens-title">Tokens semânticos, não decoração</h2>
+              <h2 id="tokens-title">Tokens semânticos — três camadas</h2>
             </div>
-            <p>
-              A cor reforça a mensagem, mas não carrega significado sozinha. Todo estado crítico precisa de texto,
-              ícone ou label acessível.
-            </p>
+            <p>Cores reforçam a mensagem, mas nunca carregam significado sozinhas. Todo estado crítico tem texto + ícone + cor.</p>
           </div>
-
           <div class="token-board">
-            <div class="panel card">
-              <h3>Escala visual inicial</h3>
-              <div class="swatches" aria-label="Amostra de tokens de cor">
-                <div class="swatch">
-                  <div class="swatch-color" style="background: var(--official)"></div>
-                  <div>semantic-official</div>
-                </div>
-                <div class="swatch">
-                  <div class="swatch-color" style="background: var(--ai)"></div>
-                  <div>semantic-ai</div>
-                </div>
-                <div class="swatch">
-                  <div class="swatch-color" style="background: var(--attention)"></div>
-                  <div>semantic-attention</div>
-                </div>
-                <div class="swatch">
-                  <div class="swatch-color" style="background: var(--source)"></div>
-                  <div>semantic-source</div>
-                </div>
+            <div class="card">
+              <h3 style="margin-bottom:12px">Escala de informação</h3>
+              <div class="swatches">
+                <div class="swatch"><div class="swatch-color" style="background:var(--official)"></div><div>official · #0b6b56<br>Fato oficial</div></div>
+                <div class="swatch"><div class="swatch-color" style="background:var(--ai)"></div><div>ai · #4a4f9f<br>Explicação IA</div></div>
+                <div class="swatch"><div class="swatch-color" style="background:var(--attention)"></div><div>attention · #9b4d16<br>Sinal de atenção</div></div>
+                <div class="swatch"><div class="swatch-color" style="background:var(--source)"></div><div>source · #1d5f8f<br>Fonte / link</div></div>
+              </div>
+              <div class="swatches" style="margin-top:8px">
+                <div class="swatch"><div class="swatch-color" style="background:var(--political)"></div><div>political · #1a3561<br>Camada política</div></div>
+                <div class="swatch"><div class="swatch-color" style="background:var(--territorial)"></div><div>territorial · #2d5016<br>Camada territorial</div></div>
+                <div class="swatch"><div class="swatch-color" style="background:var(--vote-sim)"></div><div>vote-sim · #0a5c36<br>Voto SIM</div></div>
+                <div class="swatch"><div class="swatch-color" style="background:var(--vote-nao)"></div><div>vote-nao · #8b1a1a<br>Voto NÃO</div></div>
               </div>
             </div>
-            <div class="panel card">
-              <h3>Taxonomia mínima</h3>
+            <div class="card">
+              <h3 style="margin-bottom:12px">Taxonomia de tokens</h3>
               <div class="component-list">
                 <div class="component-row">
-                  <strong>Tipo de informação</strong>
-                  <p>Fato oficial, explicação por IA, sinal de atenção, notícia, opinião, revisão manual.</p>
+                  <strong>Informação</strong>
+                  <p>official, ai, attention, source, review, danger — para tipo de dado e estado de confiança.</p>
                   <code>TipoInformacaoBadge</code>
                 </div>
                 <div class="component-row">
-                  <strong>Confiança</strong>
-                  <p>Fonte oficial, cópia verificada, verificação pendente, fonte atrasada, incompleto, contraditório.</p>
-                  <code>ConfiancaBadge</code>
+                  <strong>Política</strong>
+                  <p>political, vote-sim, vote-nao, vote-abs — para camada da câmara municipal.</p>
+                  <code>VotoRegistro</code>
                 </div>
                 <div class="component-row">
-                  <strong>Fonte</strong>
-                  <p>Origem, data publicada, data coletada, estado da coleta e marcação de dado sintético.</p>
-                  <code>FonteBadge</code>
+                  <strong>Território</strong>
+                  <p>territorial — para bairros, ruas e localização geográfica.</p>
+                  <code>BairroTag</code>
+                </div>
+                <div class="component-row">
+                  <strong>Superfície</strong>
+                  <p>bg, paper, paper-soft, ink, muted, line, line-strong — fundação neutra.</p>
+                  <code>tokens base</code>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
+        <!-- ===== SHADCN ===== -->
         <section id="shadcn" aria-labelledby="shadcn-title">
-            <div class="section-head">
-              <div>
-                <span class="eyebrow">shadcn/ui</span>
-                <h2 id="shadcn-title">Código próprio, composto com rigor cívico</h2>
-              </div>
-              <p>
-                O DeOlho usa shadcn/ui como distribuição de código, não como caixa fechada. O componente base entra
-                no repositório, recebe tokens do DeOlho e é composto em componentes cívicos revisáveis.
-              </p>
-            </div>
-
-            <div class="grid cols-3">
-              <article class="card">
-                <h3>Open code</h3>
-                <p>Agentes e humanos leem o componente real, revisam acessibilidade e ajustam comportamento sem wrapper frágil.</p>
-              </article>
-              <article class="card">
-                <h3>Monorepo consciente</h3>
-                <p>`apps/web` consome `@workspace/ui`; shadcn base mora em `packages/ui`; features ficam no app.</p>
-              </article>
-              <article class="card">
-                <h3>Registry depois</h3>
-                <p>Registro shadcn próprio só entra quando componentes cívicos tiverem Storybook, docs e uso real.</p>
-              </article>
-            </div>
-
-            <div class="grid cols-2" style="margin-top: 14px">
-              <div class="code-panel">
-                <header>
-                  <strong>Scaffold futuro</strong>
-                  <span>#22</span>
-                </header>
-                <pre><code>npx shadcn@latest init -d --monorepo --base radix
-cd apps/web
-npx shadcn@latest add button badge card avatar tooltip skeleton alert
-npx shadcn@latest add command dialog drawer sheet sidebar tabs table scroll-area</code></pre>
-              </div>
-              <div class="code-panel">
-                <header>
-                  <strong>Contrato de instalação</strong>
-                  <span>components.json</span>
-                </header>
-                <pre><code>apps/web/components.json
-  ui: "@workspace/ui/components"
-  utils: "@workspace/ui/lib/utils"
-
-packages/ui/components.json
-  ui: "@workspace/ui/components"
-  css: "src/styles/globals.css"
-
-Regra: mesmo style, iconLibrary e baseColor.</code></pre>
-              </div>
-            </div>
-
-            <div class="callout" style="margin-top: 14px">
-              <strong>Regra para agentes</strong>
-              Antes de rodar `npx shadcn`, leia `docs/design-system/shadcn.md`. Não instalar componente base fora de
-              `packages/ui` sem justificar no PR.
-            </div>
-
-            <div class="decision-table" style="margin-top: 14px">
-              <div class="decision-row">
-                <strong>Base ou cívico?</strong>
-                <p>Se a interface mostra dado público, use a matriz `docs/components/matriz-shadcn.md` para escolher o componente cívico correto.</p>
-                <code>shadcn -> DeOlho</code>
-              </div>
-              <div class="decision-row">
-                <strong>Componente novo?</strong>
-                <p>Crie primeiro o contrato em docs, depois Storybook, depois código. A UI não nasce direto em rota de produto.</p>
-                <code>docs first</code>
-              </div>
-            </div>
-          </section>
-
-        <section id="anatomia" aria-labelledby="anatomia-title">
-            <div class="section-head">
-              <div>
-                <span class="eyebrow">Anatomia</span>
-                <h2 id="anatomia-title">Todo componente cívico tem uma anatomia verificável</h2>
-              </div>
-              <p>
-                Componentes que mostram dado público precisam carregar estrutura de confiança, não apenas aparência.
-                Esta anatomia deve orientar `EventoPublicoCard`, `ContratoCard`, `EntidadeCard` e páginas de entidade.
-              </p>
-            </div>
-
-            <div class="anatomy">
-              <div class="wireframe">
-                <h3>Card cívico modelo</h3>
-                <div class="wireframe-stack" style="margin-top: 12px">
-                  <div class="wire strong">Cabeçalho: tipo de informação + entidade afetada</div>
-                  <div class="wire">Resumo neutro, sem acusação e sem inferência sem fonte</div>
-                  <div class="wire">Badges: fonte, confiança, estado da coleta</div>
-                  <div class="wire">Limitação explícita quando campo faltar ou fonte atrasar</div>
-                  <div class="wire">Ações: ver evidência, acompanhar, citar, exportar</div>
-                </div>
-              </div>
-
-              <div class="anatomy-stack">
-                <div class="anatomy-part">
-                  <strong>1. Identidade semântica</strong>
-                  <p>O usuário vê se é fato oficial, IA, sinal, notícia, opinião ou revisão manual antes da conclusão.</p>
-                </div>
-                <div class="anatomy-part">
-                  <strong>2. Proveniência</strong>
-                  <p>Fonte, data publicada, data coletada e link de evidência ficam no fluxo principal.</p>
-                </div>
-                <div class="anatomy-part">
-                  <strong>3. Confiança e limitação</strong>
-                  <p>Baixa confiança, dado incompleto, fonte atrasada e contradição têm linguagem própria.</p>
-                </div>
-                <div class="anatomy-part">
-                  <strong>4. Ação segura</strong>
-                  <p>Ação contextual não abre post, like ou comentário livre. Ela leva a evidência, correção ou exportação.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="decision-table" style="margin-top: 14px">
-              <div class="decision-row">
-                <strong>Precisa mostrar documento?</strong>
-                <p>Use `EvidenciaLink` dentro de `PainelEvidencia`, com fonte e datas.</p>
-                <code>nunca apenas tooltip</code>
-              </div>
-              <div class="decision-row">
-                <strong>Precisa explicar com IA?</strong>
-                <p>Use `BlocoExplicacaoIA`, com fontes usadas e limitação. IA não entra como fato oficial.</p>
-                <code>label obrigatório</code>
-              </div>
-              <div class="decision-row">
-                <strong>Precisa chamar atenção?</strong>
-                <p>Use `SinalAtencaoCard`, com método, evidência, limitação e aviso de não irregularidade.</p>
-                <code>sem ranking moral</code>
-              </div>
-            </div>
-        </section>
-
-        <section id="componentes" aria-labelledby="componentes-title">
           <div class="section-head">
             <div>
-              <span class="eyebrow">Componentes</span>
-              <h2 id="componentes-title">Biblioteca cívica inicial</h2>
+              <span class="eyebrow">shadcn/ui</span>
+              <h2 id="shadcn-title">Base de componentes — código aberto no repo</h2>
             </div>
-            <p>
-              Componentes cívicos traduzem dado público em UI verificável. Eles vivem em
-              `packages/ui/src/components/deolho` e têm documentação em `docs/components/civicos.md`.
-            </p>
+            <p>shadcn/ui distribui código, não dependência. O componente entra no repositório e o DeOlho passa a possuí-lo.</p>
+          </div>
+          <div class="grid cols-3">
+            <article class="card"><h3>Instalação no monorepo</h3><p>CLI copia para <code>packages/ui/src/components/ui</code>. App consome via <code>@workspace/ui</code>.</p></article>
+            <article class="card"><h3>Componentes base</h3><p>Button, Badge, Card, Avatar, Command, Dialog, Drawer, Sheet, Sidebar, Tabs, Table, Tooltip, Skeleton, Sonner, Carousel, Input, Popover.</p></article>
+            <article class="card"><h3>Regra de camadas</h3><p>Componente base em <code>components/ui</code>. Composição cívica em <code>components/deolho</code>. Nunca lógica de domínio no base.</p></article>
+          </div>
+          <div class="code-panel" style="margin-top:12px">
+            <header><strong>components.json — packages/ui</strong><span>iconLibrary: lucide</span></header>
+            <pre><code>{ "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "default", "rsc": true, "tsx": true,
+  "tailwind": { "config": "", "css": "src/styles/globals.css",
+    "baseColor": "neutral", "cssVariables": true },
+  "iconLibrary": "lucide",
+  "aliases": { "components": "@workspace/ui/components",
+    "utils": "@workspace/ui/lib/utils",
+    "ui": "@workspace/ui/components/ui" } }</code></pre>
+          </div>
+        </section>
+
+        <!-- ===== ÍCONES ===== -->
+        <section id="icones" aria-labelledby="icones-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Ícones</span>
+              <h2 id="icones-title">Duas bibliotecas, dois propósitos</h2>
+            </div>
+            <p>Lucide para UI chrome. Phosphor para semântica cívica — entidades, processos, sinais.</p>
+          </div>
+          <div class="grid cols-2">
+            <article class="card">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px">
+                <div><h3>Lucide</h3><p style="color:var(--muted);margin:4px 0 0;font-size:.84rem">UI chrome — botões, navegação, estado, formulários</p></div>
+                <span class="badge official" style="flex-shrink:0">primário</span>
+              </div>
+              <div class="icon-demo">
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Eye</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Search</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg><span>FileText</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>MapPin</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 0-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><span>Building</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg><span>Scale</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span>Alert</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg><span>Check</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bell</span></div>
+                <div class="icon-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg><span>Filter</span></div>
+              </div>
+              <div class="resource-meta">
+                <code>lucide-react</code><span class="badge">MIT</span><span class="badge">shadcn padrão</span>
+              </div>
+            </article>
+            <article class="card">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px">
+                <div><h3>Phosphor Icons</h3><p style="color:var(--muted);margin:4px 0 0;font-size:.84rem">Semântica cívica — entidades, processos, sinais políticos</p></div>
+                <span class="badge" style="flex-shrink:0">suplementar</span>
+              </div>
+              <p style="color:var(--muted);font-size:.84rem;margin:0 0 8px">9 000+ ícones em 6 pesos. Cobre contextos cívicos e governamentais que Lucide não tem.</p>
+              <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+                <span class="icon-name-tag">Gavel</span>
+                <span class="icon-name-tag">Bank</span>
+                <span class="icon-name-tag">Stamp</span>
+                <span class="icon-name-tag">Scales</span>
+                <span class="icon-name-tag">Certificate</span>
+                <span class="icon-name-tag">Newspaper</span>
+                <span class="icon-name-tag">Handshake</span>
+                <span class="icon-name-tag">Megaphone</span>
+                <span class="icon-name-tag">Buildings</span>
+                <span class="icon-name-tag">ShieldCheck</span>
+                <span class="icon-name-tag">Receipt</span>
+                <span class="icon-name-tag">FileSearch</span>
+                <span class="icon-name-tag">Money</span>
+                <span class="icon-name-tag">ChartBar</span>
+                <span class="icon-name-tag">SealCheck</span>
+                <span class="icon-name-tag">UserCheck</span>
+              </div>
+              <div class="decision-table">
+                <div class="decision-row" style="grid-template-columns:1fr 1fr">
+                  <strong>Regular</strong><p>conteúdo padrão</p>
+                </div>
+                <div class="decision-row" style="grid-template-columns:1fr 1fr">
+                  <strong>Fill</strong><p>estado ativo/selecionado</p>
+                </div>
+                <div class="decision-row" style="grid-template-columns:1fr 1fr">
+                  <strong>Bold</strong><p>destaque e chamadas</p>
+                </div>
+              </div>
+              <div class="resource-meta">
+                <code>@phosphor-icons/react</code><span class="badge">MIT</span><span class="badge">6 pesos</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- ===== BANDEIRAS ===== -->
+        <section id="bandeiras" aria-labelledby="bandeiras-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Bandeiras</span>
+              <h2 id="bandeiras-title">Flags brasileiras — três camadas</h2>
+            </div>
+            <p>Fonte canônica para estados: <a href="https://github.com/bgeneto/bandeiras-br" target="_blank" rel="noopener">github.com/bgeneto/bandeiras-br</a> — repositório com SVG e PNG das 27 UFs.</p>
+          </div>
+          <div class="grid cols-3">
+            <article class="card">
+              <h3>Brasil — nacional</h3>
+              <div style="margin:12px 0">
+                <div style="width:72px;height:48px;background:#009C3B;border-radius:4px;border:1px solid var(--line);position:relative;overflow:hidden">
+                  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:37px;background:#FFDF00;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)"></div>
+                  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:27px;height:27px;background:#002776;border-radius:50%"></div>
+                </div>
+              </div>
+              <p style="color:var(--muted);font-size:.84rem">Usar <code>flag-icons@7</code> CSS (<code>fi fi-br</code>) ou <code>country-flag-icons</code> React.</p>
+              <div class="resource-meta"><code>flag-icons</code><span class="badge">MIT</span></div>
+            </article>
+            <article class="card">
+              <h3>São Paulo — estado piloto</h3>
+              <div style="margin:12px 0">
+                <img src="https://raw.githubusercontent.com/bgeneto/bandeiras-br/master/imagens/SP.png"
+                     alt="Bandeira do Estado de São Paulo"
+                     style="height:48px;border-radius:4px;border:1px solid var(--line)"
+                     onerror="this.outerHTML='<div style=\'width:72px;height:48px;background:#000;border-radius:4px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:white;font-size:.7rem;font-weight:800\'>SP</div>'" />
+              </div>
+              <p style="color:var(--muted);font-size:.84rem">SVG/PNG do <a href="https://github.com/bgeneto/bandeiras-br/blob/master/imagens/SP.png" target="_blank">bandeiras-br</a>. URL: <code>…imagens/SP.png</code>. Um arquivo por UF (AC, AL, AM…).</p>
+              <div class="resource-meta"><span class="badge">bandeiras-br</span><span class="badge">domínio público</span></div>
+            </article>
+            <article class="card">
+              <h3>Americana — município</h3>
+              <div style="margin:12px 0;width:48px;height:48px;background:var(--political-soft);border:1px solid rgba(26,53,97,.2);border-radius:50%;display:grid;place-items:center;color:var(--political);font-weight:800;font-size:1.1rem">A</div>
+              <p style="color:var(--muted);font-size:.84rem">Componente <code>CityAvatar</code> com brasão oficial quando disponível; fallback em avatar com inicial gerada.</p>
+              <div class="resource-meta"><span class="badge">avatar gerado</span><span class="badge">fallback</span></div>
+            </article>
+          </div>
+          <div class="code-panel" style="margin-top:12px">
+            <header><strong>Uso das bandeiras no componente TerritoryFlag</strong><span>TypeScript</span></header>
+            <pre><code>// packages/ui/src/components/deolho/TerritoryFlag.tsx
+const BANDEIRAS_BR_BASE =
+  'https://raw.githubusercontent.com/bgeneto/bandeiras-br/master/imagens'
+
+function TerritoryFlag({ type, code, size = 24 }: TerritoryFlagProps) {
+  if (type === 'estado') {
+    return (
+      &lt;img
+        src={`${BANDEIRAS_BR_BASE}/${code.toUpperCase()}.png`}
+        alt={`Bandeira ${code}`}
+        width={size * 1.5} height={size}
+        onError={(e) =&gt; { /* fallback para avatar */ }}
+      /&gt;
+    )
+  }
+  // pais: flag-icons CSS
+  // municipio: brasão IBGE → avatar gerado
+}</code></pre>
+          </div>
+        </section>
+
+        <!-- ===== COMPONENTES CÍVICOS ===== -->
+        <section id="civicos" aria-labelledby="civicos-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Componentes cívicos</span>
+              <h2 id="civicos-title">Camada de confiança e evidência</h2>
+            </div>
+            <p>Componentes que aparecem em todos os cards e páginas — garantem que fonte, tipo e limitação estão sempre visíveis.</p>
           </div>
 
-          <div class="component-list">
+          <div class="anatomy">
+            <div class="wireframe">
+              <h3>Anatomia do card cívico</h3>
+              <div class="wireframe-stack">
+                <div class="wire strong">Tipo de informação + entidade afetada</div>
+                <div class="wire">Resumo neutro sem acusação</div>
+                <div class="wire">TipoInformacaoBadge · FonteBadge · ConfiancaBadge</div>
+                <div class="wire">BlocoLimitacaoDado quando campo faltar</div>
+                <div class="wire">Ações: ver evidência · acompanhar · citar</div>
+              </div>
+            </div>
+            <div class="anatomy-stack">
+              <div class="anatomy-part">
+                <strong>TipoInformacaoBadge</strong>
+                <p>fato oficial / explicação IA / sinal de atenção / notícia / opinião / dado incompleto. Nunca só cor.</p>
+              </div>
+              <div class="anatomy-part">
+                <strong>ConfiancaBadge</strong>
+                <p>fonte oficial / verificação pendente / fonte atrasada / incompleto / contraditório.</p>
+              </div>
+              <div class="anatomy-part">
+                <strong>FonteBadge</strong>
+                <p>PNCP · Portal Transparência · Câmara Municipal · DOU · IBGE · TSE. Com data de coleta.</p>
+              </div>
+              <div class="anatomy-part">
+                <strong>BlocoExplicacaoIA</strong>
+                <p>Sempre rotulado. Nunca parece fato oficial. Mostra fontes usadas e limitações.</p>
+              </div>
+              <div class="anatomy-part">
+                <strong>SinalAtencaoCard</strong>
+                <p>Exige método + evidência + limitação + aviso: "sinal não indica irregularidade".</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="component-list" style="margin-top:14px">
             <div class="component-row">
-              <strong>Badges semânticos</strong>
-              <p>TipoInformacaoBadge, ConfiancaBadge e FonteBadge separam categoria, fonte, confiança e estado.</p>
-              <code>tipo + fonte + confiança</code>
+              <strong>EntidadeCard</strong>
+              <p>Card compacto para vereador, empresa, órgão, contrato, bairro. Tipo, nome, fonte, confiança.</p>
+              <code>components/deolho/EntidadeCard</code>
             </div>
             <div class="component-row">
-              <strong>Entidades</strong>
-              <p>EntidadeAvatar, EntidadeCard e PerfilEntidadeHeader estruturam páginas de entidade sem tom social.</p>
-              <code>página de entidade</code>
+              <strong>EventoPublicoCard</strong>
+              <p>Unidade do radar. Tipo de evento, entidade afetada, timestamp, fonte, confiança, ações.</p>
+              <code>components/deolho/EventoPublicoCard</code>
             </div>
             <div class="component-row">
-              <strong>Eventos públicos</strong>
-              <p>EventoPublicoCard é a unidade do radar. Não é post, não tem curtida e não aceita comentário livre.</p>
-              <code>radar de mudanças</code>
+              <strong>PainelEvidencia</strong>
+              <p>Painel lateral ou drawer com documentos, links oficiais, datas e limitações.</p>
+              <code>components/deolho/PainelEvidencia</code>
             </div>
             <div class="component-row">
-              <strong>Contratos</strong>
-              <p>ContratoCard mostra objeto, órgão, empresa, valor, fonte, limitações e caminho para evidência.</p>
-              <code>contrato verificável</code>
-            </div>
-            <div class="component-row">
-              <strong>Evidência</strong>
-              <p>PainelEvidencia e EvidenciaLink mantêm o usuário perto da fonte e do documento original.</p>
-              <code>documento e fonte</code>
-            </div>
-            <div class="component-row">
-              <strong>IA e limitações</strong>
-              <p>BlocoExplicacaoIA e BlocoLimitacaoDado impedem que explicação ou ausência de dado pareça fato.</p>
-              <code>IA separada</code>
-            </div>
-            <div class="component-row">
-              <strong>Atenção</strong>
-              <p>SinalAtencaoCard exige método, evidência, limitação e aviso de que não indica irregularidade.</p>
-              <code>não acusatório</code>
-            </div>
-            <div class="component-row">
-              <strong>Navegação</strong>
-              <p>TerritorialCarousel, MobileBottomNav, FloatingActionButton, ContextualActionDrawer e UniversalCommandSearch.</p>
-              <code>mobile-first</code>
+              <strong>BlocoLimitacaoDado</strong>
+              <p>"A fonte não informa X", "fonte atrasada", "coleta pendente". Antes de qualquer conclusão sensível.</p>
+              <code>components/deolho/BlocoLimitacaoDado</code>
             </div>
           </div>
         </section>
 
+        <!-- ===== COMPONENTES POLÍTICOS ===== -->
+        <section id="politico" aria-labelledby="politico-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Camada política</span>
+              <h2 id="politico-title">Câmara Municipal de Americana</h2>
+            </div>
+            <p>Componentes para vereadores, sessões, votações e projetos de lei. 21 vereadores, tudo desde outubro de 2024.</p>
+          </div>
+
+          <!-- VereadorCard -->
+          <div class="resource-subhead">
+            <strong>VereadorCard — perfil de vereador</strong>
+            <p>Mostra identidade, partido, mandato, estatísticas de presença e atividade legislativa.</p>
+          </div>
+          <div class="grid cols-2">
+            <div>
+              <p style="color:var(--muted);font-size:.78rem;text-transform:uppercase;font-weight:800;letter-spacing:.04em;margin-bottom:8px">Demo — card compacto</p>
+              <div class="vereador-card">
+                <div class="vereador-avatar" aria-hidden="true">JS</div>
+                <div>
+                  <div class="vereador-name">João da Silva Sintético</div>
+                  <div class="vereador-meta">
+                    <span class="badge political">PSB sintético</span>
+                    <span class="badge official">Em mandato</span>
+                  </div>
+                  <div class="badge-row" style="margin-top:6px">
+                    <span class="voto-pill sim">87% SIM</span>
+                    <span class="voto-pill nao">8% NÃO</span>
+                    <span class="voto-pill abs">5% ABS</span>
+                  </div>
+                </div>
+                <div class="vereador-stats">
+                  <div class="stat"><strong>42</strong> sessões</div>
+                  <div class="stat"><strong>3</strong> projetos</div>
+                </div>
+              </div>
+              <div class="vereador-card">
+                <div class="vereador-avatar" aria-hidden="true" style="background:var(--attention-soft);border-color:rgba(155,77,22,.2);color:var(--attention)">MC</div>
+                <div>
+                  <div class="vereador-name">Maria Costa Sintética</div>
+                  <div class="vereador-meta">
+                    <span class="badge political">PT sintético</span>
+                    <span class="badge official">Em mandato</span>
+                  </div>
+                  <div class="badge-row" style="margin-top:6px">
+                    <span class="voto-pill sim">62% SIM</span>
+                    <span class="voto-pill nao">34% NÃO</span>
+                    <span class="voto-pill abs">4% ABS</span>
+                  </div>
+                </div>
+                <div class="vereador-stats">
+                  <div class="stat"><strong>40</strong> sessões</div>
+                  <div class="stat"><strong>7</strong> projetos</div>
+                </div>
+              </div>
+              <div class="vereador-card" style="opacity:.55">
+                <div class="vereador-avatar" aria-hidden="true" style="background:var(--paper-soft);border-color:var(--line);color:var(--muted)">RP</div>
+                <div>
+                  <div class="vereador-name">Roberto Pereira Sintético</div>
+                  <div class="vereador-meta">
+                    <span class="badge political">PL sintético</span>
+                    <span class="badge attention">2 faltas não justificadas</span>
+                  </div>
+                  <div class="badge-row" style="margin-top:6px">
+                    <span class="voto-pill sim">71% SIM</span>
+                    <span class="voto-pill nao">20% NÃO</span>
+                    <span class="voto-pill abs">9% ABS</span>
+                  </div>
+                </div>
+                <div class="vereador-stats">
+                  <div class="stat"><strong>38</strong> sessões</div>
+                  <div class="stat"><strong>1</strong> projeto</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p style="color:var(--muted);font-size:.78rem;text-transform:uppercase;font-weight:800;letter-spacing:.04em;margin-bottom:8px">Contrato do componente</p>
+              <div class="code-panel">
+                <header><strong>VereadorCard.tsx</strong><span>props</span></header>
+                <pre><code>interface VereadorCardProps {
+  id: string
+  nome: string
+  partido: string
+  foto?: string          // URL ou undefined
+  mandato: {
+    inicio: Date
+    fim: Date
+    status: 'ativo' | 'afastado' | 'cassado'
+  }
+  stats: {
+    sessoesTotal: number
+    presencas: number
+    votosSim: number
+    votosNao: number
+    votosAbs: number
+    projetosAtivos: number
+  }
+  confianca: ConfiancaLevel
+  fonte: FonteInfo
+}</code></pre>
+              </div>
+              <div class="anatomy-part" style="margin-top:8px">
+                <strong>Regras obrigatórias</strong>
+                <p>Dados sintéticos marcados. Foto real só de pessoa pública em exercício. Percentuais de voto são fatos oficiais — não opinião. Taxa de presença: cálculo sobre sessões em que estava convocado.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SessaoCard -->
+          <div class="resource-subhead" style="margin-top:24px">
+            <strong>SessaoCard — registro de sessão</strong>
+            <p>Registro completo de uma sessão da Câmara: tipo, data, quórum, itens votados.</p>
+          </div>
+          <div class="grid cols-2">
+            <div class="sessao-card">
+              <div class="sessao-header">
+                <div>
+                  <strong>Sessão Ordinária</strong>
+                  <div class="badge-row" style="margin-top:4px">
+                    <span class="badge political">Câmara Municipal</span>
+                    <span class="badge official">Fato oficial</span>
+                  </div>
+                </div>
+                <div style="text-align:right;font-size:.8rem;color:var(--political)">
+                  <strong>15/05/2025</strong><br>
+                  <span style="color:var(--muted)">14h00 · Sintético</span>
+                </div>
+              </div>
+              <div class="sessao-body">
+                <div class="sessao-stats">
+                  <div class="sessao-stat"><strong>17</strong><span>presentes</span></div>
+                  <div class="sessao-stat"><strong>4</strong><span>ausentes</span></div>
+                  <div class="sessao-stat"><strong>3</strong><span>votações</span></div>
+                </div>
+                <div class="badge-row" style="margin-top:10px">
+                  <span class="badge source">Câmara · ata sintética</span>
+                  <span class="badge">Coletado em 15/05</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p style="color:var(--muted);font-size:.84rem;margin:0 0 10px">
+                O <strong>SessaoCard</strong> não julga a sessão — registra o que aconteceu. Tipos: ordinária, extraordinária, especial. A ausência de vereador é fato oficial, não sinal de atenção automático.
+              </p>
+              <div class="component-list">
+                <div class="component-row" style="grid-template-columns:1fr 1fr">
+                  <strong>sessaoId</strong><p>Identificador único da sessão na fonte</p>
+                </div>
+                <div class="component-row" style="grid-template-columns:1fr 1fr">
+                  <strong>tipo</strong><p>ordinária / extraordinária / especial / solene</p>
+                </div>
+                <div class="component-row" style="grid-template-columns:1fr 1fr">
+                  <strong>presentes</strong><p>Lista de VereadorRef com presença confirmada</p>
+                </div>
+                <div class="component-row" style="grid-template-columns:1fr 1fr">
+                  <strong>votacoes</strong><p>Array de VotacaoRef vinculados à sessão</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VotoGrid -->
+          <div class="resource-subhead" style="margin-top:24px">
+            <strong>VotoGrid — painel de votação nominal</strong>
+            <p>Exibe como cada vereador votou em um projeto específico. Fato oficial — nunca inferido.</p>
+          </div>
+          <div class="grid cols-2">
+            <div>
+              <p style="color:var(--muted);font-size:.78rem;text-transform:uppercase;font-weight:800;letter-spacing:.04em;margin-bottom:8px">Demo — PL 023/2024 (sintético)</p>
+              <div class="vote-grid">
+                <div class="vote-row">
+                  <div>
+                    <div class="vote-row-name">João da Silva Sintético</div>
+                    <div class="vote-row-party">PSB sintético</div>
+                  </div>
+                  <span class="voto-pill sim">SIM</span>
+                </div>
+                <div class="vote-row">
+                  <div>
+                    <div class="vote-row-name">Maria Costa Sintética</div>
+                    <div class="vote-row-party">PT sintético</div>
+                  </div>
+                  <span class="voto-pill nao">NÃO</span>
+                </div>
+                <div class="vote-row">
+                  <div>
+                    <div class="vote-row-name">Carlos Oliveira Sintético</div>
+                    <div class="vote-row-party">MDB sintético</div>
+                  </div>
+                  <span class="voto-pill sim">SIM</span>
+                </div>
+                <div class="vote-row">
+                  <div>
+                    <div class="vote-row-name">Ana Lima Sintética</div>
+                    <div class="vote-row-party">PSD sintético</div>
+                  </div>
+                  <span class="voto-pill abs">ABSTENÇÃO</span>
+                </div>
+                <div class="vote-row" style="opacity:.6">
+                  <div>
+                    <div class="vote-row-name">Pedro Souza Sintético</div>
+                    <div class="vote-row-party">Republicanos sint.</div>
+                  </div>
+                  <span class="badge" style="font-size:.72rem">AUSENTE</span>
+                </div>
+              </div>
+              <div class="badge-row" style="margin-top:8px">
+                <span class="badge official">15 SIM · 4 NÃO · 2 ABS</span>
+                <span class="badge source">Câmara Municipal · sintético</span>
+              </div>
+            </div>
+            <div>
+              <div class="callout political">
+                <strong>Regra crítica — votações</strong>
+                "Ausente" é diferente de "NÃO". Nunca tratar ausência como voto contrário. Ausência justificada é diferente de falta — mostrar o tipo quando disponível na fonte.
+              </div>
+              <div class="anatomy-part" style="margin-top:10px">
+                <strong>Contrato VotoRegistro</strong>
+                <p><code>vereadorId</code> · <code>votacaoId</code> · <code>voto: 'SIM' | 'NAO' | 'ABSTENCAO' | 'AUSENTE' | 'JUSTIFICADO'</code> · <code>fonteUrl</code> · <code>coletadoEm</code></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ProjetoLeiCard -->
+          <div class="resource-subhead" style="margin-top:24px">
+            <strong>ProjetoLeiCard — projeto de lei</strong>
+            <p>Registro de um PL, PLP, emenda ou requerimento. Status, autor, histórico de tramitação.</p>
+          </div>
+          <div class="grid cols-3">
+            <div class="projeto-card">
+              <div class="projeto-numero">PL 023/2024</div>
+              <div class="projeto-title">Institui programa de modernização da iluminação pública no Jardim Brasil</div>
+              <div class="badge-row" style="margin-top:8px">
+                <span class="projeto-status aprovado">Aprovado</span>
+                <span class="badge political">João Silva Sint.</span>
+              </div>
+              <div class="badge-row" style="margin-top:6px">
+                <span class="badge source">Câmara · sintético</span>
+                <span class="badge">Mai/2025</span>
+              </div>
+            </div>
+            <div class="projeto-card">
+              <div class="projeto-numero">PL 031/2025</div>
+              <div class="projeto-title">Cria Conselho Municipal de Transparência e Acesso à Informação</div>
+              <div class="badge-row" style="margin-top:8px">
+                <span class="projeto-status em-votacao">Em votação</span>
+                <span class="badge political">Maria Costa Sint.</span>
+              </div>
+              <div class="badge-row" style="margin-top:6px">
+                <span class="badge source">Câmara · sintético</span>
+                <span class="badge">Abr/2025</span>
+              </div>
+            </div>
+            <div class="projeto-card" style="opacity:.65">
+              <div class="projeto-numero">PL 008/2024</div>
+              <div class="projeto-title">Dispõe sobre nomenclatura de logradouros no Monte Libano</div>
+              <div class="badge-row" style="margin-top:8px">
+                <span class="projeto-status arquivado">Arquivado</span>
+                <span class="badge political">Carlos Oliveira Sint.</span>
+              </div>
+              <div class="badge-row" style="margin-top:6px">
+                <span class="badge source">Câmara · sintético</span>
+                <span class="badge">Jan/2024</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== COMPONENTES TERRITORIAIS ===== -->
+        <section id="territorio" aria-labelledby="territorio-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Camada territorial</span>
+              <h2 id="territorio-title">Bairros, ruas e território de Americana</h2>
+            </div>
+            <p>Cada dado público tem um território. Bairro e rua conectam contratos, obras e eventos ao lugar onde impactam o cidadão.</p>
+          </div>
+
+          <!-- Território nav -->
+          <div class="resource-subhead">
+            <strong>TerritorialBreadcrumb — navegação por território</strong>
+          </div>
+          <div style="display:grid;gap:8px">
+            <div class="territorio-nav">
+              <span class="bairro-tag">SP</span>
+              <span class="territorio-sep">›</span>
+              <strong>Americana</strong>
+              <span class="territorio-sep">›</span>
+              <strong>Monte Libano</strong>
+              <span class="territorio-sep">›</span>
+              <span style="color:var(--muted)">Rua das Acácias</span>
+            </div>
+            <div class="territorio-nav">
+              <span class="bairro-tag">SP</span>
+              <span class="territorio-sep">›</span>
+              <strong>Americana</strong>
+              <span class="territorio-sep">›</span>
+              <strong>Centro</strong>
+            </div>
+          </div>
+
+          <!-- BairroCard -->
+          <div class="resource-subhead" style="margin-top:20px">
+            <strong>BairroCard — cartão de bairro</strong>
+            <p>Visão consolidada de um bairro: dados territoriais, contratos ativos, obras, eventos recentes.</p>
+          </div>
+          <div class="grid cols-3">
+            <div class="bairro-card">
+              <div class="bairro-name">Monte Libano</div>
+              <div class="bairro-loc">Americana · SP · sintético</div>
+              <div class="badge-row">
+                <span class="bairro-tag">Residencial</span>
+                <span class="badge official">Fato oficial</span>
+              </div>
+              <div class="bairro-stats">
+                <div class="bairro-stat"><strong>12</strong><span>contratos ativos</span></div>
+                <div class="bairro-stat"><strong>2</strong><span>obras</span></div>
+                <div class="bairro-stat"><strong>38</strong><span>ruas</span></div>
+              </div>
+            </div>
+            <div class="bairro-card">
+              <div class="bairro-name">Jardim Brasil</div>
+              <div class="bairro-loc">Americana · SP · sintético</div>
+              <div class="badge-row">
+                <span class="bairro-tag">Misto</span>
+                <span class="badge official">Fato oficial</span>
+              </div>
+              <div class="bairro-stats">
+                <div class="bairro-stat"><strong>7</strong><span>contratos ativos</span></div>
+                <div class="bairro-stat"><strong>1</strong><span>obra</span></div>
+                <div class="bairro-stat"><strong>22</strong><span>ruas</span></div>
+              </div>
+            </div>
+            <div class="bairro-card">
+              <div class="bairro-name">Centro</div>
+              <div class="bairro-loc">Americana · SP · sintético</div>
+              <div class="badge-row">
+                <span class="bairro-tag">Comercial</span>
+                <span class="badge official">Fato oficial</span>
+              </div>
+              <div class="bairro-stats">
+                <div class="bairro-stat"><strong>31</strong><span>contratos ativos</span></div>
+                <div class="bairro-stat"><strong>5</strong><span>obras</span></div>
+                <div class="bairro-stat"><strong>64</strong><span>ruas</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RuaList -->
+          <div class="resource-subhead" style="margin-top:20px">
+            <strong>RuaList — lista de logradouros por bairro</strong>
+            <p>Logradouros com tipo, contratos e obras vinculados. Fonte: IBGE + Prefeitura de Americana.</p>
+          </div>
+          <div class="rua-list">
+            <div class="rua-list-header">
+              <strong>Monte Libano — logradouros (sintético)</strong>
+            </div>
+            <div class="rua-item">
+              <div>
+                <span class="rua-tipo">Rua</span>
+                <strong style="display:block;font-size:.92rem">das Acácias</strong>
+              </div>
+              <div style="text-align:right">
+                <span class="badge">3 contratos</span>
+              </div>
+            </div>
+            <div class="rua-item">
+              <div>
+                <span class="rua-tipo">Avenida</span>
+                <strong style="display:block;font-size:.92rem">Brasil</strong>
+              </div>
+              <div style="text-align:right">
+                <span class="badge official">1 obra ativa</span>
+              </div>
+            </div>
+            <div class="rua-item">
+              <div>
+                <span class="rua-tipo">Rua</span>
+                <strong style="display:block;font-size:.92rem">dos Ipês</strong>
+              </div>
+              <div style="text-align:right">
+                <span class="badge">sem registros</span>
+              </div>
+            </div>
+            <div class="rua-item">
+              <div>
+                <span class="rua-tipo">Travessa</span>
+                <strong style="display:block;font-size:.92rem">São José</strong>
+              </div>
+              <div style="text-align:right">
+                <span class="badge">1 contrato</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout" style="margin-top:12px">
+            <strong>Fonte geográfica</strong>
+            Logradouros: IBGE Malhas (<code>servicodados.ibge.gov.br/api/v2/malhas</code>) + OpenStreetMap para geometria. Código IBGE de Americana: <code>3501608</code>. Bairros oficiais: Prefeitura / IBGE CNEFE.
+          </div>
+        </section>
+
+        <!-- ===== COMPONENTES PREFEITURA ===== -->
+        <section id="prefeitura" aria-labelledby="prefeitura-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Camada prefeitura</span>
+              <h2 id="prefeitura-title">Contratos, obras e despesas</h2>
+            </div>
+            <p>Componentes para dados da Prefeitura de Americana — o que foi contratado, onde, por quanto e com quem.</p>
+          </div>
+
+          <!-- ContratoCard -->
+          <div class="resource-subhead">
+            <strong>ContratoCard — contrato público verificável</strong>
+          </div>
+          <div class="grid cols-2">
+            <div class="contrato-card">
+              <div class="contrato-header">
+                <div>
+                  <div class="contrato-numero">Contrato nº 042/2024 · PNCP sintético</div>
+                  <div class="contrato-object">Serviços de manutenção de vias públicas no Monte Libano e Jardim Brasil</div>
+                </div>
+                <div class="contrato-value">R$ 2,4M</div>
+              </div>
+              <div class="badge-row">
+                <span class="badge official">Fato oficial</span>
+                <span class="badge source">PNCP</span>
+                <span class="badge territorial">Monte Libano</span>
+              </div>
+              <div class="contrato-meta">
+                <div class="contrato-meta-item"><span>Contratada</span><strong>Empresa Sintética LTDA</strong></div>
+                <div class="contrato-meta-item"><span>Secretaria</span><strong>Sec. Obras e Infraestrutura</strong></div>
+                <div class="contrato-meta-item"><span>Vigência</span><strong>Jan/2024 – Dez/2024</strong></div>
+                <div class="contrato-meta-item"><span>Modalidade</span><strong>Pregão eletrônico</strong></div>
+              </div>
+              <div class="badge-row" style="margin-top:10px">
+                <span class="badge">Coletado em 10/01/2024</span>
+                <span class="badge">Ver PNCP</span>
+              </div>
+            </div>
+            <div>
+              <p style="color:var(--muted);font-size:.84rem;margin:0 0 10px">
+                O <strong>ContratoCard</strong> vincula automaticamente ao bairro quando o endereço está disponível na fonte. CNPJ da contratada é verificado contra CEIS/CNEP ao exibir.
+              </p>
+              <div class="code-panel">
+                <header><strong>ContratoCard.tsx</strong><span>props</span></header>
+                <pre><code>interface ContratoCardProps {
+  numero: string
+  objeto: string
+  valor: number
+  contratada: { nome: string; cnpj: string }
+  secretaria: string
+  modalidade: string
+  vigencia: { inicio: Date; fim: Date }
+  territorio?: TerritoryRef
+  sancoes?: SancaoRef[]   // CEIS/CNEP
+  fonte: FonteInfo        // PNCP | Portal Transp.
+  confianca: ConfiancaLevel
+  limitacoes?: string[]
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- ObraCard -->
+          <div class="resource-subhead" style="margin-top:20px">
+            <strong>ObraCard — obra pública com progresso</strong>
+          </div>
+          <div class="grid cols-3">
+            <div class="obra-card">
+              <div class="obra-status-bar"><div class="progress" style="width:72%"></div></div>
+              <div class="obra-body">
+                <div class="obra-name">Pavimentação Rua das Acácias</div>
+                <div class="obra-loc">Monte Libano · Americana · sintético</div>
+                <div class="badge-row">
+                  <span class="badge territorial">Em andamento</span>
+                  <span class="badge">72% concluído</span>
+                </div>
+                <div class="badge-row" style="margin-top:6px">
+                  <span class="badge">R$ 480 mil</span>
+                  <span class="badge source">Prefeitura sint.</span>
+                </div>
+              </div>
+            </div>
+            <div class="obra-card">
+              <div class="obra-status-bar"><div class="progress" style="width:100%;background:var(--vote-sim)"></div></div>
+              <div class="obra-body">
+                <div class="obra-name">Reforma Praça da República — Centro</div>
+                <div class="obra-loc">Centro · Americana · sintético</div>
+                <div class="badge-row">
+                  <span class="badge official">Concluída</span>
+                </div>
+                <div class="badge-row" style="margin-top:6px">
+                  <span class="badge">R$ 1,2M</span>
+                  <span class="badge source">Prefeitura sint.</span>
+                </div>
+              </div>
+            </div>
+            <div class="obra-card" style="opacity:.7">
+              <div class="obra-status-bar"><div class="progress" style="width:15%;background:var(--attention)"></div></div>
+              <div class="obra-body">
+                <div class="obra-name">Ampliação UBS Jardim Brasil</div>
+                <div class="obra-loc">Jardim Brasil · Americana · sintético</div>
+                <div class="badge-row">
+                  <span class="badge attention">Paralisada</span>
+                  <span class="badge">15% concluído</span>
+                </div>
+                <div class="badge-row" style="margin-top:6px">
+                  <span class="badge">R$ 890 mil</span>
+                  <span class="badge source">Prefeitura sint.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== PADRÕES DE TELA ===== -->
         <section id="padroes" aria-labelledby="padroes-title">
           <div class="section-head">
             <div>
               <span class="eyebrow">Padrões</span>
               <h2 id="padroes-title">Telas orientadas a evidência</h2>
             </div>
-            <p>
-              Cada tela tem objetivo, usuário principal, layout desktop, layout mobile, componentes, estados obrigatórios
-              e o que não fazer.
-            </p>
+            <p>Cada tela tem objetivo, componentes principais, estados obrigatórios e o que não fazer.</p>
           </div>
-
-          <div class="screen-map">
+          <div class="grid cols-2">
             <div class="wireframe">
-              <h3>Página de entidade</h3>
-              <div class="wireframe-stack" style="margin-top: 12px">
-                <div class="wire strong">PerfilEntidadeHeader com tipo, fonte e confiança</div>
-                <div class="wire">Resumo verificável e BlocoExplicacaoIA separado</div>
-                <div class="wire">Fatos principais com EvidenciaLink</div>
-                <div class="wire">Radar da entidade com EventoPublicoCard</div>
-                <div class="wire">BlocoLimitacaoDado antes de qualquer conclusão sensível</div>
+              <h3>Página do Vereador</h3>
+              <div class="wireframe-stack">
+                <div class="wire political">PerfilEntidadeHeader — foto, nome, partido, mandato</div>
+                <div class="wire">Estatísticas: presença, votos SIM/NÃO/ABS, projetos</div>
+                <div class="wire">Tabs: Votações · Projetos · Presença · Declarações</div>
+                <div class="wire strong">VotoGrid — todos os votos nominais ordenados por data</div>
+                <div class="wire">ProjetoLeiCard por projeto de autoria</div>
+                <div class="wire">BlocoExplicacaoIA separado ("resumo de atividade")</div>
+                <div class="wire">BlocoLimitacaoDado quando scraper tiver lacuna</div>
               </div>
             </div>
-            <div class="panel card">
-              <h3>Rotas conceituais</h3>
-              <p>`/`, `/explorar`, `/radar`, `/mapa`, `/entidade/[tipo]/[slug]`, `/contrato/[id]`, `/cidade/[slug]`.</p>
-              <p>Cada rota deve prever carregando, vazio, erro, dado incompleto, fonte atrasada e baixa confiança quando aplicável.</p>
+            <div class="wireframe">
+              <h3>Página do Bairro</h3>
+              <div class="wireframe-stack">
+                <div class="wire territorial">TerritorialBreadcrumb — SP › Americana › Bairro</div>
+                <div class="wire">BairroCard com stats consolidados</div>
+                <div class="wire strong">Mapa SVG do bairro com ruas e obras</div>
+                <div class="wire">Tabs: Contratos · Obras · Vereadores · Eventos</div>
+                <div class="wire">ContratoCard por contrato com território vinculado</div>
+                <div class="wire">ObraCard com progresso</div>
+                <div class="wire">RuaList com logradouros</div>
+              </div>
+            </div>
+            <div class="wireframe">
+              <h3>Radar — Home</h3>
+              <div class="wireframe-stack">
+                <div class="wire strong">TerritorialCarousel — Americana · Monte Libano · Centro…</div>
+                <div class="wire political">EventoPublicoCard — sessão da Câmara</div>
+                <div class="wire">EventoPublicoCard — contrato atualizado</div>
+                <div class="wire attention">EventoPublicoCard — sinal de atenção (com aviso)</div>
+                <div class="wire">Tabs: Tudo · Câmara · Contratos · Obras · Bairros</div>
+                <div class="wire">MobileBottomNav: Início · Radar · + · Câmara · Mapa</div>
+              </div>
+            </div>
+            <div class="wireframe">
+              <h3>Sessão da Câmara</h3>
+              <div class="wireframe-stack">
+                <div class="wire political">SessaoCard — header com data, tipo, quórum</div>
+                <div class="wire strong">Pauta: lista de ProjetoLeiCard votados</div>
+                <div class="wire">VotoGrid por projeto (todos os 21 vereadores)</div>
+                <div class="wire">Presença: quem esteve, quem faltou, justificativas</div>
+                <div class="wire">BlocoLimitacaoDado se ata não estiver digitalizada</div>
+                <div class="wire">EvidenciaLink para ata oficial da sessão</div>
+              </div>
             </div>
           </div>
         </section>
 
+        <!-- ===== ESTADOS ===== -->
         <section id="estados" aria-labelledby="estados-title">
           <div class="section-head">
             <div>
               <span class="eyebrow">Estados</span>
               <h2 id="estados-title">Nada entra só no estado feliz</h2>
             </div>
-            <p>Estados são parte do produto. Em dados públicos, ausência, atraso e contradição são informação.</p>
+            <p>Ausência, atraso e contradição são informação. Todo componente prevê os seis estados abaixo.</p>
           </div>
-
           <div class="grid cols-3">
-            <article class="state-card">
-              <h3>Carregando</h3>
-              <p>Skeleton com estrutura real, sem spinner solto em listas densas.</p>
-            </article>
-            <article class="state-card">
-              <h3>Vazio</h3>
-              <p>Explica se não houve coleta, se o filtro não retornou ou se a fonte não informa.</p>
-            </article>
-            <article class="state-card">
-              <h3>Erro</h3>
-              <p>Separa falha operacional de limitação da fonte ou da entidade.</p>
-            </article>
-            <article class="state-card">
-              <h3>Dado incompleto</h3>
-              <p>Mostra campo ausente, fonte consultada e impacto na leitura.</p>
-            </article>
-            <article class="state-card">
-              <h3>Fonte atrasada</h3>
-              <p>Mostra última coleta e não apresenta dado antigo como atual.</p>
-            </article>
-            <article class="state-card">
-              <h3>Contraditório</h3>
-              <p>Mostra fontes em conflito e não escolhe vencedor sem regra documentada.</p>
-            </article>
+            <article class="state-card"><h3>Carregando</h3><p>Skeleton com estrutura real do componente. Sem spinner solto.</p></article>
+            <article class="state-card"><h3>Vazio</h3><p>Explica se não houve coleta, se o filtro não retornou ou se a fonte não informa.</p></article>
+            <article class="state-card"><h3>Erro operacional</h3><p>Falha do scraper ou da API. Diferente de limitação da fonte.</p></article>
+            <article class="state-card"><h3>Dado incompleto</h3><p>Campo ausente na fonte. Mostra o campo, a fonte consultada e o impacto.</p></article>
+            <article class="state-card"><h3>Fonte atrasada</h3><p>Última coleta exibida. Não apresenta dado antigo como atual.</p></article>
+            <article class="state-card"><h3>Contraditório</h3><p>Fontes em conflito. Mostra as duas versões sem escolher vencedor.</p></article>
           </div>
         </section>
 
+        <!-- ===== MATURIDADE ===== -->
         <section id="maturidade" aria-labelledby="maturidade-title">
-            <div class="section-head">
-              <div>
-                <span class="eyebrow">Maturidade</span>
-                <h2 id="maturidade-title">Componentes têm ciclo de vida público</h2>
-              </div>
-              <p>
-                Um design system confiável não trata todo componente como estável. Cada peça precisa dizer se é
-                rascunho, candidata, estável ou depreciada.
-              </p>
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Maturidade</span>
+              <h2 id="maturidade-title">Componentes têm ciclo de vida</h2>
             </div>
+            <p>Todo componente declara seu status. Agentes não usam <code>draft</code> em produção.</p>
+          </div>
+          <div class="maturity">
+            <article class="maturity-card"><small>draft</small><h3>Rascunho</h3><p>Para explorar. Pode mudar sem aviso. Só dados sintéticos.</p></article>
+            <article class="maturity-card"><small>candidate</small><h3>Candidato</h3><p>API proposta, Storybook mínimo, estados principais, docs iniciais.</p></article>
+            <article class="maturity-card"><small>stable</small><h3>Estável</h3><p>Uso em tela, acessibilidade revisada, exemplos completos, checklist de confiança.</p></article>
+            <article class="maturity-card"><small>deprecated</small><h3>Depreciado</h3><p>Substituto documentado, plano de remoção, bloqueio contra novo uso.</p></article>
+          </div>
+        </section>
 
-            <div class="maturity">
-              <article class="maturity-card">
-                <small>draft</small>
-                <h3>Rascunho</h3>
-                <p>Existe para explorar. Pode mudar sem aviso. Só usa dados sintéticos e não bloqueia produto.</p>
-              </article>
-              <article class="maturity-card">
-                <small>candidate</small>
-                <h3>Candidato</h3>
-                <p>Tem API proposta, Storybook mínimo, estados principais e documentação inicial.</p>
-              </article>
-              <article class="maturity-card">
-                <small>stable</small>
-                <h3>Estável</h3>
-                <p>Tem uso em tela, acessibilidade revisada, exemplos completos e checklist de confiança cumprido.</p>
-              </article>
-              <article class="maturity-card">
-                <small>deprecated</small>
-                <h3>Depreciado</h3>
-                <p>Tem substituto documentado, plano de remoção e bloqueio contra novo uso.</p>
-              </article>
-            </div>
-
-            <div class="decision-table" style="margin-top: 14px">
-              <div class="decision-row">
-                <strong>Promover para candidate</strong>
-                <p>Exige props documentadas, dados sintéticos, loading, vazio, erro e fonte atrasada quando aplicável.</p>
-                <code>docs + Storybook</code>
-              </div>
-              <div class="decision-row">
-                <strong>Promover para stable</strong>
-                <p>Exige uso real em tela, revisão de acessibilidade, revisão de linguagem e teste de regressão.</p>
-                <code>PR checklist</code>
-              </div>
-              <div class="decision-row">
-                <strong>Alterar componente stable</strong>
-                <p>Exige changelog, justificativa, análise de impacto e screenshots desktop/mobile.</p>
-                <code>sem mudança silenciosa</code>
-              </div>
-            </div>
-          </section>
-
+        <!-- ===== GOVERNANÇA ===== -->
         <section id="governanca" aria-labelledby="governanca-title">
           <div class="section-head">
             <div>
               <span class="eyebrow">Governança</span>
-              <h2 id="governanca-title">Como humanos e agentes devem evoluir a UI</h2>
+              <h2 id="governanca-title">Como humanos e agentes evoluem a UI</h2>
             </div>
-            <p>
-              A governança evita componentes duplicados, decisões soltas e regressões de confiança. Toda mudança de UI
-              precisa atravessar documentação, Storybook e revisão.
-            </p>
+            <p>Toda mudança de UI atravessa documentação, Storybook e revisão de confiança. Sem atalho.</p>
           </div>
-
-          <div class="panel card">
+          <div class="card">
             <div class="timeline">
-              <div class="timeline-item">
-                <div>
-                  <h3>Ler contexto</h3>
-                  <p>`PROJECT.md`, `DESIGN_SYSTEM.md`, docs do Interface System e issue ativa.</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div>
-                  <h3>Escolher componente existente</h3>
-                  <p>Procurar em `packages/ui`, `docs/components` e Storybook antes de criar algo novo.</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div>
-                  <h3>Implementar com estados</h3>
-                  <p>Padrão, loading, vazio, erro, incompleto, fonte atrasada e baixa confiança quando fizer sentido.</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div>
-                  <h3>Documentar e testar</h3>
-                  <p>Criar Storybook, atualizar docs e validar acessibilidade, linguagem e mobile.</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div>
-                  <h3>Registrar handoff</h3>
-                  <p>Issue, arquivos alterados, verificações, pendências e próxima issue recomendada.</p>
-                </div>
-              </div>
+              <div class="timeline-item"><div><h3>Ler contexto</h3><p><code>PROJECT.md</code>, <code>DESIGN_SYSTEM.md</code>, este documento e a issue ativa.</p></div></div>
+              <div class="timeline-item"><div><h3>Escolher componente existente</h3><p>Procurar em <code>packages/ui</code>, <code>docs/components</code> e Storybook antes de criar algo novo.</p></div></div>
+              <div class="timeline-item"><div><h3>Implementar com todos os estados</h3><p>Padrão, loading, vazio, erro, dado incompleto, fonte atrasada.</p></div></div>
+              <div class="timeline-item"><div><h3>Documentar e testar</h3><p>Storybook, docs, acessibilidade por teclado, linguagem neutra, mobile.</p></div></div>
+              <div class="timeline-item"><div><h3>Registrar handoff</h3><p>Issue, arquivos alterados, verificações, pendências, próxima issue recomendada.</p></div></div>
             </div>
           </div>
         </section>
 
+        <!-- ===== CHECKLIST ===== -->
         <section id="checklist" aria-labelledby="checklist-title">
           <div class="section-head">
             <div>
               <span class="eyebrow">PR</span>
-              <h2 id="checklist-title">Checklist curto de revisão</h2>
+              <h2 id="checklist-title">Checklist de revisão</h2>
             </div>
-            <p>Use o checklist completo em `docs/agents/checklist-pr-ui.md` antes de fechar qualquer PR de UI.</p>
+            <p>Todo PR de UI passa por este checklist antes de ser aprovado. Use o completo em <code>docs/agents/checklist-pr-ui.md</code>.</p>
           </div>
-
           <div class="grid cols-2 checklist">
-            <div class="check">A issue está referenciada e a documentação relevante foi atualizada.</div>
-            <div class="check">Todo dado público mostra tipo, fonte, confiança, evidência ou limitação quando aplicável.</div>
-            <div class="check">Explicação por IA está separada de fato oficial.</div>
+            <div class="check">Issue referenciada e documentação relevante atualizada.</div>
+            <div class="check">Todo dado público mostra tipo, fonte, confiança, evidência ou limitação.</div>
+            <div class="check">Explicação por IA separada de fato oficial visual e textualmente.</div>
             <div class="check">Sinal de atenção contém aviso de que não indica irregularidade.</div>
-            <div class="check">Loading, vazio, erro, dado incompleto e fonte atrasada foram previstos.</div>
-            <div class="check">UI funciona por teclado, tem foco visível e não depende só de cor.</div>
-            <div class="check">Exemplos e mocks usam dados sintéticos marcados.</div>
-            <div class="check">Não há post, like, comentário livre, ranking moral ou score de corrupção.</div>
+            <div class="check">Loading, vazio, erro, dado incompleto e fonte atrasada previstos.</div>
+            <div class="check">UI funciona por teclado, foco visível, sem dependência só de cor.</div>
+            <div class="check">Dados sintéticos marcados como "Dados sintéticos".</div>
+            <div class="check">Voto de vereador é fato oficial — nunca inferido ou interpretado como fato.</div>
+            <div class="check">Ausência de vereador não é tratada como voto NÃO.</div>
+            <div class="check">Contrato vinculado a bairro/rua quando território disponível na fonte.</div>
+            <div class="check">Sem post, like, comentário livre, ranking moral ou score de corrupção.</div>
+            <div class="check">CNPJ de contratada verificado contra CEIS/CNEP antes de exibir.</div>
           </div>
         </section>
+
       </main>
     </div>
 
     <footer>
       <p>
-        Documento estático inicial. A implementação futura de `apps/docs` deve renderizar o conteúdo de `docs/`
-        para manter uma fonte de verdade entre documentação web, Storybook e código.
+        DeOlho Interface System — piloto Americana, SP.
+        Dados sintéticos em todos os demos. Componentes em <code>packages/ui/src/components/deolho</code>.
+        Bandeiras de estados: <a href="https://github.com/bgeneto/bandeiras-br">github.com/bgeneto/bandeiras-br</a>.
       </p>
     </footer>
   </body>
