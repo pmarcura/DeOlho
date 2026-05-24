@@ -51,10 +51,14 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="rounded-lg border bg-card p-4 flex flex-col gap-2">
-      <Icon className="w-5 h-5 text-[var(--political)]" />
-      <p className="font-medium text-sm">{label}</p>
-      <p className="text-xs text-muted-foreground">{description}</p>
+    <div className="group rounded-xl border border-border/60 bg-card p-5 flex flex-col gap-4 hover:shadow-sm transition-shadow cursor-default">
+      <div className="w-10 h-10 rounded-xl bg-[var(--political-soft)] flex items-center justify-center">
+        <Icon className="w-5 h-5 text-[var(--political)]" />
+      </div>
+      <div>
+        <p className="font-semibold text-sm">{label}</p>
+        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{description}</p>
+      </div>
     </div>
   );
 }
