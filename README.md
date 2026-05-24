@@ -60,7 +60,9 @@ Versões exatas devem ser verificadas no momento do scaffold. A arquitetura do C
 - [.planning/config.json](.planning/config.json) - configuração GSD deixada pelo Claude.
 - [.planning/OBSIDIAN.md](.planning/OBSIDIAN.md) - ponte entre Obsidian, `.planning/` e GitHub.
 - [.planning/DESIGN_SYSTEM.md](.planning/DESIGN_SYSTEM.md) - fundação shadcn/ui e componentes cívicos próprios.
+- [apps/docs/index.html](apps/docs/index.html) - página HTML estática inicial do DeOlho Interface System.
 - [docs/design-system/index.md](docs/design-system/index.md) - documentação operacional do DeOlho Interface System.
+- [docs/design-system/referencias.md](docs/design-system/referencias.md) - referências externas usadas para amadurecer o design system.
 - [docs/components/civicos.md](docs/components/civicos.md) - contrato de uso dos componentes cívicos.
 - [docs/patterns/telas.md](docs/patterns/telas.md) - padrões de tela e checklists de UI.
 - [docs/agents/regras.md](docs/agents/regras.md) - regras de UI para Codex, Claude, GSD e contribuidores.

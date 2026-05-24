@@ -14,7 +14,7 @@ Antes de implementar qualquer coisa, leia nesta ordem:
 2. `.planning/config.json`
 3. `.planning/OBSIDIAN.md`
 4. `.planning/DESIGN_SYSTEM.md`, quando a tarefa tocar UI ou experiência de usuário
-5. `docs/design-system/index.md`, `docs/components/civicos.md` e `docs/agents/regras.md`, quando a tarefa tocar UI ou experiência de usuário
+5. `docs/design-system/index.md`, `docs/design-system/referencias.md`, `docs/components/civicos.md` e `docs/agents/regras.md`, quando a tarefa tocar UI ou experiência de usuário
 6. A issue GitHub ativa
 7. `.planning/research/STACK.md` e `.planning/research/FEATURES.md`, quando a tarefa tocar stack, arquitetura ou produto
 8. `.planning/HANDOFF.md`, quando existir
@@ -78,7 +78,7 @@ Versões exatas devem ser verificadas no npm no momento do scaffold. Trocas de s
 
 ## UI e design system
 
-Para qualquer mudança de UI, siga `.planning/DESIGN_SYSTEM.md` e a documentação operacional em `docs/design-system/index.md`. A interface pode ter familiaridade de app social moderno, mas deve continuar cívica, verificável e não sensacionalista.
+Para qualquer mudança de UI, siga `.planning/DESIGN_SYSTEM.md` e a documentação operacional em `docs/design-system/index.md`. A página HTML inicial do sistema está em `apps/docs/index.html`; use-a como referência visual até o scaffold de `apps/docs` existir. A interface pode ter familiaridade de app social moderno, mas deve continuar cívica, verificável e não sensacionalista.
 
 Use shadcn/ui como base em `packages/ui/src/components/ui` e componha componentes próprios em `packages/ui/src/components/deolho`. Não coloque lógica de produto nos componentes base do shadcn.
 

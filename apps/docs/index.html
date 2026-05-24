@@ -1,0 +1,1274 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DeOlho Interface System</title>
+    <meta
+      name="description"
+      content="Documentação operacional de UI/UX do DeOlho para humanos, Codex, Claude e GSD."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f7f3;
+        --paper: #ffffff;
+        --paper-soft: #fbfaf6;
+        --ink: #171a1f;
+        --muted: #5c6470;
+        --line: #d9ddd7;
+        --line-strong: #b6beb6;
+        --official: #0b6b56;
+        --official-soft: #e5f5ef;
+        --ai: #4a4f9f;
+        --ai-soft: #eceefe;
+        --attention: #9b4d16;
+        --attention-soft: #fff0df;
+        --source: #1d5f8f;
+        --source-soft: #e8f3fb;
+        --review: #6f4a00;
+        --review-soft: #fff7d6;
+        --danger: #a12a2a;
+        --danger-soft: #ffebeb;
+        --radius: 8px;
+        --shadow: 0 18px 50px rgba(24, 31, 42, 0.10);
+        --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        overflow-x: hidden;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(247, 247, 243, 0.94)),
+          repeating-linear-gradient(90deg, rgba(23, 26, 31, 0.035) 0 1px, transparent 1px 96px);
+        color: var(--ink);
+        font-family: var(--sans);
+        line-height: 1.55;
+      }
+
+      a {
+        color: inherit;
+        text-decoration-color: rgba(29, 95, 143, 0.42);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+
+      a:hover {
+        text-decoration-color: currentColor;
+      }
+
+      a:focus-visible,
+      button:focus-visible {
+        outline: 3px solid #2a7fcb;
+        outline-offset: 3px;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: 16px;
+        top: 12px;
+        z-index: 20;
+        transform: translateY(-140%);
+        background: var(--ink);
+        color: white;
+        padding: 10px 14px;
+        border-radius: var(--radius);
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(247, 247, 243, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 14px 24px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: var(--paper);
+        color: var(--official);
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      .brand-title {
+        display: grid;
+        gap: 1px;
+      }
+
+      .brand-title strong {
+        font-size: 0.95rem;
+      }
+
+      .brand-title span {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 36px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: var(--paper);
+        color: var(--ink);
+        font-weight: 700;
+        padding: 8px 12px;
+        text-decoration: none;
+      }
+
+      .button.primary {
+        border-color: var(--official);
+        background: var(--official);
+        color: white;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 28px;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 28px 24px 64px;
+      }
+
+      .side-nav {
+        position: sticky;
+        top: 78px;
+        align-self: start;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 14px;
+        box-shadow: 0 12px 34px rgba(24, 31, 42, 0.06);
+      }
+
+      .side-nav h2 {
+        margin: 4px 8px 12px;
+        color: var(--muted);
+        font-size: 0.76rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .side-nav a {
+        display: block;
+        border-radius: 6px;
+        padding: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        text-decoration: none;
+      }
+
+      .side-nav a:hover {
+        background: var(--paper-soft);
+        color: var(--ink);
+      }
+
+      main {
+        min-width: 0;
+      }
+
+      section {
+        scroll-margin-top: 96px;
+        margin-top: 28px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .hero-copy,
+      .hero-preview,
+      .panel {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: var(--shadow);
+      }
+
+      .hero-copy {
+        padding: clamp(24px, 4vw, 48px);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--paper-soft);
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        padding: 6px 10px;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        letter-spacing: 0;
+        line-height: 1.08;
+      }
+
+      h1 {
+        max-width: 780px;
+        margin: 22px 0 18px;
+        font-size: clamp(2.25rem, 4.8vw, 4.9rem);
+        overflow-wrap: break-word;
+      }
+
+      h2 {
+        margin: 0 0 10px;
+        font-size: clamp(1.75rem, 3vw, 3rem);
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.02rem;
+      }
+
+      .lead {
+        max-width: 760px;
+        color: var(--muted);
+        font-size: clamp(1rem, 1.5vw, 1.22rem);
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 28px;
+      }
+
+      .hero-preview {
+        overflow: hidden;
+        min-height: 560px;
+        padding: 18px;
+      }
+
+      .phone-shell {
+        max-width: 380px;
+        min-height: 520px;
+        margin: 0 auto;
+        border: 1px solid var(--line-strong);
+        border-radius: 28px;
+        background: #10141a;
+        padding: 12px;
+      }
+
+      .phone-screen {
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        min-height: 494px;
+        overflow: hidden;
+        border-radius: 20px;
+        background: #fbfaf6;
+      }
+
+      .phone-top,
+      .phone-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid var(--line);
+        padding: 12px;
+      }
+
+      .phone-bottom {
+        border-top: 1px solid var(--line);
+        border-bottom: 0;
+        color: var(--muted);
+        font-size: 0.74rem;
+      }
+
+      .search-pill {
+        max-width: 62%;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: white;
+        color: var(--muted);
+        padding: 7px 10px;
+        font-size: 0.78rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .territory-row {
+        display: flex;
+        gap: 8px;
+        overflow: hidden;
+        border-bottom: 1px solid var(--line);
+        padding: 10px 12px;
+      }
+
+      .chip,
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: white;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 800;
+        padding: 5px 8px;
+        white-space: nowrap;
+      }
+
+      .chip.active {
+        border-color: var(--official);
+        background: var(--official-soft);
+        color: var(--official);
+      }
+
+      .phone-feed {
+        display: grid;
+        gap: 10px;
+        align-content: start;
+        padding: 12px;
+      }
+
+      .event-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: white;
+        padding: 12px;
+      }
+
+      .event-card strong {
+        display: block;
+        margin: 8px 0 4px;
+        font-size: 0.98rem;
+      }
+
+      .event-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .badge.official {
+        border-color: rgba(11, 107, 86, 0.28);
+        background: var(--official-soft);
+        color: var(--official);
+      }
+
+      .badge.ai {
+        border-color: rgba(74, 79, 159, 0.25);
+        background: var(--ai-soft);
+        color: var(--ai);
+      }
+
+      .badge.attention {
+        border-color: rgba(155, 77, 22, 0.28);
+        background: var(--attention-soft);
+        color: var(--attention);
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 14px;
+      }
+
+      .section-head p {
+        max-width: 760px;
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        gap: 14px;
+      }
+
+      .grid.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid.cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid.cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .card,
+      .reference-card,
+      .component-row,
+      .state-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.88);
+        padding: 18px;
+      }
+
+      .card p,
+      .reference-card p,
+      .state-card p {
+        margin: 10px 0 0;
+        color: var(--muted);
+      }
+
+      .reference-card {
+        display: grid;
+        min-height: 180px;
+        align-content: space-between;
+      }
+
+      .reference-card span {
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 0.76rem;
+      }
+
+      .doctrine {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 14px;
+      }
+
+      .rule-list {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .rule-list li {
+        border-left: 4px solid var(--official);
+        background: var(--paper);
+        border-radius: 0 var(--radius) var(--radius) 0;
+        padding: 12px 14px;
+      }
+
+      .token-board {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 14px;
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .swatch {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        overflow: hidden;
+      }
+
+      .swatch-color {
+        height: 58px;
+      }
+
+      .swatch div:last-child {
+        padding: 10px;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 0.75rem;
+      }
+
+      .component-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .component-row {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr) 220px;
+        gap: 12px;
+        align-items: start;
+        padding: 14px;
+      }
+
+      .component-row p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .component-row code,
+      code {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--paper-soft);
+        color: #3f4350;
+        font-family: var(--mono);
+        font-size: 0.78em;
+        padding: 2px 5px;
+      }
+
+      .screen-map {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 14px;
+      }
+
+      .wireframe {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        padding: 14px;
+      }
+
+      .wireframe-stack {
+        display: grid;
+        gap: 10px;
+      }
+
+      .wire {
+        border: 1px dashed var(--line-strong);
+        border-radius: 6px;
+        background: var(--paper-soft);
+        color: var(--muted);
+        padding: 10px;
+        font-size: 0.86rem;
+      }
+
+      .wire.strong {
+        border-style: solid;
+        background: var(--official-soft);
+        color: var(--official);
+        font-weight: 800;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 12px;
+        counter-reset: step;
+      }
+
+      .timeline-item {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+      }
+
+      .timeline-item::before {
+        counter-increment: step;
+        content: counter(step);
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border-radius: 999px;
+        background: var(--ink);
+        color: white;
+        font-weight: 800;
+      }
+
+      .checklist {
+        display: grid;
+        gap: 10px;
+      }
+
+      .check {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        padding: 12px;
+      }
+
+      .check::before {
+        content: "";
+        flex: 0 0 18px;
+        height: 18px;
+        border: 2px solid var(--official);
+        border-radius: 4px;
+        margin-top: 2px;
+      }
+
+      .callout {
+        border: 1px solid rgba(155, 77, 22, 0.32);
+        border-radius: var(--radius);
+        background: var(--attention-soft);
+        padding: 18px;
+      }
+
+      .callout strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--attention);
+      }
+
+      footer {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 24px 44px;
+        color: var(--muted);
+      }
+
+      @media (max-width: 1180px) {
+        .layout,
+        .hero,
+        .doctrine,
+        .token-board,
+        .screen-map {
+          grid-template-columns: 1fr;
+        }
+
+        .side-nav {
+          position: static;
+          order: 2;
+        }
+
+        .grid.cols-4,
+        .grid.cols-3 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 760px) {
+        .topbar-inner,
+        .layout {
+          max-width: 100%;
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .layout {
+          display: block;
+        }
+
+        .side-nav {
+          display: none;
+        }
+
+        .topbar-inner,
+        .section-head {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .top-actions {
+          width: 100%;
+          flex-direction: column;
+        }
+
+        .button {
+          width: 100%;
+        }
+
+        .grid.cols-2,
+        .grid.cols-3,
+        .grid.cols-4,
+        .component-row {
+          grid-template-columns: 1fr;
+        }
+
+        main,
+        section,
+        .hero,
+        .hero-copy,
+        .hero-preview {
+          max-width: 100%;
+          width: 100%;
+        }
+
+        .hero {
+          display: block;
+        }
+
+        .hero-copy,
+        .hero-preview {
+          max-width: calc(100vw - 32px);
+          overflow: hidden;
+          width: calc(100vw - 32px);
+        }
+
+        .hero-preview {
+          margin-top: 22px;
+        }
+
+        .lead,
+        .hero-copy p {
+          max-width: 100%;
+          overflow-wrap: break-word;
+        }
+
+        h1 {
+          font-size: clamp(2rem, 8vw, 2.35rem);
+        }
+
+        .hero-preview {
+          min-height: auto;
+        }
+
+        .phone-shell {
+          max-width: 340px;
+          min-width: 0;
+          width: 100%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="#inicio" aria-label="Ir para o início do DeOlho Interface System">
+          <span class="brand-mark" aria-hidden="true">D</span>
+          <span class="brand-title">
+            <strong>DeOlho Interface System</strong>
+            <span>UI cívica, verificável e orientada a evidência</span>
+          </span>
+        </a>
+        <nav class="top-actions" aria-label="Ações rápidas">
+          <a class="button" href="../../docs/design-system/index.md">Docs Markdown</a>
+          <a class="button primary" href="../../docs/agents/checklist-pr-ui.md">Checklist de PR</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="side-nav" aria-label="Navegação da documentação">
+        <h2>Nesta página</h2>
+        <a href="#inicio">Visão geral</a>
+        <a href="#referencias">Referências</a>
+        <a href="#doutrina">Doutrina cívica</a>
+        <a href="#arquitetura">Arquitetura</a>
+        <a href="#tokens">Tokens</a>
+        <a href="#componentes">Componentes</a>
+        <a href="#padroes">Padrões de tela</a>
+        <a href="#estados">Estados obrigatórios</a>
+        <a href="#governanca">Governança</a>
+        <a href="#checklist">Checklist</a>
+      </aside>
+
+      <main id="conteudo">
+        <section class="hero" id="inicio" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <span class="eyebrow">Documentação web inicial</span>
+            <h1 id="hero-title">Um design system para confiança pública, não para engajamento vazio.</h1>
+            <p class="lead">
+              O DeOlho Interface System define como construir interfaces brasileiras de observabilidade cívica:
+              evidência antes de opinião, fonte antes de conclusão, IA sempre identificada e sinal de atenção sem acusação.
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="#componentes">Ver componentes cívicos</a>
+              <a class="button" href="#referencias">Ver referências usadas</a>
+            </div>
+          </div>
+
+          <div class="hero-preview" aria-label="Prévia sintética de tela mobile do DeOlho">
+            <div class="phone-shell">
+              <div class="phone-screen">
+                <div class="phone-top">
+                  <strong>DeOlho</strong>
+                  <span class="search-pill">Buscar fonte, contrato, cidade</span>
+                </div>
+                <div class="territory-row" aria-label="Camadas territoriais sintéticas">
+                  <span class="chip active">Brasil</span>
+                  <span class="chip">SP sintético</span>
+                  <span class="chip">Cidade sintética</span>
+                  <span class="chip">Saúde</span>
+                </div>
+                <div class="phone-feed">
+                  <article class="event-card">
+                    <span class="badge official">Fato oficial</span>
+                    <strong>Contrato sintético atualizado</strong>
+                    <p>Valor publicado na fonte foi atualizado. Esta prévia usa dados sintéticos.</p>
+                    <div class="badge-row">
+                      <span class="badge official">PNCP sintético</span>
+                      <span class="badge">Fonte e coleta visíveis</span>
+                    </div>
+                  </article>
+                  <article class="event-card">
+                    <span class="badge attention">Sinal de atenção</span>
+                    <strong>Campo relevante ausente</strong>
+                    <p>Sinal de atenção não indica irregularidade. A fonte não informa território impactado.</p>
+                    <div class="badge-row">
+                      <span class="badge">Dado incompleto</span>
+                      <span class="badge">Ver evidência</span>
+                    </div>
+                  </article>
+                  <article class="event-card">
+                    <span class="badge ai">Explicação por IA</span>
+                    <strong>Resumo em português simples</strong>
+                    <p>Gerado a partir dos campos oficiais disponíveis. Não substitui o documento original.</p>
+                  </article>
+                </div>
+                <div class="phone-bottom" aria-label="Navegação inferior mobile">
+                  <span>Início</span>
+                  <span>Radar</span>
+                  <strong>+</strong>
+                  <span>Explorar</span>
+                  <span>Mapa</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="referencias" aria-labelledby="referencias-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Benchmark</span>
+              <h2 id="referencias-title">Referências usadas sem copiar identidade</h2>
+            </div>
+            <p>
+              Sistemas maduros documentam princípios, componentes, padrões, tokens, acessibilidade, contribuição e
+              ferramentas. O DeOlho acrescenta uma camada própria: governança de evidência pública.
+            </p>
+          </div>
+
+          <div class="grid cols-4">
+            <article class="reference-card">
+              <span>IBM</span>
+              <h3><a href="https://carbondesignsystem.com/">Carbon Design System</a></h3>
+              <p>Open source, modular, com código, design kits, guidelines, comunidade e princípios de inclusão.</p>
+            </article>
+            <article class="reference-card">
+              <span>Microsoft</span>
+              <h3><a href="https://fluent2.microsoft.design/">Fluent 2</a></h3>
+              <p>Organização por plataformas, recursos de acessibilidade, kits Figma e documentação para desenvolvimento.</p>
+            </article>
+            <article class="reference-card">
+              <span>Figma</span>
+              <h3><a href="https://www.figma.com/design-systems/">Design Systems</a></h3>
+              <p>Bibliotecas compartilhadas, variáveis, modos, tokens, analytics e ponte entre componente e código.</p>
+            </article>
+            <article class="reference-card">
+              <span>USWDS</span>
+              <h3><a href="https://designsystem.digital.gov/">U.S. Web Design System</a></h3>
+              <p>Componentes, padrões, tokens e acessibilidade para serviços públicos mobile-friendly.</p>
+            </article>
+            <article class="reference-card">
+              <span>GOV.UK</span>
+              <h3><a href="https://design-system.service.gov.uk/">Design System</a></h3>
+              <p>Orientação de uso, exemplos codificados e consistência para serviços governamentais.</p>
+            </article>
+            <article class="reference-card">
+              <span>Atlassian</span>
+              <h3><a href="https://atlassian.design/">Atlassian Design</a></h3>
+              <p>Linguagem unificada, tokens, conteúdo e colaboração em escala entre design e engenharia.</p>
+            </article>
+            <article class="reference-card">
+              <span>GitHub</span>
+              <h3><a href="https://primer.style/">Primer</a></h3>
+              <p>Separação entre Product UI, Brand UI, acessibilidade, ícones e primitives de design.</p>
+            </article>
+            <article class="reference-card">
+              <span>Adobe e Shopify</span>
+              <h3><a href="https://spectrum.adobe.com/">Spectrum</a> / <a href="https://polaris-react.shopify.com/">Polaris</a></h3>
+              <p>Componentes, ferramentas, guidelines, conteúdo, padrões e tokens para produtos operacionais.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="doutrina" aria-labelledby="doutrina-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Princípios</span>
+              <h2 id="doutrina-title">Doutrina cívica da interface</h2>
+            </div>
+            <p>
+              Antes de parecer moderno, o DeOlho precisa ser confiável. A interface deve reduzir ambiguidade,
+              não aumentar engajamento por tensão.
+            </p>
+          </div>
+
+          <div class="doctrine">
+            <div class="panel card">
+              <h3>Seis regras de experiência</h3>
+              <ul class="rule-list">
+                <li><strong>Clareza antes de densidade.</strong> Volume só entra quando a hierarquia estiver clara.</li>
+                <li><strong>Fonte antes de conclusão.</strong> O usuário precisa ver de onde veio a afirmação.</li>
+                <li><strong>Evidência antes de opinião.</strong> Interpretação nunca pesa mais que documento.</li>
+                <li><strong>IA sempre identificada.</strong> Explicação por IA não parece fato oficial.</li>
+                <li><strong>Sinal não é acusação.</strong> Atenção sugere verificação, não culpa.</li>
+                <li><strong>Voltar ao documento.</strong> Toda leitura relevante precisa caminho para evidência.</li>
+              </ul>
+            </div>
+            <div class="panel card">
+              <h3>Separação obrigatória</h3>
+              <p>A UI precisa distinguir visual e textualmente:</p>
+              <div class="badge-row">
+                <span class="badge official">Fato oficial</span>
+                <span class="badge ai">Explicação por IA</span>
+                <span class="badge attention">Sinal estatístico</span>
+                <span class="badge">Notícia</span>
+                <span class="badge">Opinião de usuário</span>
+                <span class="badge">Revisão manual</span>
+              </div>
+              <div class="callout" style="margin-top: 16px">
+                <strong>Regra de produto</strong>
+                Sem fonte, sem afirmação pública. Sem evidência, sem conclusão. Sem contexto, sem sinal de atenção.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="arquitetura" aria-labelledby="arquitetura-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Arquitetura</span>
+              <h2 id="arquitetura-title">Camadas do sistema</h2>
+            </div>
+            <p>
+              A documentação HTML é a porta pública. Os documentos Markdown continuam sendo fonte operacional até o
+              scaffold de Next.js e Storybook existir.
+            </p>
+          </div>
+
+          <div class="grid cols-4">
+            <article class="card">
+              <h3>Fundações</h3>
+              <p>Princípios, tokens, linguagem, acessibilidade e regras anti-sensacionalismo.</p>
+            </article>
+            <article class="card">
+              <h3>Componentes</h3>
+              <p>shadcn/ui como base e componentes cívicos próprios em `packages/ui`.</p>
+            </article>
+            <article class="card">
+              <h3>Padrões</h3>
+              <p>Home, radar, entidade, contrato, busca, painel de fonte, erro e página sem dados.</p>
+            </article>
+            <article class="card">
+              <h3>Governança</h3>
+              <p>Checklist de PR, regras para agentes, Storybook e atualização contínua da documentação.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="tokens" aria-labelledby="tokens-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Tokens</span>
+              <h2 id="tokens-title">Tokens semânticos, não decoração</h2>
+            </div>
+            <p>
+              A cor reforça a mensagem, mas não carrega significado sozinha. Todo estado crítico precisa de texto,
+              ícone ou label acessível.
+            </p>
+          </div>
+
+          <div class="token-board">
+            <div class="panel card">
+              <h3>Escala visual inicial</h3>
+              <div class="swatches" aria-label="Amostra de tokens de cor">
+                <div class="swatch">
+                  <div class="swatch-color" style="background: var(--official)"></div>
+                  <div>semantic-official</div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: var(--ai)"></div>
+                  <div>semantic-ai</div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: var(--attention)"></div>
+                  <div>semantic-attention</div>
+                </div>
+                <div class="swatch">
+                  <div class="swatch-color" style="background: var(--source)"></div>
+                  <div>semantic-source</div>
+                </div>
+              </div>
+            </div>
+            <div class="panel card">
+              <h3>Taxonomia mínima</h3>
+              <div class="component-list">
+                <div class="component-row">
+                  <strong>Tipo de informação</strong>
+                  <p>Fato oficial, explicação por IA, sinal de atenção, notícia, opinião, revisão manual.</p>
+                  <code>TipoInformacaoBadge</code>
+                </div>
+                <div class="component-row">
+                  <strong>Confiança</strong>
+                  <p>Fonte oficial, cópia verificada, verificação pendente, fonte atrasada, incompleto, contraditório.</p>
+                  <code>ConfiancaBadge</code>
+                </div>
+                <div class="component-row">
+                  <strong>Fonte</strong>
+                  <p>Origem, data publicada, data coletada, estado da coleta e marcação de dado sintético.</p>
+                  <code>FonteBadge</code>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="componentes" aria-labelledby="componentes-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Componentes</span>
+              <h2 id="componentes-title">Biblioteca cívica inicial</h2>
+            </div>
+            <p>
+              Componentes cívicos traduzem dado público em UI verificável. Eles vivem em
+              `packages/ui/src/components/deolho` e têm documentação em `docs/components/civicos.md`.
+            </p>
+          </div>
+
+          <div class="component-list">
+            <div class="component-row">
+              <strong>Badges semânticos</strong>
+              <p>TipoInformacaoBadge, ConfiancaBadge e FonteBadge separam categoria, fonte, confiança e estado.</p>
+              <code>tipo + fonte + confiança</code>
+            </div>
+            <div class="component-row">
+              <strong>Entidades</strong>
+              <p>EntidadeAvatar, EntidadeCard e PerfilEntidadeHeader estruturam páginas de entidade sem tom social.</p>
+              <code>página de entidade</code>
+            </div>
+            <div class="component-row">
+              <strong>Eventos públicos</strong>
+              <p>EventoPublicoCard é a unidade do radar. Não é post, não tem curtida e não aceita comentário livre.</p>
+              <code>radar de mudanças</code>
+            </div>
+            <div class="component-row">
+              <strong>Contratos</strong>
+              <p>ContratoCard mostra objeto, órgão, empresa, valor, fonte, limitações e caminho para evidência.</p>
+              <code>contrato verificável</code>
+            </div>
+            <div class="component-row">
+              <strong>Evidência</strong>
+              <p>PainelEvidencia e EvidenciaLink mantêm o usuário perto da fonte e do documento original.</p>
+              <code>documento e fonte</code>
+            </div>
+            <div class="component-row">
+              <strong>IA e limitações</strong>
+              <p>BlocoExplicacaoIA e BlocoLimitacaoDado impedem que explicação ou ausência de dado pareça fato.</p>
+              <code>IA separada</code>
+            </div>
+            <div class="component-row">
+              <strong>Atenção</strong>
+              <p>SinalAtencaoCard exige método, evidência, limitação e aviso de que não indica irregularidade.</p>
+              <code>não acusatório</code>
+            </div>
+            <div class="component-row">
+              <strong>Navegação</strong>
+              <p>TerritorialCarousel, MobileBottomNav, FloatingActionButton, ContextualActionDrawer e UniversalCommandSearch.</p>
+              <code>mobile-first</code>
+            </div>
+          </div>
+        </section>
+
+        <section id="padroes" aria-labelledby="padroes-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Padrões</span>
+              <h2 id="padroes-title">Telas orientadas a evidência</h2>
+            </div>
+            <p>
+              Cada tela tem objetivo, usuário principal, layout desktop, layout mobile, componentes, estados obrigatórios
+              e o que não fazer.
+            </p>
+          </div>
+
+          <div class="screen-map">
+            <div class="wireframe">
+              <h3>Página de entidade</h3>
+              <div class="wireframe-stack" style="margin-top: 12px">
+                <div class="wire strong">PerfilEntidadeHeader com tipo, fonte e confiança</div>
+                <div class="wire">Resumo verificável e BlocoExplicacaoIA separado</div>
+                <div class="wire">Fatos principais com EvidenciaLink</div>
+                <div class="wire">Radar da entidade com EventoPublicoCard</div>
+                <div class="wire">BlocoLimitacaoDado antes de qualquer conclusão sensível</div>
+              </div>
+            </div>
+            <div class="panel card">
+              <h3>Rotas conceituais</h3>
+              <p>`/`, `/explorar`, `/radar`, `/mapa`, `/entidade/[tipo]/[slug]`, `/contrato/[id]`, `/cidade/[slug]`.</p>
+              <p>Cada rota deve prever carregando, vazio, erro, dado incompleto, fonte atrasada e baixa confiança quando aplicável.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="estados" aria-labelledby="estados-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Estados</span>
+              <h2 id="estados-title">Nada entra só no estado feliz</h2>
+            </div>
+            <p>Estados são parte do produto. Em dados públicos, ausência, atraso e contradição são informação.</p>
+          </div>
+
+          <div class="grid cols-3">
+            <article class="state-card">
+              <h3>Carregando</h3>
+              <p>Skeleton com estrutura real, sem spinner solto em listas densas.</p>
+            </article>
+            <article class="state-card">
+              <h3>Vazio</h3>
+              <p>Explica se não houve coleta, se o filtro não retornou ou se a fonte não informa.</p>
+            </article>
+            <article class="state-card">
+              <h3>Erro</h3>
+              <p>Separa falha operacional de limitação da fonte ou da entidade.</p>
+            </article>
+            <article class="state-card">
+              <h3>Dado incompleto</h3>
+              <p>Mostra campo ausente, fonte consultada e impacto na leitura.</p>
+            </article>
+            <article class="state-card">
+              <h3>Fonte atrasada</h3>
+              <p>Mostra última coleta e não apresenta dado antigo como atual.</p>
+            </article>
+            <article class="state-card">
+              <h3>Contraditório</h3>
+              <p>Mostra fontes em conflito e não escolhe vencedor sem regra documentada.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="governanca" aria-labelledby="governanca-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Governança</span>
+              <h2 id="governanca-title">Como humanos e agentes devem evoluir a UI</h2>
+            </div>
+            <p>
+              A governança evita componentes duplicados, decisões soltas e regressões de confiança. Toda mudança de UI
+              precisa atravessar documentação, Storybook e revisão.
+            </p>
+          </div>
+
+          <div class="panel card">
+            <div class="timeline">
+              <div class="timeline-item">
+                <div>
+                  <h3>Ler contexto</h3>
+                  <p>`PROJECT.md`, `DESIGN_SYSTEM.md`, docs do Interface System e issue ativa.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div>
+                  <h3>Escolher componente existente</h3>
+                  <p>Procurar em `packages/ui`, `docs/components` e Storybook antes de criar algo novo.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div>
+                  <h3>Implementar com estados</h3>
+                  <p>Padrão, loading, vazio, erro, incompleto, fonte atrasada e baixa confiança quando fizer sentido.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div>
+                  <h3>Documentar e testar</h3>
+                  <p>Criar Storybook, atualizar docs e validar acessibilidade, linguagem e mobile.</p>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div>
+                  <h3>Registrar handoff</h3>
+                  <p>Issue, arquivos alterados, verificações, pendências e próxima issue recomendada.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="checklist" aria-labelledby="checklist-title">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">PR</span>
+              <h2 id="checklist-title">Checklist curto de revisão</h2>
+            </div>
+            <p>Use o checklist completo em `docs/agents/checklist-pr-ui.md` antes de fechar qualquer PR de UI.</p>
+          </div>
+
+          <div class="grid cols-2 checklist">
+            <div class="check">A issue está referenciada e a documentação relevante foi atualizada.</div>
+            <div class="check">Todo dado público mostra tipo, fonte, confiança, evidência ou limitação quando aplicável.</div>
+            <div class="check">Explicação por IA está separada de fato oficial.</div>
+            <div class="check">Sinal de atenção contém aviso de que não indica irregularidade.</div>
+            <div class="check">Loading, vazio, erro, dado incompleto e fonte atrasada foram previstos.</div>
+            <div class="check">UI funciona por teclado, tem foco visível e não depende só de cor.</div>
+            <div class="check">Exemplos e mocks usam dados sintéticos marcados.</div>
+            <div class="check">Não há post, like, comentário livre, ranking moral ou score de corrupção.</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer>
+      <p>
+        Documento estático inicial. A implementação futura de `apps/docs` deve renderizar o conteúdo de `docs/`
+        para manter uma fonte de verdade entre documentação web, Storybook e código.
+      </p>
+    </footer>
+  </body>
+</html>

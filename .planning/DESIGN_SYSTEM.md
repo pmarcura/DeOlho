@@ -7,6 +7,7 @@ Fundação de UI para uma experiência social-cívica moderna com shadcn/ui. A r
 Este arquivo registra a direção de produto e arquitetura do design system. A documentação pública e operacional fica em:
 
 - `docs/design-system/index.md`
+- `docs/design-system/referencias.md`
 - `docs/components/base.md`
 - `docs/components/civicos.md`
 - `docs/patterns/telas.md`
@@ -16,6 +17,7 @@ Este arquivo registra a direção de produto e arquitetura do design system. A d
 - `docs/patterns/acessibilidade.md`
 - `docs/agents/regras.md`
 - `docs/agents/checklist-pr-ui.md`
+- `apps/docs/index.html`
 
 Agentes devem consultar esses arquivos antes de alterar UI, componentes, navegação ou linguagem.
 

@@ -30,7 +30,7 @@ Todo agente deve tratar este sistema como fonte operacional para UI. Quando houv
 | `packages/ui` | Componentes base, componentes cívicos, tokens e stories | Código |
 | Storybook | Estados vivos, acessibilidade visual e variantes isoladas | `packages/ui` |
 | `docs/` | Regras, padrões, linguagem, checklists e decisões | Markdown versionado |
-| `apps/docs` | Site público que renderiza a documentação | `docs/` |
+| `apps/docs` | Site público que renderiza a documentação; por enquanto tem um HTML estático inicial em `apps/docs/index.html` | `docs/` |
 | `apps/web` | Produto final usando componentes e padrões aprovados | App |
 
 ## Leitura mínima para UI
@@ -38,11 +38,18 @@ Todo agente deve tratar este sistema como fonte operacional para UI. Quando houv
 1. [Princípios de UX](principios-ux.md)
 2. [Princípios de UI](principios-ui.md)
 3. [Tokens](tokens.md)
-4. [Componentes cívicos](../components/civicos.md)
-5. [Padrões de tela](../patterns/telas.md)
-6. [Estados obrigatórios](../patterns/estados.md)
-7. [Regras para agentes](../agents/regras.md)
-8. [Checklist de PR de UI](../agents/checklist-pr-ui.md)
+4. [Referências de design systems](referencias.md)
+5. [Componentes cívicos](../components/civicos.md)
+6. [Padrões de tela](../patterns/telas.md)
+7. [Estados obrigatórios](../patterns/estados.md)
+8. [Regras para agentes](../agents/regras.md)
+9. [Checklist de PR de UI](../agents/checklist-pr-ui.md)
+
+## Página HTML inicial
+
+A primeira versão navegável da documentação está em `apps/docs/index.html`. Ela é um protótipo estático e pode ser aberta diretamente no navegador enquanto o scaffold de `apps/docs` ainda não existe.
+
+O HTML não substitui os arquivos Markdown. Ele deve ser tratado como a face pública inicial do conteúdo versionado em `docs/`.
 
 ## Regra central
 
