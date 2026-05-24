@@ -56,7 +56,7 @@ Transformar um contrato público difícil de entender em uma página clara, rast
 - **Feed social / comentários abertos** — risco de virar arena política antes de ter moderação adequada; entra em v2 com regras estruturadas
 - **Chat com IA como feature principal** — a IA serve para explicar e resumir, não para ser o produto em si
 - **Dados em "tempo real"** — fontes públicas não atualizam instantaneamente; prometer isso é desonesto
-- **Dados municipais despadronizados (v1)** — cada prefeitura tem formato diferente; entra depois de provar a tese federal
+- **Dados municipais genéricos (v1)** — Americana-SP é o piloto municipal; outras prefeituras entram depois de provar a tese com Americana
 - **TSE / dados eleitorais (v1)** — camada importante mas não sustenta o MVP de contrato; entra em v2 com módulo político completo
 - **Transferegov / emendas (v1)** — entra quando houver página de cidade funcionando
 - **Mapa como feature principal** — mapa é camada visual, não fundação; entra depois do sistema de confiança estar sólido
@@ -70,12 +70,16 @@ Transformar um contrato público difícil de entender em uma página clara, rast
 
 **Diferencial de posicionamento:** Entre portal de governo (confuso), rede social política (barulhenta) e site partidário (parcial) — o DeOlho é uma ferramenta pública moderna, limpa e séria. Referências visuais: enciclopédia viva + jornalismo de dados premium + sistema público moderno.
 
-**Fontes de dados v1 (em ordem de prioridade):**
-1. **PNCP** — base principal para contratos, atas, licitações. API pública sem cadastro.
-2. **Portal da Transparência / CGU** — contratos federais, despesas, sanções CEIS/CNEP, licitações. Rate limit crítico: usar dados abertos para carga pesada, API para consulta pontual.
-3. **DOU / INLABS** — publicações oficiais em XML para evidência documental. Atualização diária pós-publicação.
+**Fontes de dados v1 — piloto Americana-SP (em ordem de prioridade):**
+1. **PNCP** — contratos, atas, licitações. API pública sem cadastro. Cobre municípios.
+2. **TCE-SP** — despesas, receitas e dados municipais paulistas. API JSON/XML pública.
+3. **Portal da Transparência de Americana** — dados locais. Crawlee quando não houver API.
+4. **Diário Oficial de Americana** — publicações em PDF. Crawlee + parser + OCR seletivo.
+5. **Portal da Transparência / CGU** — sanções CEIS/CNEP, contratos federais. Rate limit: 90 req/min dia / 300 noturno.
+6. **DOU / INLABS** — publicações federais em XML como evidência documental.
+7. **Câmara Municipal de Americana** — verificar disponibilidade de API antes de scraping.
 
-**Fontes v2+:** Câmara (deputados, votações, proposições), Senado, Transferegov (convênios, emendas parlamentares), TSE (candidatos, campanha, eleições), portais municipais.
+**Fontes v2+:** Câmara federal (deputados, votações, proposições), Senado, Transferegov (convênios, emendas parlamentares), TSE (candidatos, campanha, eleições), outras prefeituras.
 
 **Fluxo de desenvolvimento:**
 - Obsidian vault local → thinking, decisões, mapas mentais, rascunhos de specs
@@ -117,6 +121,7 @@ Transformar um contrato público difícil de entender em uma página clara, rast
 | Next.js + PostgreSQL | Melhor suporte de agentes de IA, TypeScript full-stack, ecossistema amplo para civic tech | — Pending |
 | Obsidian vault → .planning/ → GSD (não Obsidian como repositório central) | GSD precisa de controle de versão git; Obsidian é camada de thinking, não de execução | — Pending |
 | Agentes constroem o código E o produto usa agentes internamente | Projeto nasce AI-native em ambas as camadas: desenvolvimento e produto | — Pending |
+| Americana-SP como piloto municipal (não federal-first) | Americana concentra todas as fontes necessárias (PNCP, TCE-SP, Portal, Diário Oficial, Câmara) e permite provar a tese do produto com um município real antes de generalizar | — Decided 2026-05-24 |
 | Público-alvo amplo desde v1 (jornalistas + cidadãos + devs) | Não sacrificar profundidade por simplicidade nem vice-versa — três perfis têm necessidades complementares | — Pending |
 | Sem comentários abertos em v1 | Risco de desinformação e perseguição antes de moderação madura — comunidade estruturada vem depois | — Pending |
 | Separar pessoa pública × cidadão comum desde a arquitetura | Obrigação jurídica e ética — não é feature opcional | — Pending |
