@@ -1,0 +1,23 @@
+{
+  "name": "@deolho/collectors",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "collect": "tsx src/runner.ts",
+    "collect:pncp": "tsx src/adapters/pncp.ts",
+    "collect:tce": "tsx src/adapters/tce-sp.ts",
+    "collect:diario": "tsx src/adapters/querido-diario.ts",
+    "collect:camara": "tsx src/adapters/camara-americana.ts"
+  },
+  "dependencies": {
+    "crawlee": "^3.12.1",
+    "playwright": "^1.52.0",
+    "zod": "^3.25.56"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

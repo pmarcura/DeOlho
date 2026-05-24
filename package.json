@@ -1,0 +1,12 @@
+{
+  "name": "deolho",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "shadcn": "^4.8.0"
+  }
+}
