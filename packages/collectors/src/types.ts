@@ -107,8 +107,8 @@ export interface GazetaEdicao {
   date: string;
   url: string;
   txt_url: string | null;
-  edition: string;
-  is_extra_edition: boolean;
+  edition: string | null;
+  is_extra_edition: boolean | null;
   scraped_at: string;
   excerpts: string[];
 }
