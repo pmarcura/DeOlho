@@ -12,7 +12,8 @@ export const AMERICANA = {
 // API de consulta pública — sem autenticação
 export const PNCP_BASE = "https://pncp.gov.br/api/consulta/v1";
 export const TCE_SP_BASE = "https://transparencia.tce.sp.gov.br";
-export const QUERIDO_DIARIO_BASE = "https://queridodiario.ok.org.br/api";
+// Host da API (o domínio principal serve o SPA; /api cai no front e devolve HTML)
+export const QUERIDO_DIARIO_BASE = "https://api.queridodiario.ok.org.br";
 
 // janela de coleta inicial: últimos 12 meses
 const hoje = new Date();

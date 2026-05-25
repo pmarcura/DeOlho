@@ -103,11 +103,12 @@ export interface TceSpReceita {
 export interface GazetaEdicao {
   territory_id: string;
   territory_name: string;
+  state_code: string;
   date: string;
   url: string;
-  is_extra_edition: boolean;
-  edition: string | null;
-  scraped_at: string;
   txt_url: string | null;
-  highlight_texts: string[];
+  edition: string;
+  is_extra_edition: boolean;
+  scraped_at: string;
+  excerpts: string[];
 }

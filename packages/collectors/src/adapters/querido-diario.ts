@@ -3,9 +3,11 @@
  *
  * O projeto Querido Diário (Open Knowledge Brasil) agrega diários oficiais
  * municipais e expõe uma API pública de busca.
- * Docs: https://queridodiario.ok.org.br/api/docs
+ * Docs: https://api.queridodiario.ok.org.br/docs
  *
- * Americana está coberta: territory_id = 3501608
+ * Americana está registrada (territory_id = 3501608), mas no momento sem
+ * edições raspadas (availability_date vazio em /cities/3501608) — a coleta
+ * retornará 0 até o QD começar a raspar o diário do município.
  */
 
 import { get } from "../utils/http.js";
@@ -26,8 +28,8 @@ interface QdResponse {
 async function coletarGazetas(offset = 0, size = 100): Promise<QdResponse> {
   return get<QdResponse>(`${QUERIDO_DIARIO_BASE}/gazettes`, {
     territory_ids: AMERICANA.ibge,
-    since: DATA_INICIAL_ISO,
-    until: DATA_FINAL_ISO,
+    published_since: DATA_INICIAL_ISO,
+    published_until: DATA_FINAL_ISO,
     offset,
     size,
   });
