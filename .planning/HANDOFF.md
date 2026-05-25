@@ -1,59 +1,56 @@
 # Handoff
 
-Última atualização: 2026-05-23
+Última atualização: 2026-05-24
 
 ## Estado atual
 
 - Repositório canônico: `https://github.com/pmarcura/DeOlho`
-- Branch base: `main`
-- Branch de trabalho atual: `codex/issue-7-m0-fundacao`
+- Branch base: `main` (agora COM a fundação M0 — reconciliado)
+- Branch de trabalho atual: `claude/issue-22-scaffold-tecnico`
 - Milestone atual: `M0 - Fundação aberta`
-- Issue atual: [#7 - Configurar repositório público, licença, README e CONTRIBUTING](https://github.com/pmarcura/DeOlho/issues/7)
-- Próxima issue preparada: [#22 - Scaffold técnico Next/Postgres/Drizzle](https://github.com/pmarcura/DeOlho/issues/22)
-- Issue de UI preparada: [#24 - Implementar design system shadcn social-cívico](https://github.com/pmarcura/DeOlho/issues/24)
+- Issue em andamento: [#22 - Scaffold técnico Next/Postgres/Drizzle](https://github.com/pmarcura/DeOlho/issues/22)
+- Próxima issue de UI: [#24 - Design system shadcn social-cívico](https://github.com/pmarcura/DeOlho/issues/24)
 
-## O que este pacote entrega
+## O que foi entregue nesta sessão (2026-05-24)
 
-- Documentação inicial do projeto em PT-BR.
-- Regras de contribuição e conduta.
-- Licença MIT para o código.
-- Instruções compartilhadas para Codex, Claude Code e GSD.
-- Ponte Obsidian local -> `.planning/` -> GitHub documentada.
-- Fundação de design system shadcn/ui documentada em `.planning/DESIGN_SYSTEM.md`.
-- Documentação operacional do DeOlho Interface System criada em `docs/design-system`, `docs/components`, `docs/patterns` e `docs/agents`.
-- Página HTML estática inicial do DeOlho Interface System criada em `apps/docs/index.html`.
-- Referências externas de maturidade registradas em `docs/design-system/referencias.md`.
-- Contrato operacional de shadcn/ui para monorepo registrado em `docs/design-system/shadcn.md`.
-- Tokens iniciais estruturados em `packages/ui/src/tokens/deolho.tokens.json`.
-- Estrutura inicial de `apps/docs` e `packages/ui` preparada para o scaffold futuro.
-- Ponte explícita para scaffold técnico antes do CI completo.
+### 1. Reconciliação do repositório
+- O branch `codex/issue-7-m0-fundacao` tinha 6 commits locais não enviados (risco de perda) e estava 12 commits à frente do `main`. Tudo foi enviado ao `origin` e o `main` recebeu fast-forward com toda a fundação M0.
+- `main` agora contém: docs OSS, design system, `apps/web` (Next 16 + shadcn + `/financas` mock), `packages/collectors`, `packages/ui`.
 
-## Decisões preservadas do Claude
+### 2. Saneamento do monorepo (commit `chore: unificar monorepo em pnpm`)
+- Package manager unificado em **pnpm** (root tinha npm workspaces + `apps/web` tinha pnpm aninhado — inconsistente).
+- Removidos: `package-lock.json` (raiz e collectors), `apps/web/pnpm-workspace.yaml`, `apps/web/pnpm-lock.yaml`.
+- Criados: `pnpm-workspace.yaml` na raiz, lockfile único.
+- `.gitignore` expandido (`.env`, build outputs, `.obsidian`, editores).
 
-- MVP é a página viva de contrato público.
-- Sistema de confiança vem antes da UI final.
-- PNCP é a primeira fonte de dados.
-- Next.js + PostgreSQL + Drizzle é a arquitetura base.
-- IA não pode inventar fatos, acusar ou substituir evidência oficial.
-- Obsidian continua como camada de pensamento; `.planning/` é o contexto versionado para execução.
-- Interface deve seguir o design system social-cívico: eventos públicos, páginas de entidade, evidência, fonte e confiança.
-- `.claude/` fica fora do versionamento.
+### 3. Fundação de dados — `@deolho/db` (commit `feat(db): fundação de dados`)
+Pacote novo `packages/db` (Drizzle ORM + driver `postgres`) com o núcleo transversal que precisa existir desde o dia 1 (caro de retrofitar — `research/FEATURES.md`):
+- `sources` — catálogo de fontes; `limitacoes` alimenta TRUST-05.
+- `raw_records` — evidência verbatim (JSONB) + proveniência + versionamento append-only por `content_hash` (TRUST-02/03, DATA-04).
+- `entities` + `entity_references` — IDs canônicos + ponte de resolução.
+- `contracts` + `contract_events` — unidade do MVP + linha do tempo (CONT-04).
+- Tipagem de confiança (`trust_type`) embutida (TRUST-01); busca FTS portuguesa (tsvector gerado) + fuzzy `pg_trgm` (CONT-01).
+- Migration `0000` gerada + extensões `pg_trgm`/`unaccent`/`vector`.
+- `docker-compose.yml` (pgvector) na raiz; scripts `seed`/`check`; `.env.example`.
 
-## Obsidian
+## Verificações executadas
+- `pnpm --filter @deolho/db typecheck` → OK (0 erros).
+- `drizzle-kit generate` → migration `0000_square_talon.sql` gerada corretamente.
+- `pnpm --filter web build` → OK (Next 16.2.6 Turbopack; 3 rotas estáticas).
 
-Leia `.planning/OBSIDIAN.md` antes de mexer em decisões de produto ou arquitetura vindas de notas locais. O vault Obsidian atual não foi detectado dentro deste repositório; por isso, não há configuração `.obsidian/` versionada.
+## Pendências conhecidas (bloqueios)
+- **Migrations ao vivo + seed + check**: precisam de um Postgres acessível.
+  Docker **não está instalado** nesta máquina. Caminhos:
+  1. Instalar Docker Desktop → `docker compose up -d` → `pnpm --filter @deolho/db migrate && seed && check`.
+  2. OU usar Postgres gerenciado (Supabase/Neon, free tier — já trazem pg_trgm/unaccent/pgvector): pôr a connection string em `packages/db/.env` e rodar migrate/seed/check.
+- **Conectores**: o registry de MCP está vazio neste ambiente — **GitHub MCP e Supabase/Postgres MCP não estão disponíveis para adicionar**. Alternativas: `gh` CLI (não instalado) para issues/PRs; `DATABASE_URL` direto (não precisa de MCP para migrar). `Apify`, `Claude Preview` e `Claude in Chrome` estão conectados e prontos. Bright Data depende da CLI `bdata` (não instalada — skill `brightdata` guia o install).
 
 ## Próximo passo recomendado
+1. Prover um Postgres (Docker ou Supabase/Neon) e rodar `migrate → seed → check` para validar a fundação ao vivo.
+2. **Fatia vertical PNCP**: adaptar `packages/collectors/src/adapters/pncp.ts` para persistir em `@deolho/db` (raw_records → contracts + entities), e criar a primeira página viva de contrato em `apps/web` consumindo o banco (substituindo o mock de Americana). Requer `transpilePackages: ['@deolho/db']` no `next.config.ts` e ler `node_modules/next/dist/docs/` antes (Next 16 tem breaking changes — ver `apps/web/AGENTS.md`).
+3. Consertar o adapter `querido-diario` (recebe HTML em vez de JSON — `totalRegistros: 0`).
 
-Executar a issue #22 em uma branch nova após merge deste pacote:
-
-```bash
-git pull --ff-only
-git switch main
-git pull --ff-only
-git switch -c codex/issue-22-scaffold-tecnico
-```
-
-O scaffold deve criar os scripts que a issue #8 usará no CI.
-
-Ao criar `apps/web` e `packages/ui`, seguir `.planning/DESIGN_SYSTEM.md`, `docs/design-system/index.md`, `docs/design-system/shadcn.md` e a referência visual em `apps/docs/index.html` para estrutura de pastas, componentes shadcn base, componentes cívicos, estados obrigatórios e regras de agentes.
+## Decisões a registrar (candidatas a ADR)
+- Package manager: **pnpm** como padrão do monorepo.
+- Modelo de dados: padrão **typed-core + raw JSONB** com proveniência por campo, tipagem de confiança e IDs canônicos desde o início.
+- `pg-boss` (jobs) e colunas de embedding pgvector ficam para fases posteriores; a extensão `vector` já é criada.
