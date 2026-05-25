@@ -1,2 +1,33 @@
+# Agentes / config local (não versionar — ver AGENTS.md)
 .claude/
+
+# Dependências
 node_modules/
+.pnp.*
+
+# Build / output
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# Variáveis de ambiente (commitar apenas o exemplo)
+.env
+.env.*
+!.env.example
+
+# Logs
+*-debug.log*
+logs/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Obsidian — vault local é camada de pensamento, não versionada (ver OBSIDIAN.md)
+.obsidian/

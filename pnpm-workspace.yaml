@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Pacotes nativos cujos scripts de build são ignorados no install.
+# (movido de apps/web/pnpm-workspace.yaml ao unificar o monorepo em pnpm)
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
