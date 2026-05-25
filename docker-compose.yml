@@ -1,0 +1,29 @@
+# Postgres local com pgvector para desenvolvimento do DeOlho.
+#
+#   docker compose up -d        # sobe o banco em background
+#   docker compose down         # para (mantém os dados no volume)
+#   docker compose down -v      # para e apaga os dados
+#
+# As extensões (pg_trgm, unaccent, vector) são criadas pelas migrations de
+# @deolho/db, não aqui.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: deolho-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: deolho
+      POSTGRES_PASSWORD: deolho
+      POSTGRES_DB: deolho
+    ports:
+      - "5432:5432"
+    volumes:
+      - deolho_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U deolho -d deolho"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  deolho_pgdata:
