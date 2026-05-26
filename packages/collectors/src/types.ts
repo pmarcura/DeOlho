@@ -2,8 +2,12 @@ export type Fonte =
   | "pncp"
   | "tce-sp"
   | "querido-diario"
+  | "diario-americana"
+  | "transparencia-americana"
+  | "receita-cnpj"
   | "camara-americana"
-  | "cgu-transparencia";
+  | "cgu-transparencia"
+  | "tse";
 
 export interface ResultadoColeta<T = unknown> {
   fonte: Fonte;

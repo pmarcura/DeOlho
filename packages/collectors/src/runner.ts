@@ -7,8 +7,12 @@
 
 import { coletarPncp } from "./adapters/pncp.js";
 import { coletarQueiridoDiario } from "./adapters/querido-diario.js";
+import { coletarDiarioAmericana } from "./adapters/diario-americana.js";
+import { coletarTransparenciaAmericana } from "./adapters/transparencia-americana.js";
 import { coletarTceSp } from "./adapters/tce-sp.js";
 import { coletarCamaraAmericana } from "./adapters/camara-americana.js";
+import { coletarSancoes } from "./adapters/ceis-cnep.js";
+import { coletarTseDoacoes } from "./adapters/tse-doacoes.js";
 
 interface Adapter {
   nome: string;
@@ -18,8 +22,12 @@ interface Adapter {
 const adapters: Adapter[] = [
   { nome: "pncp", fn: coletarPncp },
   { nome: "querido-diario", fn: coletarQueiridoDiario },
+  { nome: "diario-americana", fn: coletarDiarioAmericana },
+  { nome: "transparencia-americana", fn: coletarTransparenciaAmericana },
   { nome: "tce-sp", fn: coletarTceSp },
   { nome: "camara-americana", fn: coletarCamaraAmericana },
+  { nome: "ceis-cnep", fn: () => coletarSancoes("ceis") },
+  { nome: "tse", fn: coletarTseDoacoes },
 ];
 
 async function run() {

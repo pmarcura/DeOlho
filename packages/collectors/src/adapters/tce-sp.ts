@@ -10,10 +10,17 @@
  * ATENÇÃO: Os endpoints exatos precisam de verificação na documentação oficial.
  * Se retornarem 404, inspecionar https://transparencia.tce.sp.gov.br com DevTools
  * para encontrar os endpoints reais usados pela interface.
+ *
+ * VERIFICADO 2026-05-25: `/despesas.json` retorna 404 e `api.tce.sp.gov.br` não
+ * resolve — os endpoints atuais ainda são desconhecidos (maior risco do eixo do
+ * dinheiro). Enquanto isso, coletarDespesas() retorna [] graciosamente; assim que
+ * o endpoint real for descoberto, a ingestão e o mapper (mappers/tce-sp.ts → payments)
+ * já estão prontos. Cuidado: o TCE-SP usa código próprio de município, não o IBGE.
  */
 
 import { get } from "../utils/http.js";
 import { salvar, salvarLatest } from "../utils/save.js";
+import { getDb, ingestRaw } from "../utils/ingest.js";
 import { AMERICANA, TCE_SP_BASE } from "../config.js";
 import type { ResultadoColeta, TceSpDespesa, TceSpReceita } from "../types.js";
 
@@ -64,6 +71,24 @@ export async function coletarTceSp(): Promise<void> {
     despesas.push(...d);
     receitas.push(...r);
     console.log(`[tce-sp] ${exercicio}: ${d.length} despesas, ${r.length} receitas`);
+  }
+
+  // Ingestão L0 — despesas como raw_records (eixo do dinheiro, lado da saída).
+  const db = getDb();
+  if (db) {
+    for (const d of despesas) {
+      const mes = String(d.mes ?? 1).padStart(2, "0");
+      await ingestRaw(db, {
+        sourceId: "tce-sp",
+        sourceKey: `despesa-${d.exercicio}-${d.empenho}`,
+        recordType: "despesa",
+        payload: d,
+        publishedAt: d.exercicio ? new Date(`${d.exercicio}-${mes}-01`) : null,
+      });
+    }
+    if (despesas.length) {
+      console.log(`[tce-sp] ingeridas ${despesas.length} despesas em raw_records`);
+    }
   }
 
   const agora = new Date().toISOString();

@@ -13,6 +13,7 @@
 
 import { get, sleep } from "../utils/http.js";
 import { salvar, salvarLatest } from "../utils/save.js";
+import { getDb, ingestRaw } from "../utils/ingest.js";
 import {
   AMERICANA,
   DATA_FINAL,
@@ -71,12 +72,13 @@ export async function coletarPncp(): Promise<void> {
   const erros: string[] = [];
   const agora = new Date().toISOString();
 
-  // Parâmetros comuns: município de Americana por código IBGE
-  const baseParams = {
-    codigoMunicipio: AMERICANA.ibge,
-    dataInicial: DATA_INICIAL,
-    dataFinal: DATA_FINAL,
-  };
+  // Período comum. ATENÇÃO aos filtros do PNCP: /contratos filtra por ÓRGÃO
+  // (cnpjOrgao), não por município; /contratacoes/publicacao aceita
+  // codigoMunicipioIbge e EXIGE codigoModalidadeContratacao (iterar 1..14 é o
+  // próximo passo — TODO). O `codigoMunicipio` antigo não era filtro válido.
+  const periodo = { dataInicial: DATA_INICIAL, dataFinal: DATA_FINAL };
+  const contratosParams = { ...periodo, cnpjOrgao: AMERICANA.cnpj };
+  const comprasParams = { ...periodo, codigoMunicipioIbge: AMERICANA.ibge };
 
   // 1. Licitações / compras
   let compras: PncpCompra[] = [];
@@ -84,7 +86,7 @@ export async function coletarPncp(): Promise<void> {
     console.log(`[pncp] Coletando licitações — ${AMERICANA.nome} — ${DATA_INICIAL} → ${DATA_FINAL}`);
     compras = await buscarTodos<PncpCompra>(
       "contratacoes/publicacao",
-      baseParams,
+      comprasParams,
       "licitações"
     );
   } catch (e) {
@@ -99,13 +101,44 @@ export async function coletarPncp(): Promise<void> {
     console.log(`[pncp] Coletando contratos — ${AMERICANA.nome}`);
     contratos = await buscarTodos<PncpContrato>(
       "contratos",
-      baseParams,
+      contratosParams,
       "contratos"
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     erros.push(`contratos: ${msg}`);
     console.error(`[pncp] Contratos erro: ${msg}`);
+  }
+
+  // Ingestão L0 — registros crus com proveniência (raw_records).
+  // Dedup por content_hash: re-rodar não duplica; conteúdo novo vira nova versão.
+  const db = getDb();
+  if (db) {
+    for (const c of compras) {
+      const cnpj = c.orgaoEntidade?.cnpj ?? "sem-cnpj";
+      await ingestRaw(db, {
+        sourceId: "pncp",
+        sourceKey: `compra-${cnpj}-${c.anoCompra}-${c.sequencialCompra}`,
+        recordType: "compra",
+        payload: c,
+        sourceUrl: c.orgaoEntidade?.cnpj
+          ? `https://pncp.gov.br/app/editais/${c.orgaoEntidade.cnpj}/${c.anoCompra}/${c.sequencialCompra}`
+          : null,
+        publishedAt: c.dataPublicacaoPncp ? new Date(c.dataPublicacaoPncp) : null,
+      });
+    }
+    for (const ct of contratos) {
+      await ingestRaw(db, {
+        sourceId: "pncp",
+        sourceKey: `contrato-${ct.anoContrato}-${ct.numeroContrato}-${ct.sequencialContrato}`,
+        recordType: "contrato",
+        payload: ct,
+        publishedAt: ct.dataAssinatura ? new Date(ct.dataAssinatura) : null,
+      });
+    }
+    console.log(
+      `[pncp] ingeridos ${compras.length} compras + ${contratos.length} contratos em raw_records`,
+    );
   }
 
   // Salva licitações

@@ -8,15 +8,31 @@
     "collect:pncp": "tsx src/adapters/pncp.ts",
     "collect:tce": "tsx src/adapters/tce-sp.ts",
     "collect:diario": "tsx src/adapters/querido-diario.ts",
-    "collect:camara": "tsx src/adapters/camara-americana.ts"
+    "collect:diario-americana": "tsx src/adapters/diario-americana.ts",
+    "collect:camara": "tsx src/adapters/camara-americana.ts",
+    "collect:ceis": "tsx src/adapters/ceis-cnep.ts",
+    "collect:tse": "tsx src/adapters/tse-doacoes.ts",
+    "map:pncp": "tsx src/mappers/pncp.ts",
+    "map:tce": "tsx src/mappers/tce-sp.ts",
+    "map:diario": "tsx src/mappers/diario-mentions.ts",
+    "enrich:socios": "tsx src/enrich/cnpj-socios.ts",
+    "collect:transparencia": "tsx src/adapters/transparencia-americana.ts",
+    "reconcile": "tsx src/reconcile/entities.ts",
+    "view:contract": "tsx src/queries/contract-view.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@deolho/db": "workspace:*",
     "crawlee": "^3.12.1",
+    "drizzle-orm": "^0.45.2",
+    "dotenv": "^17.4.2",
+    "pdf-parse": "^1.1.1",
     "playwright": "^1.52.0",
     "zod": "^3.25.56"
   },
   "devDependencies": {
     "@types/node": "^20.19.0",
+    "@types/pdf-parse": "^1.1.4",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }
