@@ -56,11 +56,57 @@ const fontes: NewSource[] = [
     id: "querido-diario",
     nome: "Querido Diário (Open Knowledge Brasil)",
     descricao: "Diários oficiais municipais com OCR e busca textual.",
-    baseUrl: "https://queridodiario.ok.org.br/api",
+    baseUrl: "https://api.queridodiario.ok.org.br",
     licenca: "Open Knowledge Brasil",
     cobertura: "Gazetas municipais das cidades cobertas pelo projeto.",
     limitacoes:
       "Cobertura municipal parcial. O texto vem de OCR e pode conter ruído.",
+    defaultTrustType: "fato_oficial",
+  },
+  {
+    id: "diario-americana",
+    nome: "Diário Oficial de Americana",
+    descricao:
+      "Diário oficial do município de Americana-SP, publicado diretamente pela prefeitura.",
+    baseUrl: "https://diariooficial.americana.sp.gov.br",
+    licenca: "Publicação oficial municipal",
+    cobertura:
+      "Atos oficiais do Município de Americana-SP publicados em seu diário oficial.",
+    limitacoes:
+      "Edições em PDF; o texto depende de extração e pode conter ruído. Cobertura conforme o calendário de publicação da prefeitura.",
+    defaultTrustType: "fato_oficial",
+  },
+  {
+    id: "transparencia-americana",
+    nome: "Portal da Transparência de Americana",
+    descricao: "Execução orçamentária, licitações e contratos do município.",
+    baseUrl: "https://transparencia.americana.sp.gov.br",
+    licenca: "Publicação oficial municipal (LAI 12.527/2011)",
+    cobertura: "Dados de transparência do Município de Americana-SP.",
+    limitacoes:
+      "Seção SIAFIC (despesas/empenhos com credor) marcada como 'em breve' em 2026-05 — a execução detalhada ainda não foi publicada no portal.",
+    defaultTrustType: "fato_oficial",
+  },
+  {
+    id: "receita-cnpj",
+    nome: "Cadastro Nacional da Pessoa Jurídica (Receita Federal via BrasilAPI)",
+    descricao: "Dados cadastrais e quadro de sócios (QSA) de empresas.",
+    baseUrl: "https://brasilapi.com.br/api/cnpj/v1",
+    licenca: "Dados públicos da Receita Federal",
+    cobertura: "Empresas com CNPJ na base da Receita Federal.",
+    limitacoes:
+      "O CPF dos sócios vem mascarado. Reflete a base da Receita, que pode ter defasagem de atualização.",
+    defaultTrustType: "fato_oficial",
+  },
+  {
+    id: "tse",
+    nome: "Tribunal Superior Eleitoral (Dados Abertos)",
+    descricao: "Prestação de contas eleitorais — receitas/doações e candidaturas.",
+    baseUrl: "https://dadosabertos.tse.jus.br",
+    licenca: "Dados abertos governamentais",
+    cobertura: "Eleições brasileiras (candidatos, doadores e despesas de campanha).",
+    limitacoes:
+      "Dados em arquivos bulk (CSV/ZIP) por eleição/UF; exigem download e filtragem por município/candidato.",
     defaultTrustType: "fato_oficial",
   },
 ];

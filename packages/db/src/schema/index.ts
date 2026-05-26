@@ -3,3 +3,7 @@ export * from "./sources";
 export * from "./raw-records";
 export * from "./entities";
 export * from "./contracts";
+export * from "./payments";
+export * from "./gazettes";
+export * from "./company-partners";
+export * from "./sanctions";

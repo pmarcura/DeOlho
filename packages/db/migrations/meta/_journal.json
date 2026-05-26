@@ -8,6 +8,27 @@
       "when": 1779670334370,
       "tag": "0000_square_talon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779747560442,
+      "tag": "0001_worthless_fenris",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779748972935,
+      "tag": "0002_panoramic_hedge_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779749964200,
+      "tag": "0003_short_sentinel",
+      "breakpoints": true
     }
   ]
 }
