@@ -1,64 +1,124 @@
+"use client";
+
+/**
+ * Home — DeOlho mobile-first.
+ *
+ * Estrutura (docs/patterns/telas.md "Home"):
+ *  - Carrossel territorial (Brasil → SP → Americana → bairro → temas).
+ *  - Radar de mudanças públicas (EventoPublicoCard em lista vertical).
+ *  - Entidades em destaque (EntidadeCard).
+ *  - Aviso de dados sintéticos.
+ *  - Navegação inferior mobile (MobileBottomNav via AppShell).
+ *
+ * Sem hero de marketing. Sem feed social. Sem post/like.
+ */
+import { useState } from "react";
 import Link from "next/link";
-import { Eye, Search, FileText, Building2, MapPin } from "lucide-react";
+import { ArrowRight, FileText, Radar as RadarIcon, Eye } from "lucide-react";
+import { AppShell } from "@/components/app-shell/app-shell";
+import { TerritorialCarousel } from "@/components/deolho/territorial-carousel";
+import { EventoPublicoCard, EntidadeCard } from "@/components/deolho/cards";
+import { AvisoSintetico } from "@/components/deolho/blocos";
 import { Button } from "@/components/ui/button";
+import { EVENTOS_RADAR, TERRITORIOS, EMPRESAS_REF, PREFEITURA_REF } from "@/lib/civic-data";
 
 export default function HomePage() {
+  const [territorio, setTerritorio] = useState<string>("americana");
+
   return (
-    <main className="flex flex-col items-center justify-center min-h-svh gap-8 px-4 py-16">
-      <div className="flex flex-col items-center gap-3 text-center max-w-2xl">
-        <div className="flex items-center gap-2 text-[var(--political)] font-semibold text-sm tracking-wide uppercase">
-          <Eye className="w-4 h-4" />
-          DeOlho
+    <AppShell>
+      {/* Hero compacto — não vende, situa */}
+      <section className="flex flex-col gap-1 pb-1">
+        <div className="flex items-center gap-1.5 text-[var(--political)] text-[10px] font-semibold uppercase tracking-wider">
+          <Eye className="w-3 h-3" aria-hidden />
+          DeOlho · Americana, SP
         </div>
-        <h1 className="text-4xl font-bold tracking-tight text-balance">
-          Transparência cívica para qualquer cidadão
+        <h1 className="text-xl font-bold tracking-tight leading-tight">
+          O que mudou na coisa pública hoje?
         </h1>
-        <p className="text-muted-foreground text-lg text-balance">
-          Transformamos dados públicos difíceis em conhecimento verificável.
-          Contratos, vereadores, obras e licitações — tudo com fonte, data e grau de confiança.
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Atos, contratos e atualizações verificáveis — com fonte, data e grau de confiança.
         </p>
-        <div className="flex items-center gap-3 mt-2">
-          <Button size="lg">
-            <Search className="w-4 h-4" />
-            Buscar contrato
-          </Button>
-          <Button variant="outline" size="lg" asChild>
-            <Link href="/financas">Ver Americana — SP</Link>
+      </section>
+
+      {/* Atualizações recentes — carrossel territorial */}
+      <section className="mt-5">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+          Atualizações recentes
+        </h2>
+        <TerritorialCarousel
+          items={TERRITORIOS}
+          selectedId={territorio}
+          onSelect={setTerritorio}
+        />
+      </section>
+
+      {/* Radar de mudanças públicas */}
+      <section className="mt-5">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <RadarIcon className="w-3.5 h-3.5" aria-hidden />
+            Radar de mudanças públicas
+          </h2>
+          <Button variant="link" size="xs" asChild>
+            <Link href="/radar" className="flex items-center gap-0.5">
+              ver todas
+              <ArrowRight className="w-3 h-3" aria-hidden />
+            </Link>
           </Button>
         </div>
-      </div>
+        <div className="flex flex-col gap-2.5">
+          {EVENTOS_RADAR.slice(0, 4).map((ev) => (
+            <EventoPublicoCard key={ev.id} evento={ev} />
+          ))}
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl mt-4">
-        <FeatureCard icon={FileText} label="Contratos públicos" description="PNCP · Portal da Transparência" />
-        <FeatureCard icon={Building2} label="Câmara Municipal" description="Vereadores · Votações · Projetos" />
-        <FeatureCard icon={MapPin} label="Território" description="Bairros · Obras · Impacto" />
-      </div>
+      {/* Entidades em destaque */}
+      <section className="mt-6">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+          Entidades em destaque
+        </h2>
+        <div className="flex flex-col gap-2">
+          <EntidadeCard
+            entidade={PREFEITURA_REF}
+            subtitulo="Órgão público sintético · Americana, SP"
+          />
+          {EMPRESAS_REF.map((e) => (
+            <EntidadeCard
+              key={e.id}
+              entidade={e}
+              subtitulo="Empresa sintética com vínculo público sintético"
+            />
+          ))}
+        </div>
+      </section>
 
-      <p className="text-xs text-muted-foreground">
-        Piloto: <strong>Americana, SP</strong> · IBGE 3501608 · Open source
-      </p>
-    </main>
-  );
-}
+      {/* Atalho /financas como ponte para o que já existe */}
+      <section className="mt-6">
+        <Link
+          href="/financas"
+          className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-4 py-3 hover:shadow-sm transition-shadow"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="w-10 h-10 rounded-xl bg-[var(--political-soft)] text-[var(--political)] flex items-center justify-center shrink-0">
+              <FileText className="w-5 h-5" aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold">Painel financeiro de Americana</p>
+              <p className="text-xs text-muted-foreground truncate">
+                Orçamento, contratos por mês, secretarias e fornecedores.
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden />
+        </Link>
+      </section>
 
-function FeatureCard({
-  icon: Icon,
-  label,
-  description,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  description: string;
-}) {
-  return (
-    <div className="group rounded-xl border border-border/60 bg-card p-5 flex flex-col gap-4 hover:shadow-sm transition-shadow cursor-default">
-      <div className="w-10 h-10 rounded-xl bg-[var(--political-soft)] flex items-center justify-center">
-        <Icon className="w-5 h-5 text-[var(--political)]" />
-      </div>
-      <div>
-        <p className="font-semibold text-sm">{label}</p>
-        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{description}</p>
-      </div>
-    </div>
+      {/* Rodapé com aviso de dados sintéticos */}
+      <section className="mt-6 mb-4">
+        <AvisoSintetico />
+      </section>
+    </AppShell>
   );
 }
