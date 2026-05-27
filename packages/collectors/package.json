@@ -19,6 +19,7 @@
     "collect:transparencia": "tsx src/adapters/transparencia-americana.ts",
     "reconcile": "tsx src/reconcile/entities.ts",
     "view:contract": "tsx src/queries/contract-view.ts",
+    "extract:atoms": "tsx src/extract/atoms.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
