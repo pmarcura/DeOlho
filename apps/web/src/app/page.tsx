@@ -1,124 +1,141 @@
-"use client";
-
 /**
- * Home — DeOlho mobile-first.
+ * Home — feed cívico de Americana com dados REAIS.
  *
- * Estrutura (docs/patterns/telas.md "Home"):
- *  - Carrossel territorial (Brasil → SP → Americana → bairro → temas).
- *  - Radar de mudanças públicas (EventoPublicoCard em lista vertical).
- *  - Entidades em destaque (EntidadeCard).
- *  - Aviso de dados sintéticos.
- *  - Navegação inferior mobile (MobileBottomNav via AppShell).
- *
- * Sem hero de marketing. Sem feed social. Sem post/like.
+ * Sem fixtures. O feed é montado a partir das edições reais do Diário Oficial
+ * de Americana (raspadas pelo coletor — 60 edições com PDFs reais). Reações
+ * cívicas em CADA edição (👀 🤔 🚩 nunca em pessoa). Stories de bairros e temas
+ * pra navegação rápida. Tom conversacional, mobile-first, sem cara de SaaS.
  */
-import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, FileText, Radar as RadarIcon, Eye } from "lucide-react";
+import { Eye, ArrowRight } from "lucide-react";
 import { AppShell } from "@/components/app-shell/app-shell";
-import { TerritorialCarousel } from "@/components/deolho/territorial-carousel";
-import { EventoPublicoCard, EntidadeCard } from "@/components/deolho/cards";
-import { AvisoSintetico } from "@/components/deolho/blocos";
-import { Button } from "@/components/ui/button";
-import { EVENTOS_RADAR, TERRITORIOS, EMPRESAS_REF, PREFEITURA_REF } from "@/lib/civic-data";
+import { EventoCard } from "@/components/feed/event-card";
+import { StoriesRow, type StoryItem } from "@/components/feed/stories-row";
+import { GeoBreadcrumb } from "@/components/feed/geo-breadcrumb";
+import { EmptyState } from "@/components/feed/empty-state";
+import { getDiarioEdicoes, getDiarioMeta, dataAmigavel, dataExtensa } from "@/lib/diario";
+import { BAIRROS_AMERICANA } from "@/lib/civic-data";
 
-export default function HomePage() {
-  const [territorio, setTerritorio] = useState<string>("americana");
+export const revalidate = 600; // 10 min — combina com cadência do scraper
+
+function saudacao(now = new Date()): string {
+  const h = now.getHours();
+  if (h < 5) return "Boa madrugada";
+  if (h < 12) return "Bom dia";
+  if (h < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
+export default async function HomePage() {
+  const [edicoes, meta] = await Promise.all([getDiarioEdicoes(), getDiarioMeta()]);
+  const feed = edicoes.filter((e) => e.date).slice(0, 12); // só com data
+  const ultimaData = feed[0]?.date ?? null;
+
+  const stories: StoryItem[] = [
+    { id: "tudo", label: "tudo", href: "/", iniciais: "✨", novo: true, bg: "bg-foreground/5", fg: "text-foreground" },
+    { id: "saude", label: "saúde", href: "/explorar?tema=saude", iniciais: "💚" },
+    { id: "educacao", label: "educação", href: "/explorar?tema=educacao", iniciais: "📚" },
+    { id: "infra", label: "infra", href: "/explorar?tema=infra", iniciais: "🏗️" },
+    { id: "cultura", label: "cultura", href: "/explorar?tema=cultura", iniciais: "🎭" },
+    ...BAIRROS_AMERICANA.slice(0, 6).map((b) => ({
+      id: b.toLowerCase().replace(/\s+/g, "-"),
+      label: b.toLowerCase(),
+      href: `/explorar?bairro=${encodeURIComponent(b)}`,
+    })),
+  ];
 
   return (
     <AppShell>
-      {/* Hero compacto — não vende, situa */}
-      <section className="flex flex-col gap-1 pb-1">
-        <div className="flex items-center gap-1.5 text-[var(--political)] text-[10px] font-semibold uppercase tracking-wider">
-          <Eye className="w-3 h-3" aria-hidden />
-          DeOlho · Americana, SP
+      {/* Saudação amigável */}
+      <section className="pt-1">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Eye className="w-3.5 h-3.5 text-[var(--political)]" aria-hidden />
+          <span>de olho em americana</span>
         </div>
-        <h1 className="text-xl font-bold tracking-tight leading-tight">
-          O que mudou na coisa pública hoje?
+        <h1 className="text-2xl font-bold tracking-tight leading-tight mt-1">
+          {saudacao()} 👋
         </h1>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Atos, contratos e atualizações verificáveis — com fonte, data e grau de confiança.
+        <p className="text-sm text-foreground/70 mt-0.5">
+          {ultimaData
+            ? `Última atualização do diário: ${dataAmigavel(ultimaData)}.`
+            : "Conferindo o que rolou na prefeitura."}
         </p>
       </section>
 
-      {/* Atualizações recentes — carrossel territorial */}
-      <section className="mt-5">
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-          Atualizações recentes
-        </h2>
-        <TerritorialCarousel
-          items={TERRITORIOS}
-          selectedId={territorio}
-          onSelect={setTerritorio}
+      {/* Geo breadcrumb */}
+      <div className="mt-3">
+        <GeoBreadcrumb
+          niveis={[
+            { label: "Brasil", href: "/explorar" },
+            { label: "SP", href: "/explorar?uf=SP" },
+            { label: "Americana", href: "/", ativo: true },
+          ]}
+        />
+      </div>
+
+      {/* Stories de temas/bairros */}
+      <section className="mt-4">
+        <StoriesRow items={stories} />
+      </section>
+
+      {/* Feed real */}
+      <section className="mt-4 flex flex-col gap-4">
+        {feed.map((e, idx) => (
+          <EventoCard
+            key={e.slug}
+            autor={{
+              nome: "Prefeitura de Americana",
+              iniciais: "PA",
+              paleta: "bg-emerald-100 text-emerald-700",
+            }}
+            tempo={dataAmigavel(e.date)}
+            tipoLabel={e.isExtra ? "diário · edição extra" : "diário oficial"}
+            trust="oficial"
+            visual={
+              e.isExtra
+                ? { bg: "bg-gradient-to-br from-amber-100 to-rose-100", emoji: "📰" }
+                : { bg: "bg-gradient-to-br from-sky-100 to-emerald-100", emoji: "📜" }
+            }
+            titulo={
+              e.isExtra
+                ? `Edição extra · ${dataExtensa(e.date)}`
+                : `Edição de ${dataExtensa(e.date)}`
+            }
+            resumo={
+              e.isExtra
+                ? "A prefeitura publicou uma edição extra. PDF oficial disponível pra consulta."
+                : "Diário oficial do dia, com atos, nomeações e publicações da prefeitura."
+            }
+            href={`/diario/${e.slug}`}
+            cta={{ label: "abrir PDF", href: e.url, externo: true }}
+            fonte={{
+              label: "@prefeitura-americana",
+              url: "https://www.americana.sp.gov.br",
+            }}
+            shareUrl={`/diario/${e.slug}`}
+          />
+        ))}
+
+        {/* Estado honesto: o que ainda não temos */}
+        <EmptyState
+          icone="🚧"
+          titulo="Contratos e pagamentos: estamos chegando"
+          descricao={`Pra Americana, a execução orçamentária (despesas e pagamentos com credor) ainda não foi publicada pela prefeitura. Os contratos do PNCP entram quando o coletor passar pela API. Por enquanto, fica só o diário — que já são ${meta.total} edições reais.`}
+          acao={
+            <Link
+              href="/financas"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--political)] mt-1"
+            >
+              ver painel financeiro
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden />
+            </Link>
+          }
         />
       </section>
 
-      {/* Radar de mudanças públicas */}
-      <section className="mt-5">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <RadarIcon className="w-3.5 h-3.5" aria-hidden />
-            Radar de mudanças públicas
-          </h2>
-          <Button variant="link" size="xs" asChild>
-            <Link href="/radar" className="flex items-center gap-0.5">
-              ver todas
-              <ArrowRight className="w-3 h-3" aria-hidden />
-            </Link>
-          </Button>
-        </div>
-        <div className="flex flex-col gap-2.5">
-          {EVENTOS_RADAR.slice(0, 4).map((ev) => (
-            <EventoPublicoCard key={ev.id} evento={ev} />
-          ))}
-        </div>
-      </section>
-
-      {/* Entidades em destaque */}
-      <section className="mt-6">
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-          Entidades em destaque
-        </h2>
-        <div className="flex flex-col gap-2">
-          <EntidadeCard
-            entidade={PREFEITURA_REF}
-            subtitulo="Órgão público sintético · Americana, SP"
-          />
-          {EMPRESAS_REF.map((e) => (
-            <EntidadeCard
-              key={e.id}
-              entidade={e}
-              subtitulo="Empresa sintética com vínculo público sintético"
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Atalho /financas como ponte para o que já existe */}
-      <section className="mt-6">
-        <Link
-          href="/financas"
-          className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-card px-4 py-3 hover:shadow-sm transition-shadow"
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="w-10 h-10 rounded-xl bg-[var(--political-soft)] text-[var(--political)] flex items-center justify-center shrink-0">
-              <FileText className="w-5 h-5" aria-hidden />
-            </span>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold">Painel financeiro de Americana</p>
-              <p className="text-xs text-muted-foreground truncate">
-                Orçamento, contratos por mês, secretarias e fornecedores.
-              </p>
-            </div>
-          </div>
-          <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden />
-        </Link>
-      </section>
-
-      {/* Rodapé com aviso de dados sintéticos */}
-      <section className="mt-6 mb-4">
-        <AvisoSintetico />
-      </section>
+      <p className="text-[11px] text-muted-foreground/70 text-center mt-6 mb-2">
+        {meta.total} edições reais carregadas · última coleta {dataAmigavel(meta.ultimaColeta.slice(0, 10))}
+      </p>
     </AppShell>
   );
 }

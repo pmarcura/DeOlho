@@ -16,11 +16,12 @@ import { useRouter } from "next/navigation";
 import { Eye, Search, X, FileText, Building2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Atalhos reais (sem fixtures). CNPJs vieram de extração validada no diário.
 const SUGESTOES = [
-  { tipo: "Contrato", label: "CT-2026/118 — Manutenção escolar", href: "/contrato/ct-sint-001" },
-  { tipo: "Empresa", label: "Construtora Sintética Alfa", href: "/entidade/empresa/construtora-sintetica-alfa" },
-  { tipo: "Órgão", label: "Município de Americana", href: "/entidade/orgao/municipio-americana" },
-  { tipo: "Cidade", label: "Americana — SP", href: "/cidade/americana" },
+  { tipo: "Empresa", label: "CNPJ 47.145.224/0001-55", href: "/empresa/47145224000155" },
+  { tipo: "Empresa", label: "CNPJ 23.228.076/0001-74", href: "/empresa/23228076000174" },
+  { tipo: "Diário", label: "Edições do diário oficial", href: "/radar" },
+  { tipo: "Painel", label: "Painel financeiro de Americana", href: "/financas" },
 ];
 
 export function TopSearchBar() {

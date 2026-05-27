@@ -1,120 +1,164 @@
 /**
- * Explorar — navegar por entidades.
+ * /explorar — entrada para entidades REAIS.
  *
- * Mobile-first: tiles de tipo (Contratos / Empresas / Órgãos / Pessoas /
- * Cidades / Documentos / Leis / Temas) → entidades em destaque.
- *
- * Suporta ?q= da busca universal (sem ranking moral; resultado mostra tipo+fonte).
+ * Mostra os CNPJs reais que já apareceram no diário (extraídos com checksum
+ * validado), as cidades e os temas. Sem fixtures. Cada CNPJ leva para
+ * /empresa/[cnpj] que carrega BrasilAPI + CEIS reais.
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  Building2,
-  FileText,
-  Hammer,
-  Landmark,
-  MapPin,
-  ScrollText,
-  Tag,
-  UserCircle2,
-} from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Tag } from "lucide-react";
 import { AppShell } from "@/components/app-shell/app-shell";
-import { EntidadeCard } from "@/components/deolho/cards";
-import { AvisoSintetico } from "@/components/deolho/blocos";
-import { Card, CardContent } from "@/components/ui/card";
-import { EMPRESAS_REF, PREFEITURA_REF, CONTRATO_DESTAQUE } from "@/lib/civic-data";
+import { StoriesRow, type StoryItem } from "@/components/feed/stories-row";
+import { GeoBreadcrumb } from "@/components/feed/geo-breadcrumb";
+import { CNPJS_DO_DIARIO, BAIRROS_AMERICANA } from "@/lib/civic-data";
 
 export const metadata: Metadata = {
   title: "Explorar — DeOlho",
-  description: "Navegar por entidades públicas verificáveis.",
+  description: "Empresas, cidades, bairros e temas com dado público verificável.",
 };
 
-const TIPOS = [
-  { tipo: "contrato", label: "Contratos", icon: FileText, href: "/contrato/ct-sint-001" },
-  { tipo: "empresa", label: "Empresas", icon: Building2, href: "/entidade/empresa/construtora-sintetica-alfa" },
-  { tipo: "orgao", label: "Órgãos", icon: Landmark, href: "/entidade/orgao/municipio-americana" },
-  { tipo: "pessoa-publica", label: "Agentes públicos", icon: UserCircle2, href: "/explorar?q=vereador" },
-  { tipo: "cidade", label: "Cidades", icon: MapPin, href: "/cidade/americana" },
-  { tipo: "obra", label: "Obras", icon: Hammer, href: "/explorar?q=obra" },
-  { tipo: "lei", label: "Leis", icon: ScrollText, href: "/explorar?q=lei" },
-  { tipo: "tema", label: "Temas", icon: Tag, href: "/explorar?q=tema" },
-] as const;
-
 interface PageProps {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; tema?: string; bairro?: string }>;
+}
+
+function formatarCnpj(d: string): string {
+  if (d.length !== 14) return d;
+  return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
 }
 
 export default async function ExplorarPage({ searchParams }: PageProps) {
-  const { q } = await searchParams;
+  const { q, tema, bairro } = await searchParams;
+
+  const stories: StoryItem[] = [
+    { id: "saude", label: "saúde", href: "/explorar?tema=saude", iniciais: "💚" },
+    { id: "educacao", label: "educação", href: "/explorar?tema=educacao", iniciais: "📚" },
+    { id: "infra", label: "infra", href: "/explorar?tema=infra", iniciais: "🏗️" },
+    { id: "cultura", label: "cultura", href: "/explorar?tema=cultura", iniciais: "🎭" },
+    ...BAIRROS_AMERICANA.slice(0, 6).map((b) => ({
+      id: b.toLowerCase().replace(/\s+/g, "-"),
+      label: b.toLowerCase(),
+      href: `/explorar?bairro=${encodeURIComponent(b)}`,
+    })),
+  ];
 
   return (
     <AppShell>
-      <section className="flex flex-col gap-1 pb-1">
-        <h1 className="text-xl font-bold tracking-tight leading-tight">
-          Navegar por entidades
-        </h1>
-        <p className="text-sm text-muted-foreground">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-3"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" aria-hidden />
+        voltar
+      </Link>
+
+      <header className="mb-3">
+        <h1 className="text-2xl font-bold tracking-tight leading-tight">Explorar</h1>
+        <p className="text-sm text-foreground/70 mt-0.5">
           {q
-            ? `Mostrando resultados sintéticos para "${q}".`
-            : "Comece pelo tipo de informação que você quer ver com seus olhos."}
+            ? `Resultados para "${q}".`
+            : tema
+              ? `Filtrando por ${tema}.`
+              : bairro
+                ? `Bairro: ${bairro}.`
+                : "Empresas, bairros e temas — só o que existe de verdade."}
+        </p>
+      </header>
+
+      <GeoBreadcrumb
+        niveis={[
+          { label: "Brasil", href: "/explorar" },
+          { label: "SP", href: "/explorar?uf=SP" },
+          { label: "Americana", href: "/explorar", ativo: true },
+        ]}
+        className="mb-3"
+      />
+
+      <StoriesRow items={stories} className="mb-5" />
+
+      {/* CNPJs reais que apareceram no diário */}
+      <section className="mb-4">
+        <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
+          <Building2 className="w-4 h-4 text-foreground/70" aria-hidden />
+          empresas que apareceram no diário
+        </h2>
+        <div className="flex flex-col gap-2">
+          {CNPJS_DO_DIARIO.map((cnpj) => (
+            <Link
+              key={cnpj}
+              href={`/empresa/${cnpj}`}
+              className="rounded-2xl bg-card border border-border/40 shadow-sm px-4 py-3 hover:shadow-md transition-shadow flex items-center gap-3 group"
+            >
+              <span
+                aria-hidden
+                className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-100 to-rose-100 text-violet-700 flex items-center justify-center text-xs font-semibold shrink-0"
+              >
+                {cnpj.slice(0, 2)}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  CNPJ
+                </p>
+                <p className="text-sm font-medium font-mono">{formatarCnpj(cnpj)}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  toque para ver razão social, sócios e sanções
+                </p>
+              </div>
+              <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                →
+              </span>
+            </Link>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted-foreground/80 mt-2 px-1">
+          Mais empresas aparecem aqui à medida que o extrator de texto do PDF for completando o
+          cruzamento diário ↔ CNPJ.
         </p>
       </section>
 
-      {/* Grid de tipos */}
-      <section className="mt-4 grid grid-cols-2 gap-2">
-        {TIPOS.map((t) => {
-          const Icon = t.icon;
-          return (
-            <Link
-              key={t.tipo}
-              href={t.href}
-              className="rounded-xl border border-border/60 bg-card p-3 hover:shadow-sm transition-shadow flex items-center gap-2.5"
-            >
-              <span className="w-9 h-9 rounded-lg bg-[var(--political-soft)] text-[var(--political)] flex items-center justify-center shrink-0">
-                <Icon className="w-4 h-4" aria-hidden />
-              </span>
-              <span className="text-sm font-medium">{t.label}</span>
-            </Link>
-          );
-        })}
-      </section>
-
-      {/* Entidades em destaque */}
-      <section className="mt-6">
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-          Em destaque
+      {/* Temas — placeholder honesto */}
+      <section className="mb-4">
+        <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
+          <Tag className="w-4 h-4 text-foreground/70" aria-hidden />
+          temas
         </h2>
-        <div className="flex flex-col gap-2">
-          <EntidadeCard
-            entidade={PREFEITURA_REF}
-            subtitulo="Órgão público sintético · Americana, SP"
-          />
-          {EMPRESAS_REF.map((e) => (
-            <EntidadeCard key={e.id} entidade={e} subtitulo="Empresa sintética" />
+        <div className="grid grid-cols-2 gap-2">
+          {["Saúde", "Educação", "Infraestrutura", "Cultura"].map((t) => (
+            <Link
+              key={t}
+              href={`/explorar?tema=${t.toLowerCase()}`}
+              className="rounded-2xl bg-card border border-border/40 shadow-sm px-4 py-3 text-sm font-medium hover:shadow-md transition-shadow"
+            >
+              {t}
+            </Link>
           ))}
-          <Link
-            href={`/contrato/${CONTRATO_DESTAQUE.id}`}
-            className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 rounded-xl"
-          >
-            <Card size="sm" className="hover:shadow-sm transition-shadow">
-              <CardContent className="flex items-center gap-3 py-1">
-                <span className="w-11 h-11 rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-200/80 flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5" aria-hidden />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Contrato</p>
-                  <p className="text-sm font-medium truncate">
-                    {CONTRATO_DESTAQUE.numero} · {CONTRATO_DESTAQUE.objeto}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
         </div>
+        <p className="text-[11px] text-muted-foreground/80 mt-2 px-1">
+          Filtro por tema entra quando os atos do diário forem classificados.
+        </p>
       </section>
 
-      <section className="mt-6 mb-2">
-        <AvisoSintetico />
+      {/* Bairros — placeholder honesto */}
+      <section className="mb-4">
+        <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
+          <MapPin className="w-4 h-4 text-foreground/70" aria-hidden />
+          bairros de Americana
+        </h2>
+        <div className="grid grid-cols-2 gap-2">
+          {BAIRROS_AMERICANA.slice(0, 6).map((b) => (
+            <Link
+              key={b}
+              href={`/explorar?bairro=${encodeURIComponent(b)}`}
+              className="rounded-2xl bg-card border border-border/40 shadow-sm px-4 py-3 text-sm font-medium hover:shadow-md transition-shadow"
+            >
+              {b}
+            </Link>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted-foreground/80 mt-2 px-1">
+          Lista manual enquanto não houver tipagem geo nos atos. O drill-down deep
+          (rua → bairro → cidade) entra quando a fonte publicar localização.
+        </p>
       </section>
     </AppShell>
   );
