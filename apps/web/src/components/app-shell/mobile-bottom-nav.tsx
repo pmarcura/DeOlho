@@ -10,17 +10,17 @@
  */
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Radar, Compass, Map, Plus } from "lucide-react";
+import { Home, Compass, Map } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Pedro 28/05: 3 itens, sem FAB (+). "Nenhum usuário vai adicionar nada."
 const ITEMS = [
   { href: "/", label: "Início", icon: Home },
-  { href: "/radar", label: "Radar", icon: Radar },
   { href: "/explorar", label: "Explorar", icon: Compass },
   { href: "/mapa", label: "Mapa", icon: Map },
 ] as const;
 
-export function MobileBottomNav({ onPlus }: { onPlus?: () => void }) {
+export function MobileBottomNav() {
   const pathname = usePathname() ?? "/";
 
   function isActive(href: string) {
@@ -37,25 +37,8 @@ export function MobileBottomNav({ onPlus }: { onPlus?: () => void }) {
         "pb-[max(env(safe-area-inset-bottom),0.25rem)]",
       )}
     >
-      <ul className="grid grid-cols-5 items-center max-w-md mx-auto">
-        {ITEMS.slice(0, 2).map((it) => (
-          <NavItem key={it.href} {...it} active={isActive(it.href)} />
-        ))}
-        <li className="flex items-center justify-center">
-          <button
-            type="button"
-            onClick={onPlus}
-            aria-label="Ações contextuais"
-            className={cn(
-              "w-12 h-12 -mt-5 rounded-full bg-[var(--political)] text-white shadow-lg ring-4 ring-card",
-              "flex items-center justify-center hover:bg-[var(--political)]/90 transition-colors",
-              "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--political)]/30",
-            )}
-          >
-            <Plus className="w-5 h-5" aria-hidden />
-          </button>
-        </li>
-        {ITEMS.slice(2).map((it) => (
+      <ul className="grid grid-cols-3 items-center max-w-md mx-auto">
+        {ITEMS.map((it) => (
           <NavItem key={it.href} {...it} active={isActive(it.href)} />
         ))}
       </ul>

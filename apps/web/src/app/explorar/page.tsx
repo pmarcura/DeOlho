@@ -1,46 +1,40 @@
 /**
- * /explorar — entrada para entidades REAIS.
+ * /explorar — reformulado depois do feedback do Pedro.
  *
- * Mostra os CNPJs reais que já apareceram no diário (extraídos com checksum
- * validado), as cidades e os temas. Sem fixtures. Cada CNPJ leva para
- * /empresa/[cnpj] que carrega BrasilAPI + CEIS reais.
+ * Saiu o grid genérico "tipos de entidade". Entra DESCOBERTA:
+ *  1. Empresas em alta (CNPJs com mais menções no diário)
+ *  2. Atos em destaque (átomos top-score da semana)
+ *  3. Bairros de Americana (placeholder até dado real entrar)
+ *  4. Vereadores e Escolas (placeholders honestos — exigem novas fontes)
+ *
+ * Mantém a vibe Instagram-explore mas focado em civic, não social.
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Building2, MapPin, Tag } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, GraduationCap, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell/app-shell";
-import { StoriesRow, type StoryItem } from "@/components/feed/stories-row";
+import { AtomCard } from "@/components/feed/atom-card";
+import { EmptyState } from "@/components/feed/empty-state";
 import { GeoBreadcrumb } from "@/components/feed/geo-breadcrumb";
-import { CNPJS_DO_DIARIO, BAIRROS_AMERICANA } from "@/lib/civic-data";
+import { getAtomsRanqueados, getTopCnpjs } from "@/lib/atoms";
+import { BAIRROS_AMERICANA } from "@/lib/civic-data";
 
+export const revalidate = 600;
 export const metadata: Metadata = {
   title: "Explorar — DeOlho",
-  description: "Empresas, cidades, bairros e temas com dado público verificável.",
+  description: "Descobrir empresas em alta, atos em destaque, bairros e mais.",
 };
-
-interface PageProps {
-  searchParams: Promise<{ q?: string; tema?: string; bairro?: string }>;
-}
 
 function formatarCnpj(d: string): string {
   if (d.length !== 14) return d;
   return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
 }
 
-export default async function ExplorarPage({ searchParams }: PageProps) {
-  const { q, tema, bairro } = await searchParams;
-
-  const stories: StoryItem[] = [
-    { id: "saude", label: "saúde", href: "/explorar?tema=saude", iniciais: "💚" },
-    { id: "educacao", label: "educação", href: "/explorar?tema=educacao", iniciais: "📚" },
-    { id: "infra", label: "infra", href: "/explorar?tema=infra", iniciais: "🏗️" },
-    { id: "cultura", label: "cultura", href: "/explorar?tema=cultura", iniciais: "🎭" },
-    ...BAIRROS_AMERICANA.slice(0, 6).map((b) => ({
-      id: b.toLowerCase().replace(/\s+/g, "-"),
-      label: b.toLowerCase(),
-      href: `/explorar?bairro=${encodeURIComponent(b)}`,
-    })),
-  ];
+export default async function ExplorarPage() {
+  const [topCnpjs, destaques] = await Promise.all([
+    getTopCnpjs(8),
+    getAtomsRanqueados({ categoria: "tudo", limit: 3 }),
+  ]);
 
   return (
     <AppShell>
@@ -55,13 +49,7 @@ export default async function ExplorarPage({ searchParams }: PageProps) {
       <header className="mb-3">
         <h1 className="text-2xl font-bold tracking-tight leading-tight">Explorar</h1>
         <p className="text-sm text-foreground/70 mt-0.5">
-          {q
-            ? `Resultados para "${q}".`
-            : tema
-              ? `Filtrando por ${tema}.`
-              : bairro
-                ? `Bairro: ${bairro}.`
-                : "Empresas, bairros e temas — só o que existe de verdade."}
+          Descubra empresas, atos em destaque, lugares e pessoas públicas.
         </p>
       </header>
 
@@ -71,75 +59,73 @@ export default async function ExplorarPage({ searchParams }: PageProps) {
           { label: "SP", href: "/explorar?uf=SP" },
           { label: "Americana", href: "/explorar", ativo: true },
         ]}
-        className="mb-3"
+        className="mb-5"
       />
 
-      <StoriesRow items={stories} className="mb-5" />
+      {/* Atos em destaque (top 3 ranqueados) */}
+      <section className="mb-6">
+        <h2 className="text-sm font-semibold mb-2 px-1">🔥 em destaque agora</h2>
+        <div className="flex flex-col gap-3">
+          {destaques.map((a) => (
+            <AtomCard key={a.id} atom={a} />
+          ))}
+        </div>
+        <Link
+          href="/radar"
+          className="inline-flex items-center justify-center w-full h-10 mt-3 rounded-full bg-foreground/5 text-foreground/80 text-sm font-medium hover:bg-foreground/10"
+        >
+          ver tudo no radar
+        </Link>
+      </section>
 
-      {/* CNPJs reais que apareceram no diário */}
-      <section className="mb-4">
+      {/* Empresas em alta (CNPJs com mais menções no diário) */}
+      <section className="mb-6">
         <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
           <Building2 className="w-4 h-4 text-foreground/70" aria-hidden />
-          empresas que apareceram no diário
+          empresas em alta
         </h2>
-        <div className="flex flex-col gap-2">
-          {CNPJS_DO_DIARIO.map((cnpj) => (
-            <Link
-              key={cnpj}
-              href={`/empresa/${cnpj}`}
-              className="rounded-2xl bg-card border border-border/40 shadow-sm px-4 py-3 hover:shadow-md transition-shadow flex items-center gap-3 group"
-            >
-              <span
-                aria-hidden
-                className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-100 to-rose-100 text-violet-700 flex items-center justify-center text-xs font-semibold shrink-0"
+        {topCnpjs.length === 0 ? (
+          <EmptyState
+            icone="🏢"
+            titulo="Ainda sem empresas detectadas"
+            descricao="A extração de CNPJs do texto dos PDFs vai melhorando à medida que o regex é refinado."
+          />
+        ) : (
+          <div className="flex flex-col gap-2">
+            {topCnpjs.map((e) => (
+              <Link
+                key={e.cnpj}
+                href={`/empresa/${e.cnpj}`}
+                className="rounded-2xl bg-card border border-border/40 shadow-sm px-4 py-3 hover:shadow-md transition-shadow flex items-center gap-3"
               >
-                {cnpj.slice(0, 2)}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  CNPJ
-                </p>
-                <p className="text-sm font-medium font-mono">{formatarCnpj(cnpj)}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  toque para ver razão social, sócios e sanções
-                </p>
-              </div>
-              <span className="text-muted-foreground group-hover:text-foreground transition-colors">
-                →
-              </span>
-            </Link>
-          ))}
-        </div>
-        <p className="text-[11px] text-muted-foreground/80 mt-2 px-1">
-          Mais empresas aparecem aqui à medida que o extrator de texto do PDF for completando o
-          cruzamento diário ↔ CNPJ.
-        </p>
+                <span
+                  aria-hidden
+                  className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-100 to-rose-100 text-violet-700 flex items-center justify-center text-xs font-semibold shrink-0"
+                >
+                  {e.cnpj.slice(0, 2)}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    CNPJ
+                  </p>
+                  <p className="text-sm font-mono">{formatarCnpj(e.cnpj)}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-semibold text-[var(--political)] tabular-nums">
+                    {e.mencoes}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {e.mencoes === 1 ? "menção" : "menções"}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* Temas — placeholder honesto */}
-      <section className="mb-4">
-        <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
-          <Tag className="w-4 h-4 text-foreground/70" aria-hidden />
-          temas
-        </h2>
-        <div className="grid grid-cols-2 gap-2">
-          {["Saúde", "Educação", "Infraestrutura", "Cultura"].map((t) => (
-            <Link
-              key={t}
-              href={`/explorar?tema=${t.toLowerCase()}`}
-              className="rounded-2xl bg-card border border-border/40 shadow-sm px-4 py-3 text-sm font-medium hover:shadow-md transition-shadow"
-            >
-              {t}
-            </Link>
-          ))}
-        </div>
-        <p className="text-[11px] text-muted-foreground/80 mt-2 px-1">
-          Filtro por tema entra quando os atos do diário forem classificados.
-        </p>
-      </section>
-
-      {/* Bairros — placeholder honesto */}
-      <section className="mb-4">
+      {/* Bairros de Americana */}
+      <section className="mb-6">
         <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
           <MapPin className="w-4 h-4 text-foreground/70" aria-hidden />
           bairros de Americana
@@ -155,10 +141,35 @@ export default async function ExplorarPage({ searchParams }: PageProps) {
             </Link>
           ))}
         </div>
-        <p className="text-[11px] text-muted-foreground/80 mt-2 px-1">
-          Lista manual enquanto não houver tipagem geo nos atos. O drill-down deep
-          (rua → bairro → cidade) entra quando a fonte publicar localização.
+        <p className="text-[11px] text-muted-foreground/80 mt-2 px-1 leading-relaxed">
+          Filtro real por bairro entra quando os atos do diário forem geo-tageados.
         </p>
+      </section>
+
+      {/* Vereadores — placeholder honesto */}
+      <section className="mb-6">
+        <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
+          <Users className="w-4 h-4 text-foreground/70" aria-hidden />
+          vereadores
+        </h2>
+        <EmptyState
+          icone="🗳️"
+          titulo="Vereadores: precisamos da Câmara"
+          descricao="Próximo passo: raspar o portal da Câmara Municipal de Americana pra trazer cada vereador, suas propostas, votações e gastos de gabinete. Sem fonte oficial não tem post."
+        />
+      </section>
+
+      {/* Escolas — placeholder honesto */}
+      <section className="mb-4">
+        <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
+          <GraduationCap className="w-4 h-4 text-foreground/70" aria-hidden />
+          escolas públicas
+        </h2>
+        <EmptyState
+          icone="🏫"
+          titulo="Escolas: depende do SIAFIC"
+          descricao="Quando a Secretaria de Educação publicar gastos por unidade (ou o SIAFIC municipal entrar no ar), cada escola vira uma página com orçamento, contratos e obras."
+        />
       </section>
     </AppShell>
   );

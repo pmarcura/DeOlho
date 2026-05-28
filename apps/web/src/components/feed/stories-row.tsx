@@ -18,6 +18,8 @@ export interface StoryItem {
   iniciais?: string;
   /** Quando true, mostra anel gradiente quente — indicando conteúdo novo. */
   novo?: boolean;
+  /** Quando true, marca como categoria ativa do feed (ring escuro). */
+  ativo?: boolean;
   /** Override de paleta determinística. */
   bg?: string;
   fg?: string;
@@ -73,6 +75,7 @@ export function StoriesRow({
                     "relative w-16 h-16 rounded-full flex items-center justify-center transition-transform group-hover:scale-[1.02]",
                     pal.bg,
                     pal.fg,
+                    it.ativo && "ring-[3px] ring-foreground",
                   )}
                 >
                   {it.novo && (

@@ -1,22 +1,21 @@
 /**
- * /radar — feed completo de átomos do diário (sem limite).
+ * /radar — feed completo de átomos (sem limite), ordenado por relevância.
  *
- * Filtros por categoria via ?cat=, ordenação por data (mais recentes primeiro).
- * Quando esquema DB entrar em produção, vira query paginada.
+ * Stories são o único filtro — mesma estrutura que a Home.
  */
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { AtomCard } from "@/components/feed/atom-card";
-import { FeedFilter } from "@/components/feed/feed-filter";
+import { StoriesRow, type StoryItem } from "@/components/feed/stories-row";
 import { EmptyState } from "@/components/feed/empty-state";
-import { getAtoms, getAtomsStats, type CategoriaFeed } from "@/lib/atoms";
+import { getAtomsRanqueados, getAtomsStats, type CategoriaFeed } from "@/lib/atoms";
 
 export const revalidate = 600;
 export const metadata: Metadata = {
   title: "Radar — DeOlho",
-  description: "Todos os atos do diário de Americana, em ordem cronológica.",
+  description: "Todos os atos do diário de Americana ranqueados por relevância.",
 };
 
 const CATEGORIAS_VALIDAS: CategoriaFeed[] = ["tudo", "dinheiro", "leis", "atos", "convenios"];
@@ -32,9 +31,17 @@ export default async function RadarPage({ searchParams }: PageProps) {
     : "tudo";
 
   const [atoms, stats] = await Promise.all([
-    getAtoms({ categoria: cat }),
+    getAtomsRanqueados({ categoria: cat }),
     getAtomsStats(),
   ]);
+
+  const stories: StoryItem[] = [
+    { id: "tudo", label: "tudo", href: "/radar", iniciais: "✨", ativo: cat === "tudo", bg: "bg-foreground/8", fg: "text-foreground" },
+    { id: "dinheiro", label: "dinheiro", href: "/radar?cat=dinheiro", iniciais: "💰", ativo: cat === "dinheiro" },
+    { id: "leis", label: "leis", href: "/radar?cat=leis", iniciais: "📜", ativo: cat === "leis" },
+    { id: "atos", label: "atos", href: "/radar?cat=atos", iniciais: "📃", ativo: cat === "atos" },
+    { id: "convenios", label: "convênios", href: "/radar?cat=convenios", iniciais: "🤝", ativo: cat === "convenios" },
+  ];
 
   return (
     <AppShell>
@@ -49,12 +56,12 @@ export default async function RadarPage({ searchParams }: PageProps) {
       <header className="mb-3">
         <h1 className="text-2xl font-bold tracking-tight leading-tight">Radar</h1>
         <p className="text-sm text-foreground/70 mt-0.5">
-          {atoms.length} de {stats.total} atos · extraídos de {stats.edicoesProcessadas} edições reais
+          {atoms.length} de {stats.total} atos · ranqueados por relevância
         </p>
       </header>
 
       <section className="mb-4">
-        <FeedFilter ativo={cat} basePath="/radar" />
+        <StoriesRow items={stories} ariaLabel="Filtrar por categoria" />
       </section>
 
       <section className="flex flex-col gap-4">

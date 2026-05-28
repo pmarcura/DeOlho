@@ -167,3 +167,98 @@ export const TIPO_META: Record<
 export function tipoLabel(t: TipoAto): string {
   return TIPO_META[t].label;
 }
+
+// ── Algoritmo de relevância ──────────────────────────────────────────────────
+// O feed não é só "cronológico cego". Atos de dinheiro pesam mais, com CNPJ
+// pesa mais, recente pesa mais. Resultado: o usuário vê o que importa primeiro.
+const PESO_TIPO: Record<TipoAto, number> = {
+  contrato: 30,
+  pregao: 25,
+  edital: 20,
+  concorrencia: 20,
+  ata_registro: 15,
+  aditivo: 12,
+  convite: 10,
+  convenio: 10,
+  lei: 5,
+  decreto: 3,
+  resolucao: 2,
+  portaria: 1,
+};
+
+function scoreAtomo(a: Atom, hojeMs = Date.now()): number {
+  let s = PESO_TIPO[a.tipo];
+  if (a.valorMencionado) s += 25;
+  if (a.cnpjsMencionados.length > 0) s += 15 * Math.min(a.cnpjsMencionados.length, 3);
+  if (a.edicaoDate) {
+    const dias = (hojeMs - new Date(a.edicaoDate + "T12:00:00").getTime()) / 86_400_000;
+    if (dias < 7) s += 25;
+    else if (dias < 30) s += 15;
+    else if (dias < 90) s += 8;
+    else if (dias < 365) s += 3;
+  }
+  return s;
+}
+
+/**
+ * Versão ranqueada do feed — substitui ordering cronológico cego por relevância.
+ * Mesma assinatura de getAtoms; usar nas páginas de feed (Home, Radar).
+ */
+export async function getAtomsRanqueados(
+  options: { categoria?: CategoriaFeed; limit?: number; tipo?: TipoAto } = {},
+): Promise<Atom[]> {
+  const lista = await getAtoms({ ...options, limit: undefined });
+  const ordenada = [...lista].sort((a, b) => scoreAtomo(b) - scoreAtomo(a));
+  return options.limit ? ordenada.slice(0, options.limit) : ordenada;
+}
+
+// ── Limpeza leve do resumo ───────────────────────────────────────────────────
+/**
+ * Limpa noise comum de extração de PDF: espaços múltiplos, hifenizações de
+ * quebra de linha, sequências "…". Não é normalização de NLP — só ajustes
+ * cosméticos pra leitura ficar mais fluida.
+ */
+export function limparResumo(t: string): string {
+  return t
+    .replace(/\s+/g, " ")
+    .replace(/(\w)-\s(\w)/g, "$1$2") // junta palavras hifenizadas pela quebra
+    .replace(/…\s*/g, "… ")
+    .trim();
+}
+
+// ── Top entidades (CNPJs mais mencionados) ───────────────────────────────────
+/**
+ * Empresas em destaque no diário — CNPJs ordenados pelo nº de átomos
+ * em que aparecem. Usado em /explorar pra ranking de "empresas em alta".
+ */
+export async function getTopCnpjs(limit = 10): Promise<Array<{ cnpj: string; mencoes: number }>> {
+  const data = await load();
+  const cont: Record<string, number> = {};
+  for (const a of data.atomos) {
+    for (const c of a.cnpjsMencionados) cont[c] = (cont[c] ?? 0) + 1;
+  }
+  return Object.entries(cont)
+    .map(([cnpj, mencoes]) => ({ cnpj, mencoes }))
+    .sort((a, b) => b.mencoes - a.mencoes)
+    .slice(0, limit);
+}
+
+// ── Resolver referência cruzada ──────────────────────────────────────────────
+/**
+ * "lei-6274-2019" → todos os átomos onde (tipo=lei, numero=6274, ano=2019).
+ * Usado em /ref/[slug] pra mostrar "tudo que correlaciona com essa lei".
+ */
+export async function getAtomsPorRef(
+  tipo: TipoAto,
+  numero: string,
+  ano: string | null,
+): Promise<Atom[]> {
+  const data = await load();
+  const numLimpo = numero.replace(/\./g, "");
+  return data.atomos.filter(
+    (a) =>
+      a.tipo === tipo &&
+      a.numero.replace(/\./g, "") === numLimpo &&
+      (ano === null || a.ano === ano),
+  );
+}

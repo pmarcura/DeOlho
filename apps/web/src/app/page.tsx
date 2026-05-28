@@ -1,25 +1,24 @@
 /**
  * Home — feed cívico de Americana montado por ÁTOMOS reais.
  *
- * Cada post no feed é UM ato individual extraído do texto do diário:
+ * Stories são o ÚNICO filtro (Pedro: "só as bolinhas, nada de duas formas").
+ * Cada post no feed é um ato individual extraído do diário.
  *  - 1 contrato = 1 post (com valor R$ destacado)
  *  - 1 lei = 1 post
  *  - 1 decreto/portaria = 1 post
  *  - 1 pregão/edital = 1 post
  *
- * @CNPJs mencionados viram pills clicáveis → /empresa/[cnpj]. A edição PDF
- * de origem fica como proveniência no rodapé do post.
+ * Algoritmo de relevância: atos de dinheiro pesam mais, com CNPJ pesa mais,
+ * recente pesa mais — ranqueia o feed em vez de só ordenar por data.
  */
 import Link from "next/link";
 import { Eye } from "lucide-react";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { AtomCard } from "@/components/feed/atom-card";
-import { FeedFilter } from "@/components/feed/feed-filter";
 import { StoriesRow, type StoryItem } from "@/components/feed/stories-row";
 import { GeoBreadcrumb } from "@/components/feed/geo-breadcrumb";
 import { EmptyState } from "@/components/feed/empty-state";
-import { getAtoms, getAtomsStats, type CategoriaFeed } from "@/lib/atoms";
-import { BAIRROS_AMERICANA } from "@/lib/civic-data";
+import { getAtomsRanqueados, getAtomsStats, type CategoriaFeed } from "@/lib/atoms";
 
 export const revalidate = 600;
 
@@ -44,20 +43,17 @@ export default async function HomePage({ searchParams }: PageProps) {
     : "tudo";
 
   const [atoms, stats] = await Promise.all([
-    getAtoms({ categoria: cat, limit: 20 }),
+    getAtomsRanqueados({ categoria: cat, limit: 20 }),
     getAtomsStats(),
   ]);
 
+  // Stories = filtros principais. Sem duplicação com chip bar.
   const stories: StoryItem[] = [
-    { id: "tudo", label: "tudo", href: "/", iniciais: "✨", novo: true, bg: "bg-foreground/5", fg: "text-foreground" },
-    { id: "dinheiro", label: "dinheiro", href: "/?cat=dinheiro", iniciais: "💰" },
-    { id: "leis", label: "leis", href: "/?cat=leis", iniciais: "📜" },
-    { id: "atos", label: "atos", href: "/?cat=atos", iniciais: "📃" },
-    ...BAIRROS_AMERICANA.slice(0, 5).map((b) => ({
-      id: b.toLowerCase().replace(/\s+/g, "-"),
-      label: b.toLowerCase(),
-      href: `/explorar?bairro=${encodeURIComponent(b)}`,
-    })),
+    { id: "tudo", label: "tudo", href: "/", iniciais: "✨", ativo: cat === "tudo", bg: "bg-foreground/8", fg: "text-foreground", novo: cat !== "tudo" },
+    { id: "dinheiro", label: "dinheiro", href: "/?cat=dinheiro", iniciais: "💰", ativo: cat === "dinheiro" },
+    { id: "leis", label: "leis", href: "/?cat=leis", iniciais: "📜", ativo: cat === "leis" },
+    { id: "atos", label: "atos", href: "/?cat=atos", iniciais: "📃", ativo: cat === "atos" },
+    { id: "convenios", label: "convênios", href: "/?cat=convenios", iniciais: "🤝", ativo: cat === "convenios" },
   ];
 
   return (
@@ -72,9 +68,9 @@ export default async function HomePage({ searchParams }: PageProps) {
           {saudacao()} 👋
         </h1>
         <p className="text-sm text-foreground/70 mt-0.5">
-          {stats.total} atos extraídos do diário. {atoms.length > 0
-            ? `Aqui vai o que rolou${cat !== "tudo" ? ` em ${cat}` : ""}.`
-            : "Ainda não temos nada dessa categoria coletado."}
+          {atoms.length > 0
+            ? `${stats.total} atos extraídos do diário. ${cat === "tudo" ? "Veja o que rolou." : `Filtrando por ${cat}.`}`
+            : "Ainda não temos nada nessa categoria coletado."}
         </p>
       </section>
 
@@ -88,27 +84,20 @@ export default async function HomePage({ searchParams }: PageProps) {
         />
       </div>
 
+      {/* Stories = único filtro */}
       <section className="mt-4">
-        <StoriesRow items={stories} />
+        <StoriesRow items={stories} ariaLabel="Filtrar por categoria" />
       </section>
 
-      {/* Filtro do feed */}
-      <section className="mt-4">
-        <FeedFilter ativo={cat} basePath="/" />
-      </section>
-
-      {/* Feed de átomos */}
+      {/* Feed atômico ranqueado */}
       <section className="mt-4 flex flex-col gap-4">
         {atoms.length === 0 ? (
           <EmptyState
             icone="🪴"
-            titulo="Sem atos nesta categoria"
-            descricao={`Nenhum ato do tipo "${cat}" foi extraído ainda. Volte mais tarde — o coletor roda periodicamente.`}
+            titulo="Nenhum ato nessa categoria"
+            descricao="Volte mais tarde — o coletor roda periodicamente e novos atos aparecem aqui."
             acao={
-              <Link
-                href="/"
-                className="text-sm font-semibold text-[var(--political)] mt-1"
-              >
+              <Link href="/" className="text-sm font-semibold text-[var(--political)] mt-1">
                 voltar pra tudo
               </Link>
             }
@@ -119,8 +108,8 @@ export default async function HomePage({ searchParams }: PageProps) {
 
         {atoms.length >= 20 && (
           <Link
-            href="/radar"
-            className="inline-flex items-center justify-center gap-1 h-10 rounded-full bg-foreground/5 text-foreground/80 font-medium hover:bg-foreground/10 transition-colors"
+            href={cat === "tudo" ? "/radar" : `/radar?cat=${cat}`}
+            className="inline-flex items-center justify-center gap-1 h-11 rounded-full bg-foreground/5 text-foreground/80 font-medium hover:bg-foreground/10 transition-colors"
           >
             ver tudo no radar
           </Link>
@@ -128,8 +117,7 @@ export default async function HomePage({ searchParams }: PageProps) {
       </section>
 
       <p className="text-[11px] text-muted-foreground/70 text-center mt-6 mb-2">
-        {stats.total} atos atômicos extraídos de {stats.edicoesProcessadas} edições reais do
-        Diário Oficial de Americana
+        {stats.total} atos atômicos · {stats.edicoesProcessadas} edições reais do diário
       </p>
     </AppShell>
   );
