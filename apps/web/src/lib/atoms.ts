@@ -27,6 +27,49 @@ export type TipoAto =
   | "convenio"
   | "ata_registro";
 
+// Campos estruturados extraídos pelo Civic Content Compiler (collectors/compile/).
+export interface CamposContrato {
+  contratante?: string;
+  contratada?: string;
+  objeto?: string;
+  valor?: string;
+  valorNum?: number;
+  processo?: string;
+  modalidade?: string;
+  fundamento?: string;
+  vigencia?: string;
+  prazo?: string;
+}
+export interface CamposLei {
+  ementa?: string;
+  citacoes?: string[];
+}
+export interface CamposPortaria {
+  ato?: string;
+  agente?: string;
+  cargo?: string;
+  fundamento?: string;
+}
+export interface CamposPregao {
+  objeto?: string;
+  processo?: string;
+  modalidade?: string;
+  abertura?: string;
+  estado?: "aberto" | "suspenso" | "anulado" | "homologado" | "deserto" | "indefinido";
+}
+export type Campos =
+  | { tipo: "contrato" | "aditivo"; dados: CamposContrato }
+  | { tipo: "lei"; dados: CamposLei }
+  | { tipo: "portaria" | "decreto" | "resolucao"; dados: CamposPortaria }
+  | { tipo: "edital" | "pregao" | "concorrencia" | "convite" | "ata_registro" | "convenio"; dados: CamposPregao };
+
+export interface ComplexidadeUI {
+  nivel: 1 | 2 | 3 | 4 | 5;
+  label: "muito fácil" | "fácil" | "médio" | "técnico" | "muito técnico";
+  tempoLeitura: number;
+  stats?: Record<string, number>;
+}
+
 export interface Atom {
   id: string;
   edicaoSlug: string;
@@ -39,6 +82,14 @@ export interface Atom {
   posicao: number;
   cnpjsMencionados: string[];
   valorMencionado: string | null;
+  // Enriquecimento do Civic Content Compiler (opcionais — alguns átomos podem
+  // não ter tudo se o compiler não conseguiu extrair).
+  tituloHumano?: string | null;
+  subtitulo?: string | null;
+  campos?: Campos;
+  glossario?: Array<{ termo: string; definicao: string }>;
+  complexidade?: ComplexidadeUI;
+  resumoLimpo?: string;
 }
 
 interface AtomsFile {
@@ -186,10 +237,30 @@ const PESO_TIPO: Record<TipoAto, number> = {
   portaria: 1,
 };
 
+function parsearValor(s: string | null | undefined): number {
+  if (!s) return 0;
+  const m = s.match(/R\$\s*([\d.]+,\d{2})/);
+  if (!m) return 0;
+  return Number.parseFloat(m[1]!.replace(/\./g, "").replace(",", "."));
+}
+
 function scoreAtomo(a: Atom, hojeMs = Date.now()): number {
   let s = PESO_TIPO[a.tipo];
-  if (a.valorMencionado) s += 25;
+
+  // Valor R$ — log scale (R$ 1M ≠ 1000× R$ 1k, mas pesa mais)
+  const valor = parsearValor(a.valorMencionado);
+  if (valor > 0) {
+    s += Math.min(40, Math.log10(valor) * 8); // log10(1k)=3 → +24; log10(1M)=6 → +40 (cap)
+  }
+
+  // CNPJ — múltiplos pesam mais (até 3)
   if (a.cnpjsMencionados.length > 0) s += 15 * Math.min(a.cnpjsMencionados.length, 3);
+
+  // Título humano e campos estruturados = melhor pra ler
+  if (a.tituloHumano) s += 10;
+  if (a.campos && Object.keys((a.campos as { dados: object }).dados).length >= 3) s += 8;
+
+  // Freshness
   if (a.edicaoDate) {
     const dias = (hojeMs - new Date(a.edicaoDate + "T12:00:00").getTime()) / 86_400_000;
     if (dias < 7) s += 25;
@@ -197,19 +268,57 @@ function scoreAtomo(a: Atom, hojeMs = Date.now()): number {
     else if (dias < 90) s += 8;
     else if (dias < 365) s += 3;
   }
+
   return s;
 }
 
 /**
- * Versão ranqueada do feed — substitui ordering cronológico cego por relevância.
- * Mesma assinatura de getAtoms; usar nas páginas de feed (Home, Radar).
+ * Versão ranqueada com DIVERSIDADE: depois de ordenar por score, aplica uma
+ * penalidade leve em átomos do mesmo tipo/empresa consecutivos. Resultado:
+ * o feed mistura conteúdos em vez de mostrar 5 contratos seguidos da mesma
+ * empresa.
  */
 export async function getAtomsRanqueados(
   options: { categoria?: CategoriaFeed; limit?: number; tipo?: TipoAto } = {},
 ): Promise<Atom[]> {
   const lista = await getAtoms({ ...options, limit: undefined });
-  const ordenada = [...lista].sort((a, b) => scoreAtomo(b) - scoreAtomo(a));
-  return options.limit ? ordenada.slice(0, options.limit) : ordenada;
+  if (lista.length === 0) return [];
+
+  // Ranqueia inicialmente
+  const ranked = [...lista]
+    .map((a) => ({ atom: a, score: scoreAtomo(a) }))
+    .sort((a, b) => b.score - a.score);
+
+  // Aplica re-ranking com diversidade (round-robin leve)
+  const out: Atom[] = [];
+  const ultimosTipos: string[] = [];
+  const ultimasEmpresas: string[] = [];
+  const usados = new Set<string>();
+
+  while (out.length < ranked.length) {
+    let bestIdx = -1;
+    let bestScore = -Infinity;
+    for (let i = 0; i < ranked.length; i++) {
+      if (usados.has(ranked[i]!.atom.id)) continue;
+      const a = ranked[i]!.atom;
+      let s = ranked[i]!.score;
+      // Penalidade se o tipo apareceu nas 2 últimas posições
+      if (ultimosTipos.slice(-2).includes(a.tipo)) s -= 8;
+      // Penalidade se algum CNPJ apareceu nas 3 últimas posições
+      for (const c of a.cnpjsMencionados) {
+        if (ultimasEmpresas.slice(-3).includes(c)) { s -= 12; break; }
+      }
+      if (s > bestScore) { bestScore = s; bestIdx = i; }
+    }
+    if (bestIdx === -1) break;
+    const escolhido = ranked[bestIdx]!.atom;
+    out.push(escolhido);
+    usados.add(escolhido.id);
+    ultimosTipos.push(escolhido.tipo);
+    for (const c of escolhido.cnpjsMencionados) ultimasEmpresas.push(c);
+  }
+
+  return options.limit ? out.slice(0, options.limit) : out;
 }
 
 // ── Limpeza leve do resumo ───────────────────────────────────────────────────
