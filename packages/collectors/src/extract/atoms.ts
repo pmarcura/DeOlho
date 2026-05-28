@@ -20,6 +20,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { baixarPdf, extrairTextoPdf } from "../utils/pdf.js";
 import { extrairCnpjs } from "../utils/documento.js";
+import { compilarLote } from "../compile/index.js";
 
 const IN_PATH = path.resolve(process.cwd(), "data/diario-americana/latest.json");
 const OUT_PATH = path.resolve(process.cwd(), "data/diario-americana/atoms.json");
@@ -155,7 +156,10 @@ function slugFromUrl(url: string): string {
   return file.replace(/\.pdf$/i, "");
 }
 
-function trechoEmTornoDe(texto: string, posicao: number, antes = 80, depois = 200): string {
+// Contexto amplo: o compiler (sections.ts) precisa de bastante texto pra
+// encontrar CONTRATANTE/CONTRATADA/OBJETO/VALOR/PROCESSO de um contrato.
+// 1500 chars cobre a maior parte dos atos sem aumentar muito o JSON.
+function trechoEmTornoDe(texto: string, posicao: number, antes = 100, depois = 1400): string {
   const start = Math.max(0, posicao - antes);
   const end = Math.min(texto.length, posicao + depois);
   let trecho = texto.slice(start, end).replace(/\s+/g, " ").trim();
@@ -279,16 +283,30 @@ async function main() {
     return a.edicaoDate < b.edicaoDate ? 1 : -1;
   });
 
+  // Civic Content Compiler — enriquece cada átomo com titulo humano,
+  // campos estruturados, glossário e score de complexidade.
+  console.log(`[atoms] compilando ${todos.length} átomos (zero LLM, regras determinísticas)...`);
+  const compilados = compilarLote(todos);
+
+  // Estatísticas de qualidade
+  const comTituloHumano = compilados.filter((a) => a.tituloHumano).length;
+  const comCampos = compilados.filter((a) => Object.keys(a.campos.dados).length > 0).length;
+  const porComplexidade: Record<string, number> = {};
+  for (const a of compilados) porComplexidade[a.complexidade.label] = (porComplexidade[a.complexidade.label] ?? 0) + 1;
+
   const saida = {
     geradoEm: new Date().toISOString(),
     totalAtomos: todos.length,
     edicoesProcessadas: edicoes.length,
     porTipo,
-    atomos: todos,
+    qualidade: { comTituloHumano, comCampos, porComplexidade },
+    atomos: compilados,
   };
   await fs.writeFile(OUT_PATH, JSON.stringify(saida, null, 2), "utf8");
-  console.log(`[atoms] ${todos.length} átomos extraídos em ${elapsed}s → ${OUT_PATH}`);
+  console.log(`[atoms] ${todos.length} átomos extraídos + compilados em ${elapsed}s → ${OUT_PATH}`);
   console.log("[atoms] distribuição por tipo:", porTipo);
+  console.log(`[atoms] qualidade: ${comTituloHumano} com título humano, ${comCampos} com campos estruturados`);
+  console.log("[atoms] complexidade:", porComplexidade);
 }
 
 if (process.argv[1]?.endsWith("atoms.ts") || process.argv[1]?.endsWith("atoms.js")) {
