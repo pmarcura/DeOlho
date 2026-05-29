@@ -46,6 +46,7 @@ export interface CamposLei {
 }
 export interface CamposPortaria {
   ato?: string;
+  ementa?: string;
   agente?: string;
   cargo?: string;
   fundamento?: string;
@@ -70,6 +71,23 @@ export interface ComplexidadeUI {
   stats?: Record<string, number>;
 }
 
+export type PapelPessoa =
+  | "signatario" | "nomeado" | "exonerado" | "designado" | "revogado" | "citado";
+
+export interface PessoaCitada {
+  nome: string;
+  slug: string;
+  sobrenome: string;
+  papel: PapelPessoa;
+  cargo: string | null;
+}
+
+export interface OrgaoCitado {
+  nome: string;
+  slug: string;
+  sigla: string | null;
+}
+
 export interface Atom {
   id: string;
   edicaoSlug: string;
@@ -90,6 +108,12 @@ export interface Atom {
   glossario?: Array<{ termo: string; definicao: string }>;
   complexidade?: ComplexidadeUI;
   resumoLimpo?: string;
+  /** Texto fiel ao documento, legível (começa no ato, sem boilerplate). */
+  textoDocumento?: string;
+  /** Agentes públicos citados (signatário + nomeado/exonerado), com cargo. */
+  pessoas?: PessoaCitada[];
+  /** Órgãos citados (Secretarias, DAE, Guarda Municipal…). */
+  orgaos?: OrgaoCitado[];
 }
 
 interface AtomsFile {
@@ -178,6 +202,34 @@ export async function getAtomsPorCnpj(cnpj: string): Promise<Atom[]> {
   const data = await load();
   const doc = cnpj.replace(/\D+/g, "");
   return data.atomos.filter((a) => a.cnpjsMencionados.includes(doc));
+}
+
+/** Átomos por lista de ids, preservando a ordem cronológica do feed. */
+export async function getAtomsPorIds(ids: string[]): Promise<Atom[]> {
+  const data = await load();
+  const set = new Set(ids);
+  return data.atomos.filter((a) => set.has(a.id));
+}
+
+/**
+ * Átomos que mencionam um nº de processo. O slug vem como "818-2025" /
+ * "11-634-2025"; reconstruímos um regex tolerante a separadores (.,/) pra achar
+ * "11.634/2025" no texto. Resposta a "processo… clicar e ver tudo que conecta".
+ */
+export async function getAtomsPorProcesso(numeroSlug: string): Promise<Atom[]> {
+  const partes = numeroSlug.split("-").filter((p) => /^\d+$/.test(p));
+  if (partes.length < 2) return [];
+  const re = new RegExp(`\\b${partes.join("\\D{0,3}")}\\b`);
+  const data = await load();
+  return data.atomos.filter((a) => re.test(a.resumo));
+}
+
+/** Átomos de um ano — pela data da edição OU pelo ano do próprio ato. */
+export async function getAtomsPorAno(ano: string): Promise<Atom[]> {
+  const data = await load();
+  return data.atomos.filter(
+    (a) => a.ano === ano || (a.edicaoDate?.slice(0, 4) === ano),
+  );
 }
 
 export async function getAtomsStats(): Promise<{

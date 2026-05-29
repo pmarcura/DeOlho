@@ -16,7 +16,7 @@ import { AppShell } from "@/components/app-shell/app-shell";
 import { AtomCard } from "@/components/feed/atom-card";
 import { EmptyState } from "@/components/feed/empty-state";
 import { TipoExplicacao } from "@/components/feed/tipo-explicacao";
-import { getAtomsPorRef, TIPO_META, type TipoAto } from "@/lib/atoms";
+import { getAtomsPorRef, getAtomsPorProcesso, TIPO_META, type TipoAto, type Atom } from "@/lib/atoms";
 import { cn } from "@/lib/utils";
 
 interface PageProps {
@@ -44,6 +44,17 @@ interface ParsedRef {
   ano: string | null;
 }
 
+/** "processo-818-2025" → "818/2025"; "processo-11-634-2025" → "11.634/2025". */
+function numeroProcesso(slug: string): string {
+  const partes = slug.replace(/^processo-/, "").split("-").filter(Boolean);
+  if (partes.length === 0) return slug;
+  const ultimo = partes[partes.length - 1]!;
+  if (/^\d{4}$/.test(ultimo) && partes.length > 1) {
+    return `${partes.slice(0, -1).join(".")}/${ultimo}`;
+  }
+  return partes.join(".");
+}
+
 function parseSlug(slug: string): ParsedRef | null {
   // Slug: tipo-numero(-ano). Tipo pode ter "_" (ata_registro).
   const decoded = decodeURIComponent(slug);
@@ -63,6 +74,10 @@ function parseSlug(slug: string): ParsedRef | null {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+  if (slug.startsWith("processo-")) {
+    const num = numeroProcesso(slug);
+    return { title: `Processo nº ${num} — DeOlho`, description: `Atos ligados ao processo ${num} no diário de Americana.` };
+  }
   const ref = parseSlug(slug);
   if (!ref) return { title: "Referência não encontrada — DeOlho" };
   const meta = TIPO_META[ref.tipo];
@@ -75,6 +90,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function RefPage({ params }: PageProps) {
   const { slug } = await params;
+
+  // Processo administrativo — cross-ref por varredura de texto.
+  if (slug.startsWith("processo-")) {
+    const numero = numeroProcesso(slug);
+    const atoms = await getAtomsPorProcesso(slug.replace(/^processo-/, ""));
+    return <ProcessoView numero={numero} atoms={atoms} />;
+  }
+
   const ref = parseSlug(slug);
   if (!ref) notFound();
 
@@ -134,6 +157,46 @@ export default async function RefPage({ params }: PageProps) {
                 voltar pro feed
               </Link>
             }
+          />
+        ) : (
+          atoms.map((a) => <AtomCard key={a.id} atom={a} />)
+        )}
+      </section>
+    </AppShell>
+  );
+}
+
+function ProcessoView({ numero, atoms }: { numero: string; atoms: Atom[] }) {
+  return (
+    <AppShell>
+      <Link href="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mb-3">
+        <ArrowLeft className="w-3.5 h-3.5" aria-hidden />
+        voltar
+      </Link>
+
+      <header className="mb-4">
+        <div className="flex items-center gap-2 mb-1">
+          <span aria-hidden className="inline-flex items-center justify-center w-12 h-12 rounded-2xl text-2xl bg-zinc-100">
+            📁
+          </span>
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">processo administrativo</p>
+            <h1 className="text-xl font-bold tracking-tight leading-tight">Processo nº {numero}</h1>
+          </div>
+        </div>
+        <p className="text-sm text-foreground/70 mt-2">
+          {atoms.length === 0
+            ? "Nenhum ato menciona esse processo (ainda)."
+            : `${atoms.length} ${atoms.length === 1 ? "ato menciona" : "atos mencionam"} esse processo — licitação, contrato, aditivo e pagamentos costumam compartilhar o mesmo nº.`}
+        </p>
+      </header>
+
+      <section className="flex flex-col gap-4">
+        {atoms.length === 0 ? (
+          <EmptyState
+            icone="🔎"
+            titulo="Sem menções por aqui"
+            descricao="Esse processo pode não ter sido extraído ainda, ou estar fora do diário de Americana."
           />
         ) : (
           atoms.map((a) => <AtomCard key={a.id} atom={a} />)

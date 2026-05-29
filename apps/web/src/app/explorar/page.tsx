@@ -11,12 +11,13 @@
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Building2, MapPin, GraduationCap, Users } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, GraduationCap, Users, Landmark } from "lucide-react";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { AtomCard } from "@/components/feed/atom-card";
 import { EmptyState } from "@/components/feed/empty-state";
 import { GeoBreadcrumb } from "@/components/feed/geo-breadcrumb";
 import { getAtomsRanqueados, getTopCnpjs } from "@/lib/atoms";
+import { getPessoas, getOrgaos } from "@/lib/entidades";
 import { BAIRROS_AMERICANA } from "@/lib/civic-data";
 
 export const revalidate = 600;
@@ -31,9 +32,11 @@ function formatarCnpj(d: string): string {
 }
 
 export default async function ExplorarPage() {
-  const [topCnpjs, destaques] = await Promise.all([
+  const [topCnpjs, destaques, topPessoas, topOrgaos] = await Promise.all([
     getTopCnpjs(8),
     getAtomsRanqueados({ categoria: "tudo", limit: 3 }),
+    getPessoas(6),
+    getOrgaos(8),
   ]);
 
   return (
@@ -146,17 +149,74 @@ export default async function ExplorarPage() {
         </p>
       </section>
 
-      {/* Vereadores — placeholder honesto */}
+      {/* Órgãos públicos — REAL (Secretarias, DAE, Guarda Municipal…) */}
+      <section className="mb-6">
+        <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
+          <Landmark className="w-4 h-4 text-foreground/70" aria-hidden />
+          órgãos públicos
+        </h2>
+        {topOrgaos.length === 0 ? (
+          <EmptyState icone="🏛️" titulo="Sem órgãos detectados" descricao="O extrator identifica Secretarias, departamentos e a Guarda Municipal direto do texto do diário." />
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {topOrgaos.map((o) => (
+              <Link
+                key={o.slug}
+                href={`/orgao/${o.slug}`}
+                className="rounded-2xl bg-card border border-border/40 shadow-sm px-3 py-3 hover:shadow-md transition-shadow"
+              >
+                <p className="text-sm font-medium leading-tight line-clamp-2">{o.nome}</p>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  {o.sigla ? `${o.sigla} · ` : ""}{o.mencoes} {o.mencoes === 1 ? "ato" : "atos"}
+                </p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Pessoas no poder — REAL (agentes públicos citados) */}
       <section className="mb-6">
         <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
           <Users className="w-4 h-4 text-foreground/70" aria-hidden />
-          vereadores
+          quem está no poder
         </h2>
-        <EmptyState
-          icone="🗳️"
-          titulo="Vereadores: precisamos da Câmara"
-          descricao="Próximo passo: raspar o portal da Câmara Municipal de Americana pra trazer cada vereador, suas propostas, votações e gastos de gabinete. Sem fonte oficial não tem post."
-        />
+        {topPessoas.length === 0 ? (
+          <EmptyState icone="🗳️" titulo="Sem pessoas detectadas" descricao="O extrator captura agentes públicos citados em nomeações, exonerações e assinaturas." />
+        ) : (
+          <>
+            <div className="flex flex-col gap-2">
+              {topPessoas.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/pessoa/${p.slug}`}
+                  className="rounded-2xl bg-card border border-border/40 shadow-sm px-4 py-3 hover:shadow-md transition-shadow flex items-center gap-3"
+                >
+                  <span
+                    aria-hidden
+                    className="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-100 to-orange-100 text-rose-700 flex items-center justify-center text-xs font-bold shrink-0"
+                  >
+                    {p.nome.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold truncate">{p.nome}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{p.cargos[0] ?? p.papeis[0]}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold text-[var(--political)] tabular-nums">{p.mencoes}</p>
+                    <p className="text-[10px] text-muted-foreground">{p.mencoes === 1 ? "ato" : "atos"}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <Link
+              href="/familias"
+              className="inline-flex items-center justify-center w-full h-10 mt-3 rounded-full bg-foreground/5 text-foreground/80 text-sm font-medium hover:bg-foreground/10"
+            >
+              sobrenomes no poder →
+            </Link>
+          </>
+        )}
       </section>
 
       {/* Escolas — placeholder honesto */}

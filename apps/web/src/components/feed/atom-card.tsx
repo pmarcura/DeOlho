@@ -23,6 +23,7 @@ import { ReacaoCivica } from "./reacao-civica";
 import { SaveShare } from "./save-share";
 import { TextoComMencoes } from "./entity-highlight";
 import { TermoTooltip } from "./termo-tooltip";
+import { PessoasChips, OrgaosChips } from "./entidade-chips";
 import { TIPO_META, limparResumo, type Atom } from "@/lib/atoms";
 
 function dataAmigavel(iso: string | null): string {
@@ -121,6 +122,9 @@ export function AtomCard({ atom, className }: { atom: Atom; className?: string }
     .filter((x) => x.v);
   const glossario = atom.glossario ?? [];
   const complex = atom.complexidade;
+  const pessoas = atom.pessoas ?? [];
+  const orgaos = atom.orgaos ?? [];
+  const textoDoc = atom.textoDocumento ?? limparResumo(atom.resumo);
 
   return (
     <article
@@ -199,11 +203,33 @@ export function AtomCard({ atom, className }: { atom: Atom; className?: string }
                 {CAMPO_LABEL[k] ?? k}
               </dt>
               <dd className="text-sm text-foreground/90 leading-relaxed">
-                <TextoComMencoes texto={v!} />
+                <TextoComMencoes texto={v!} pessoas={pessoas} orgaos={orgaos} />
               </dd>
             </div>
           ))}
         </dl>
+      )}
+
+      {/* Pessoas + órgãos citados — clicáveis */}
+      {(pessoas.length > 0 || orgaos.length > 0) && (
+        <div className="px-5 pt-3 pb-1 flex flex-col gap-2">
+          {pessoas.length > 0 && (
+            <div className="flex items-start gap-2">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground pt-1.5 shrink-0">
+                quem
+              </span>
+              <PessoasChips pessoas={pessoas} />
+            </div>
+          )}
+          {orgaos.length > 0 && (
+            <div className="flex items-start gap-2">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground pt-1.5 shrink-0">
+                órgão
+              </span>
+              <OrgaosChips orgaos={orgaos} />
+            </div>
+          )}
+        </div>
       )}
 
       {/* Chips do glossário detectado */}
@@ -218,15 +244,15 @@ export function AtomCard({ atom, className }: { atom: Atom; className?: string }
         </div>
       )}
 
-      {/* Texto original colapsível — pra quem quer ver o cru */}
+      {/* Texto fiel do documento — começa no ato, sem ruído, com tudo clicável */}
       <details className="px-5 pt-3 pb-2 group">
         <summary className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer list-none">
           <FileText className="w-3 h-3" aria-hidden />
-          <span className="group-open:hidden">ver texto original do diário</span>
-          <span className="hidden group-open:inline">ocultar texto original</span>
+          <span className="group-open:hidden">ler trecho do documento</span>
+          <span className="hidden group-open:inline">ocultar trecho</span>
         </summary>
-        <div className="mt-2 text-[13px] text-foreground/70 leading-relaxed bg-foreground/[0.03] rounded-xl px-3 py-2.5">
-          <TextoComMencoes texto={limparResumo(atom.resumo)} />
+        <div className="mt-2 text-[13px] text-foreground/75 leading-relaxed bg-foreground/[0.03] rounded-xl px-3 py-2.5">
+          <TextoComMencoes texto={textoDoc} pessoas={pessoas} orgaos={orgaos} />
         </div>
       </details>
 
