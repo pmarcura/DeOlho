@@ -12,6 +12,11 @@ import { valorAmigavel } from "./normalize.js";
 
 const STOP_WORDS_TITULO = ["o", "a", "os", "as", "do", "da", "dos", "das", "de", "para", "com", "em"];
 
+/** Primeira frase — corta só em "." seguido de espaço/fim (não quebra "11.345"). */
+function primeiraFrase(s: string): string {
+  return s.split(/[.;](?=\s|$)/)[0]!.trim();
+}
+
 /** Pega só as N palavras significativas iniciais do objeto pra título compacto. */
 function objetoCurto(objeto: string | undefined, maxPalavras = 6): string | null {
   if (!objeto) return null;
@@ -95,8 +100,7 @@ export function gerarTituloHumano(campos: Campos, titulo: string): string | null
       const l = campos.dados;
       if (l.ementa) {
         // Pega a primeira frase da ementa (limitada)
-        const primeira = l.ementa.split(/[.;]/)[0]!.trim();
-        const palavras = primeira.split(/\s+/).slice(0, 12).join(" ");
+        const palavras = primeiraFrase(l.ementa).split(/\s+/).slice(0, 12).join(" ");
         return palavras;
       }
       return null;
@@ -106,6 +110,11 @@ export function gerarTituloHumano(campos: Campos, titulo: string): string | null
     case "decreto":
     case "resolucao": {
       const p = campos.dados;
+      // 1) Ementa oficial entre aspas é o melhor título ("Exonera servidor…").
+      if (p.ementa) {
+        return primeiraFrase(p.ementa).split(/\s+/).slice(0, 14).join(" ");
+      }
+      // 2) Ato + cargo do alvo.
       if (p.ato && p.cargo) {
         const cargoCurto = p.cargo.split(/\s+/).slice(0, 6).join(" ");
         return `${p.ato} para ${cargoCurto}`;
@@ -169,9 +178,9 @@ export function gerarSubtitulo(campos: Campos): string | null {
     case "decreto":
     case "resolucao": {
       const p = campos.dados;
-      if (p.cargo && p.ato) {
-        return `${p.ato.toLowerCase()} para função pública`;
-      }
+      // Quem + cargo é o contexto mais útil ("Marcio Raimundo · Chefe de Gabinete").
+      if (p.agente) return p.cargo ? `${p.agente} · ${p.cargo}` : p.agente;
+      if (p.cargo && p.ato) return `${p.ato.toLowerCase()} para função pública`;
       return null;
     }
     case "edital":

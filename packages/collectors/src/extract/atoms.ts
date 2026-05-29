@@ -21,9 +21,11 @@ import path from "node:path";
 import { baixarPdf, extrairTextoPdf } from "../utils/pdf.js";
 import { extrairCnpjs } from "../utils/documento.js";
 import { compilarLote } from "../compile/index.js";
+import { agregarEntidades } from "../compile/aggregate.js";
 
 const IN_PATH = path.resolve(process.cwd(), "data/diario-americana/latest.json");
 const OUT_PATH = path.resolve(process.cwd(), "data/diario-americana/atoms.json");
+const OUT_ENTIDADES = path.resolve(process.cwd(), "data/diario-americana/entidades.json");
 
 interface EdicaoMin {
   date: string | null;
@@ -291,6 +293,8 @@ async function main() {
   // Estatísticas de qualidade
   const comTituloHumano = compilados.filter((a) => a.tituloHumano).length;
   const comCampos = compilados.filter((a) => Object.keys(a.campos.dados).length > 0).length;
+  const comPessoa = compilados.filter((a) => a.pessoas.length > 0).length;
+  const comOrgao = compilados.filter((a) => a.orgaos.length > 0).length;
   const porComplexidade: Record<string, number> = {};
   for (const a of compilados) porComplexidade[a.complexidade.label] = (porComplexidade[a.complexidade.label] ?? 0) + 1;
 
@@ -299,14 +303,21 @@ async function main() {
     totalAtomos: todos.length,
     edicoesProcessadas: edicoes.length,
     porTipo,
-    qualidade: { comTituloHumano, comCampos, porComplexidade },
+    qualidade: { comTituloHumano, comCampos, comPessoa, comOrgao, porComplexidade },
     atomos: compilados,
   };
   await fs.writeFile(OUT_PATH, JSON.stringify(saida, null, 2), "utf8");
+
+  // Índice de entidades — pessoas, famílias e órgãos cruzados.
+  console.log("[atoms] agregando entidades (pessoas, famílias, órgãos)...");
+  const entidades = agregarEntidades(compilados);
+  await fs.writeFile(OUT_ENTIDADES, JSON.stringify(entidades, null, 2), "utf8");
+
   console.log(`[atoms] ${todos.length} átomos extraídos + compilados em ${elapsed}s → ${OUT_PATH}`);
   console.log("[atoms] distribuição por tipo:", porTipo);
-  console.log(`[atoms] qualidade: ${comTituloHumano} com título humano, ${comCampos} com campos estruturados`);
+  console.log(`[atoms] qualidade: ${comTituloHumano} título humano, ${comCampos} campos, ${comPessoa} c/ pessoa, ${comOrgao} c/ órgão`);
   console.log("[atoms] complexidade:", porComplexidade);
+  console.log(`[atoms] entidades: ${entidades.totais.pessoas} pessoas, ${entidades.totais.familias} famílias, ${entidades.totais.orgaos} órgãos → ${OUT_ENTIDADES}`);
 }
 
 if (process.argv[1]?.endsWith("atoms.ts") || process.argv[1]?.endsWith("atoms.js")) {

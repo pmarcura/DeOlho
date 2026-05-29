@@ -20,6 +20,7 @@
     "reconcile": "tsx src/reconcile/entities.ts",
     "view:contract": "tsx src/queries/contract-view.ts",
     "extract:atoms": "tsx src/extract/atoms.ts",
+    "recompile": "tsx src/compile/recompile.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

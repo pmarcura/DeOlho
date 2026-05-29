@@ -10,12 +10,14 @@
  * lacuna a fato fabricado).
  */
 
-import type { Atom, TipoAto } from "../extract/atoms.js";
+import type { Atom } from "../extract/atoms.js";
 import { parsearCampos, type Campos } from "./sections.js";
 import { gerarTituloHumano, gerarSubtitulo } from "./titles.js";
 import { listarTermosUnicos } from "./glossary.js";
 import { scoreComplexidade, type Complexidade } from "./complexity.js";
 import { normalizar } from "./normalize.js";
+import { textoDocumento, extrairEmenta } from "./document.js";
+import { extrairPessoas, extrairOrgaos, type PessoaCitada, type OrgaoCitado } from "./people.js";
 
 export interface CompiledAtom extends Atom {
   /** Título humano gerado por templates condicionais — null = sem dados. */
@@ -30,11 +32,36 @@ export interface CompiledAtom extends Atom {
   complexidade: Complexidade;
   /** Texto cru já normalizado (espaços, hifenização, ALL CAPS suavizado). */
   resumoLimpo: string;
+  /** Texto fiel ao documento, legível (começa no ato, sem boilerplate). */
+  textoDocumento: string;
+  /** Agentes públicos citados (signatário + nomeado/exonerado), com cargo. */
+  pessoas: PessoaCitada[];
+  /** Órgãos citados (Secretarias, DAE, Guarda Municipal…). */
+  orgaos: OrgaoCitado[];
 }
 
+const PAPEL_ALVO = new Set(["nomeado", "exonerado", "designado", "revogado"]);
+
 export function compilar(atom: Atom): CompiledAtom {
+  const textoDoc = textoDocumento(atom.resumo, atom.tipo, atom.numero);
   const resumoLimpo = normalizar(atom.resumo);
+  const pessoas = extrairPessoas(textoDoc);
+  const orgaos = extrairOrgaos(atom.resumo);
+  const ementa = extrairEmenta(atom.resumo);
+
   const campos = parsearCampos(atom.tipo, atom.resumo);
+
+  // Injeta ementa + pessoa-alvo nos atos administrativos — dá título/subtítulo
+  // MUITO melhores que o parser de regex sozinho ("Nomear oficial").
+  if (campos.tipo === "portaria" || campos.tipo === "decreto" || campos.tipo === "resolucao") {
+    if (ementa) campos.dados.ementa = ementa;
+    const alvo = pessoas.find((p) => PAPEL_ALVO.has(p.papel));
+    if (alvo) {
+      campos.dados.agente = alvo.nome;
+      if (alvo.cargo && !campos.dados.cargo) campos.dados.cargo = alvo.cargo;
+    }
+  }
+
   const tituloHumano = gerarTituloHumano(campos, atom.titulo);
   const subtitulo = gerarSubtitulo(campos);
   const glossario = listarTermosUnicos(atom.resumo);
@@ -48,6 +75,9 @@ export function compilar(atom: Atom): CompiledAtom {
     glossario,
     complexidade,
     resumoLimpo,
+    textoDocumento: textoDoc,
+    pessoas,
+    orgaos,
   };
 }
 

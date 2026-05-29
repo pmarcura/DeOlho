@@ -30,6 +30,7 @@ export interface CamposLei {
 
 export interface CamposPortaria {
   ato?: string;          // "Nomear", "Exonerar", "Designar", etc.
+  ementa?: string;       // resumo oficial entre aspas ("Que exonera servidor…")
   agente?: string;       // pessoa (somente quando é função pública)
   cargo?: string;
   fundamento?: string;
