@@ -23,9 +23,12 @@ import { extrairCnpjs } from "../utils/documento.js";
 import { compilarLote } from "../compile/index.js";
 import { agregarEntidades } from "../compile/aggregate.js";
 
-const IN_PATH = path.resolve(process.cwd(), "data/diario-americana/latest.json");
-const OUT_PATH = path.resolve(process.cwd(), "data/diario-americana/atoms.json");
-const OUT_ENTIDADES = path.resolve(process.cwd(), "data/diario-americana/entidades.json");
+const DATA_DIR = path.resolve(process.cwd(), "data/diario-americana");
+const MASTER_PATH = path.join(DATA_DIR, "edicoes.json"); // acumulado (preferido)
+const LATEST_PATH = path.join(DATA_DIR, "latest.json"); // fallback
+const OUT_PATH = path.join(DATA_DIR, "atoms.json");
+const OUT_ENTIDADES = path.join(DATA_DIR, "entidades.json");
+const CACHE_PATH = path.join(DATA_DIR, "atoms-cache.json"); // {slug: Atom[]} por edição
 
 interface EdicaoMin {
   date: string | null;
@@ -229,7 +232,8 @@ function extrairAtomosDoTexto(
   return out;
 }
 
-async function processarEdicao(e: EdicaoMin): Promise<Atom[]> {
+/** Baixa + extrai uma edição. Retorna null em falha (pra NÃO cachear e retentar depois). */
+async function extrairDeEdicao(e: EdicaoMin): Promise<Atom[] | null> {
   const slug = slugFromUrl(e.url);
   try {
     const buf = await baixarPdf(e.url);
@@ -237,8 +241,33 @@ async function processarEdicao(e: EdicaoMin): Promise<Atom[]> {
     return extrairAtomosDoTexto(texto, slug, e.date);
   } catch (err) {
     console.warn(`[atoms] falha em ${slug}: ${err instanceof Error ? err.message : err}`);
-    return [];
+    return null;
   }
+}
+
+type Cache = Record<string, Atom[]>;
+
+async function lerCache(): Promise<Cache> {
+  try {
+    return JSON.parse(await fs.readFile(CACHE_PATH, "utf8")) as Cache;
+  } catch {
+    return {};
+  }
+}
+
+async function lerEdicoes(): Promise<EdicaoMin[]> {
+  for (const p of [MASTER_PATH, LATEST_PATH]) {
+    try {
+      const snap = JSON.parse(await fs.readFile(p, "utf8")) as { dados: EdicaoMin[] };
+      if (Array.isArray(snap.dados)) {
+        console.log(`[atoms] lendo edições de ${path.basename(p)} (${snap.dados.length})`);
+        return snap.dados.filter((e) => e.url);
+      }
+    } catch {
+      /* tenta o próximo */
+    }
+  }
+  return [];
 }
 
 async function processWithConcurrency<T, R>(
@@ -263,14 +292,36 @@ async function processWithConcurrency<T, R>(
 }
 
 async function main() {
-  console.log(`[atoms] lendo ${IN_PATH}`);
-  const snap = JSON.parse(await fs.readFile(IN_PATH, "utf8")) as { dados: EdicaoMin[] };
-  const edicoes = snap.dados.filter((e) => e.url);
-  console.log(`[atoms] processando ${edicoes.length} edições (concorrência 5)...`);
+  const edicoes = await lerEdicoes();
+  const cache = await lerCache();
+  const cacheKeys = new Set(Object.keys(cache));
+
+  // Só baixa PDFs de edições AINDA não extraídas (incremental + resumável).
+  const novas = edicoes.filter((e) => !cacheKeys.has(slugFromUrl(e.url)));
+  console.log(
+    `[atoms] ${edicoes.length} edições no master · ${cacheKeys.size} em cache · ${novas.length} novas a baixar`,
+  );
 
   const start = Date.now();
-  const buckets = await processWithConcurrency(edicoes, processarEdicao, 5);
-  const todos = buckets.flat();
+  if (novas.length > 0) {
+    await processWithConcurrency(novas, async (e) => {
+      const slug = slugFromUrl(e.url);
+      const atoms = await extrairDeEdicao(e);
+      if (atoms) cache[slug] = atoms; // falha → fica fora do cache, retenta na próxima
+      return atoms;
+    }, 5);
+    await fs.writeFile(CACHE_PATH, JSON.stringify(cache, null, 2), "utf8");
+  }
+
+  // Monta a lista completa a partir do cache, re-carimbando a data do master
+  // (datas podem ter sido reconstruídas depois da 1ª extração).
+  const todos: Atom[] = [];
+  for (const e of edicoes) {
+    const slug = slugFromUrl(e.url);
+    const cached = cache[slug];
+    if (!cached) continue;
+    for (const a of cached) todos.push(e.date ? { ...a, edicaoDate: e.date } : a);
+  }
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);
 
   // Estatística por tipo

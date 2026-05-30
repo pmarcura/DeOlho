@@ -1,18 +1,27 @@
 /**
- * Adapter Diário Oficial de Americana — scrape direto (o Querido Diário ainda
- * não cobre Americana: availability_date vazio em /cities/3501608).
+ * Adapter Diário Oficial de Americana — scrape direto + backfill incremental.
  *
  * O portal (https://diariooficial.americana.sp.gov.br) é HTML server-rendered
- * (ISO-8859-1), não SPA — CheerioCrawler resolve. As edições ficam em
- * `diario-oficial-edicaoAnterior.php` (e `-edicaoExtra.php`); cada uma aponta
- * para um PDF em https://www.americana.sp.gov.br/download/diarioOficial/<hash>.pdf.
+ * (ISO-8859-1), não SPA — CheerioCrawler resolve. A página de edições anteriores
+ * aceita `?mes=M&ano=AAAA`, então dá pra varrer mês a mês PRA TRÁS e montar o
+ * histórico inteiro. Cada edição aponta pra um PDF em
+ * https://www.americana.sp.gov.br/download/diarioOficial/<hash>.pdf.
  *
- * Captura a metadata da edição (data + URL do PDF) → raw_records + gazettes.
- * A extração de texto do PDF e as menções (CNPJ/nº de contrato → gazette_mentions)
- * são um passo seguinte (precisa de parser de PDF); o util extrairCnpjs já existe.
+ * Dois modos:
+ *  - incremental (default): mês corrente + anterior + extras recentes. Barato,
+ *    pra rodar todo dia. "Aconteceu na prefeitura → aparece aqui."
+ *  - backfill (`--backfill`): caminha pra trás até `MESES_VAZIOS_LIMITE` meses
+ *    consecutivos sem NENHUMA edição nova (portal esgotado), com teto de segurança.
+ *
+ * As edições são ACUMULADAS num master `data/diario-americana/edicoes.json`
+ * (merge por URL do PDF) — nunca sobrescreve histórico. `latest.json` segue como
+ * snapshot da última rodada.
  */
 import "dotenv/config";
-import { CheerioCrawler, RequestQueue } from "crawlee";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { CheerioCrawler } from "crawlee";
 import { and, eq } from "drizzle-orm";
 import { getDb, ingestRaw } from "../utils/ingest.js";
 import { salvar, salvarLatest } from "../utils/save.js";
@@ -23,6 +32,14 @@ import type { ResultadoColeta } from "../types.js";
 const SITE = "https://diariooficial.americana.sp.gov.br";
 const PDF_HOST = "https://www.americana.sp.gov.br";
 
+// Backfill para após N meses consecutivos sem edição nova; teto duro de segurança.
+const MESES_VAZIOS_LIMITE = 8;
+const MESES_MAX = 360; // 30 anos — só evita loop infinito se o portal repetir página
+
+const MASTER_PATH = path.resolve(
+  fileURLToPath(new URL("../../data/diario-americana/edicoes.json", import.meta.url)),
+);
+
 interface EdicaoDiario {
   date: string | null; // ISO YYYY-MM-DD
   url: string; // PDF
@@ -30,9 +47,27 @@ interface EdicaoDiario {
   isExtra: boolean;
 }
 
+export interface ColetaOpts {
+  backfill?: boolean;
+  mesesIncremental?: number; // quantos meses pra trás no modo incremental (default 2)
+}
+
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
 function brParaIso(texto: string): string | null {
   const m = texto.match(/(\d{2})\/(\d{2})\/(\d{4})/);
   return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
+}
+
+/** Reconstrói a data quando a célula do calendário traz só o dia. */
+function isoDeDiaMesAno(diaTexto: string, mes: number, ano: number): string | null {
+  const m = diaTexto.match(/\b([0-3]?\d)\b/);
+  if (!m) return null;
+  const dia = Number(m[1]);
+  if (dia < 1 || dia > 31) return null;
+  return `${ano}-${pad2(mes)}-${pad2(dia)}`;
 }
 
 function urlAbsolutaPdf(href: string): string {
@@ -40,38 +75,91 @@ function urlAbsolutaPdf(href: string): string {
   return `${PDF_HOST}/${href.replace(/^\/+/, "")}`;
 }
 
-export async function coletarDiarioAmericana(): Promise<void> {
-  console.log(`[diario-americana] Crawling ${SITE}`);
-  const edicoes: EdicaoDiario[] = [];
+function urlMes(php: string, mes: number, ano: number): string {
+  return `${SITE}/${php}?mes=${mes}&ano=${ano}`;
+}
+
+function mesAnterior(mes: number, ano: number): { mes: number; ano: number } {
+  return mes <= 1 ? { mes: 12, ano: ano - 1 } : { mes: mes - 1, ano };
+}
+
+async function lerMaster(): Promise<EdicaoDiario[]> {
+  try {
+    const raw = await fs.readFile(MASTER_PATH, "utf8");
+    const parsed = JSON.parse(raw) as { dados?: EdicaoDiario[] };
+    return Array.isArray(parsed.dados) ? parsed.dados : [];
+  } catch {
+    return [];
+  }
+}
+
+async function escreverMaster(dados: EdicaoDiario[]): Promise<void> {
+  await fs.mkdir(path.dirname(MASTER_PATH), { recursive: true });
+  const payload = {
+    fonte: "diario-americana",
+    atualizadoEm: new Date().toISOString(),
+    municipio: AMERICANA.nome,
+    ibge: AMERICANA.ibge,
+    total: dados.length,
+    dados,
+  };
+  await fs.writeFile(MASTER_PATH, JSON.stringify(payload, null, 2), "utf8");
+}
+
+export async function coletarDiarioAmericana(opts: ColetaOpts = {}): Promise<void> {
+  const backfill = opts.backfill ?? false;
+  const mesesIncremental = opts.mesesIncremental ?? 2;
+  console.log(`[diario-americana] modo=${backfill ? "BACKFILL" : "incremental"} — ${SITE}`);
+
+  // Master existente seedа o dedup global (re-backfill fica barato: para cedo).
+  const master = await lerMaster();
+  const vistas = new Set<string>(master.map((e) => e.url));
+  const novas: EdicaoDiario[] = [];
   const erros: string[] = [];
 
-  const queue = await RequestQueue.open("diario-americana");
-  await queue.addRequest({
-    url: `${SITE}/diario-oficial-edicaoAnterior.php`,
-    userData: { extra: false },
-  });
-  await queue.addRequest({
-    url: `${SITE}/diario-oficial-edicaoExtra.php`,
-    userData: { extra: true },
-  });
+  const hoje = new Date();
+  let consecutivosVazios = 0;
+  let mesesVisitados = 0;
 
   const crawler = new CheerioCrawler({
-    requestQueue: queue,
-    maxRequestsPerCrawl: 20,
-    async requestHandler({ $, request }) {
-      const isExtra = Boolean((request.userData as { extra?: boolean })?.extra);
+    maxConcurrency: backfill ? 1 : 3, // sequencial no backfill (stop condition correta)
+    maxRequestsPerCrawl: backfill ? MESES_MAX * 2 + 10 : 30,
+    requestHandlerTimeoutSecs: 60,
+    async requestHandler({ $, request, addRequests }) {
+      const ud = request.userData as { extra?: boolean; mes?: number; ano?: number; walk?: boolean };
+      const isExtra = Boolean(ud.extra);
+      let novasNaPagina = 0;
+
       $('a[href*="download/diarioOficial"]').each((_, el) => {
         const href = $(el).attr("href");
         if (!href || !/\.pdf(\?|$)/i.test(href)) return;
-        const container = $(el).closest("li, tr, div, article").first();
+        const url = urlAbsolutaPdf(href);
+        if (vistas.has(url)) return;
+        const container = $(el).closest("li, tr, td, div, article").first();
         const texto = (container.text() || $(el).text() || "").trim();
-        edicoes.push({
-          date: brParaIso(texto),
-          url: urlAbsolutaPdf(href),
-          edition: null,
-          isExtra,
-        });
+        const date =
+          brParaIso(texto) ??
+          (ud.mes && ud.ano ? isoDeDiaMesAno(texto, ud.mes, ud.ano) : null);
+        vistas.add(url);
+        novas.push({ date, url, edition: null, isExtra });
+        novasNaPagina++;
       });
+
+      if (backfill && ud.walk && ud.mes && ud.ano) {
+        // "Vazio" = nenhuma edição NOVA nesta página (cobre mês sem publicação E
+        // página repetida do portal). Para após N consecutivos.
+        if (novasNaPagina === 0) consecutivosVazios++;
+        else consecutivosVazios = 0;
+        mesesVisitados++;
+        if (consecutivosVazios < MESES_VAZIOS_LIMITE && mesesVisitados < MESES_MAX) {
+          const prev = mesAnterior(ud.mes, ud.ano);
+          await addRequests([
+            { url: urlMes("diario-oficial-edicaoAnterior.php", prev.mes, prev.ano), userData: { mes: prev.mes, ano: prev.ano, walk: true } },
+          ]);
+        } else {
+          console.log(`[diario-americana] backfill parou em ${pad2(ud.mes)}/${ud.ano} (${consecutivosVazios} meses vazios seguidos)`);
+        }
+      }
     },
     failedRequestHandler({ request, error }) {
       const msg = error instanceof Error ? error.message : String(error);
@@ -79,41 +167,70 @@ export async function coletarDiarioAmericana(): Promise<void> {
     },
   });
 
-  await crawler.run();
+  // Sementes.
+  const seeds: { url: string; userData: Record<string, unknown> }[] = [];
+  const mesAtual = hoje.getMonth() + 1;
+  const anoAtual = hoje.getFullYear();
 
-  // Dedup por URL do PDF.
-  const vistas = new Set<string>();
-  const unicas = edicoes.filter((e) => (vistas.has(e.url) ? false : (vistas.add(e.url), true)));
-  console.log(`[diario-americana] ${unicas.length} edições encontradas`);
-
-  const db = getDb();
-  if (db) {
-    for (const e of unicas) {
-      const sourceKey = e.url.split("/").pop() ?? e.url;
-      await ingestRaw(db, {
-        sourceId: "diario-americana",
-        sourceKey,
-        recordType: "gazeta",
-        payload: e,
-        sourceUrl: e.url,
-        publishedAt: e.date ? new Date(e.date) : null,
-      });
-      await upsertGazette(db, sourceKey, e);
+  if (backfill) {
+    // Começa no mês corrente e caminha pra trás (anterior + extra).
+    seeds.push({ url: urlMes("diario-oficial-edicaoAnterior.php", mesAtual, anoAtual), userData: { mes: mesAtual, ano: anoAtual, walk: true } });
+    seeds.push({ url: `${SITE}/diario-oficial-edicaoExtra.php`, userData: { extra: true } });
+  } else {
+    // Incremental: últimos N meses (anterior) + extras recentes.
+    let { mes, ano } = { mes: mesAtual, ano: anoAtual };
+    for (let i = 0; i < mesesIncremental; i++) {
+      seeds.push({ url: urlMes("diario-oficial-edicaoAnterior.php", mes, ano), userData: { mes, ano } });
+      ({ mes, ano } = mesAnterior(mes, ano));
     }
-    console.log(`[diario-americana] ingeridas ${unicas.length} edições em raw_records + gazettes`);
+    seeds.push({ url: `${SITE}/diario-oficial-edicaoExtra.php`, userData: { extra: true } });
   }
 
+  await crawler.run(seeds);
+
+  console.log(`[diario-americana] ${novas.length} edições novas (master tinha ${master.length})`);
+
+  // Merge: master antigo + novas (dedup já garantido pelo Set `vistas`).
+  const todas = [...master, ...novas];
+  await escreverMaster(todas);
+
+  // DB opcional (raw_records + gazettes) — só as novas. Resiliente: se o Postgres
+  // estiver fora (ou DATABASE_URL apontar pra um banco indisponível), o JSON segue
+  // como fonte da verdade e a coleta NÃO falha. No CI sem DATABASE_URL, getDb()=null.
+  const db = getDb();
+  if (db && novas.length > 0) {
+    try {
+      for (const e of novas) {
+        const sourceKey = e.url.split("/").pop() ?? e.url;
+        await ingestRaw(db, {
+          sourceId: "diario-americana",
+          sourceKey,
+          recordType: "gazeta",
+          payload: e,
+          sourceUrl: e.url,
+          publishedAt: e.date ? new Date(e.date) : null,
+        });
+        await upsertGazette(db, sourceKey, e);
+      }
+      console.log(`[diario-americana] ingeridas ${novas.length} edições em raw_records + gazettes`);
+    } catch (err) {
+      console.warn(`[diario-americana] ingestão no Postgres pulada (${err instanceof Error ? err.message : err}) — JSON segue como fonte da verdade.`);
+    }
+  }
+
+  // Snapshot JSON (todas, pra compatibilidade com quem lê latest.json).
   const resultado: ResultadoColeta<EdicaoDiario> = {
     fonte: "diario-americana",
     coletadoEm: new Date().toISOString(),
     municipio: AMERICANA.nome,
     ibge: AMERICANA.ibge,
-    totalRegistros: unicas.length,
-    dados: unicas,
+    totalRegistros: todas.length,
+    dados: todas,
     erros,
   };
   await salvar(resultado);
   await salvarLatest(resultado);
+  console.log(`[diario-americana] master agora com ${todas.length} edições`);
 }
 
 async function upsertGazette(db: DB, sourceKey: string, e: EdicaoDiario): Promise<void> {
@@ -145,7 +262,8 @@ if (
   process.argv[1]?.endsWith("diario-americana.ts") ||
   process.argv[1]?.endsWith("diario-americana.js")
 ) {
-  coletarDiarioAmericana().catch((e) => {
+  const backfill = process.argv.includes("--backfill");
+  coletarDiarioAmericana({ backfill }).catch((e) => {
     console.error(e);
     process.exit(1);
   });

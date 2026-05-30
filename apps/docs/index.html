@@ -438,30 +438,30 @@
                 </div>
                 <div class="phone-feed">
                   <article class="event-card">
-                    <span class="badge political">Sessão ordinária</span>
-                    <strong>Câmara aprovou PL 023/2024</strong>
-                    <p>Projeto de lei sobre iluminação pública no Jardim Brasil. 15 votos SIM, 4 NÃO, 2 abstenções.</p>
+                    <span class="badge official">contrato · R$ 56 mil</span>
+                    <strong>Prefeitura contrata Ees Comunicação Multimidia por R$ 56 mil</strong>
+                    <p>Dispensa de Licitação · Ees Comunicação Multimidia LTDA · Guarda Municipal GAMA</p>
                     <div class="badge-row">
-                      <span class="badge official">Fato oficial</span>
-                      <span class="badge source">Câmara Municipal</span>
+                      <span class="badge official">Diário Oficial</span>
+                      <span class="badge">Marco Aurélio · GAMA</span>
                     </div>
                   </article>
                   <article class="event-card">
-                    <span class="badge territorial">Monte Libano</span>
-                    <strong>Contrato de pavimentação atualizado</strong>
-                    <p>Valor aditado em R$ 120 mil. Prazo estendido até março de 2025.</p>
+                    <span class="badge official">pregão · R$ 274 mil</span>
+                    <strong>Licitação para mão de obra especializada</strong>
+                    <p>Pregão Eletrônico · Proc. 739/2025 · DAE — Departamento de Água e Esgoto</p>
                     <div class="badge-row">
-                      <span class="badge official">PNCP</span>
-                      <span class="badge">Fonte oficial</span>
+                      <span class="badge official">Diário Oficial</span>
+                      <span class="badge">Fábio Renato · DAE</span>
                     </div>
                   </article>
                   <article class="event-card">
-                    <span class="badge attention">Sinal de atenção</span>
-                    <strong>Empresa com contrato em CEIS</strong>
-                    <p>Sinal de atenção não indica irregularidade. A fonte não informa escopo da sanção.</p>
+                    <span class="badge">portaria</span>
+                    <strong>Sardelli assina portaria de designação</strong>
+                    <p>94 atos citando Sardelli — clique para ver todos.</p>
                     <div class="badge-row">
-                      <span class="badge">Dado incompleto</span>
-                      <span class="badge">Portal da Transparência</span>
+                      <span class="badge official">Dado real</span>
+                      <span class="badge">Secretaria Municipal</span>
                     </div>
                   </article>
                 </div>
@@ -495,14 +495,14 @@
               <p>bairros e loteamentos com logradouros identificados pelo IBGE e Prefeitura.</p>
             </article>
             <article class="card">
-              <h3>Contratos ativos</h3>
-              <p style="font-size:2rem;font-weight:800;color:var(--official);margin:8px 0 0">∞</p>
-              <p>contratos indexados via PNCP, Portal da Transparência e Diário Oficial municipal.</p>
+              <h3>Átomos extraídos</h3>
+              <p style="font-size:2rem;font-weight:800;color:var(--official);margin:8px 0 0">273</p>
+              <p>atos reais do Diário Oficial de Americana extraídos de 60+ PDFs e exibidos no feed.</p>
             </article>
             <article class="card">
               <h3>Desde quando</h3>
               <p style="font-size:2rem;font-weight:800;color:var(--ink);margin:8px 0 0">Out/24</p>
-              <p>eleição municipal. Coletamos tudo a partir do resultado oficial do TSE.</p>
+              <p>início do pipeline. Feed ao vivo em <code>localhost:3000</code> com dados reais.</p>
             </article>
           </div>
 
@@ -594,13 +594,13 @@
                 <span class="scraper-freq">semanal</span>
               </div>
               <div class="scraper-row">
-                <span class="status-dot pendente"></span>
+                <span class="status-dot ativo"></span>
                 <span class="scraper-name">Diário Oficial municipal</span>
-                <span class="scraper-freq">diário</span>
+                <span class="scraper-freq">diário · 273 átomos</span>
               </div>
               <div class="resource-meta" style="margin-top:10px">
                 <span class="badge official">API PNCP</span>
-                <span class="badge">Playwright</span>
+                <span class="badge">Crawlee + PDF</span>
               </div>
             </article>
 
@@ -651,21 +651,26 @@
 # Filtro por CNPJ da prefeitura tbm disponível</code></pre>
             </div>
             <div class="code-panel">
-              <header><strong>Stack de scrapers</strong><span>Python</span></header>
-              <pre><code>scrapers/
-  americana/
-    camara/
-      sessoes.py       # Playwright
-      votacoes.py      # Playwright
-      projetos.py      # Playwright
-    prefeitura/
-      contratos.py     # PNCP API
-      licitacoes.py    # Playwright
-      diario.py        # Querido Diário / PDF
-  shared/
-    pipeline.py        # coleta → limpa → banco
-    rate_limiter.py
-    models.py          # Pydantic schemas</code></pre>
+              <header><strong>Stack de scrapers</strong><span>TypeScript</span></header>
+              <pre><code>packages/collectors/src/
+  adapters/
+    diario-americana.ts  # CheerioCrawler + backfill
+  extract/
+    atoms.ts             # PDF → átomos + cache
+  compile/
+    index.ts             # Civic Content Compiler
+    aggregate.ts         # pessoas + órgãos
+  utils/
+    ingest.ts            # raw_records + gazettes
+    save.ts              # JSON master acumulado
+
+apps/web/src/
+  lib/atoms.ts           # loader server-side
+  lib/entidades.ts       # pessoas, órgãos, famílias
+  components/feed/
+    atom-card.tsx        # card do feed
+    entity-highlight.tsx # highlight inline
+    entidade-chips.tsx   # chips clicáveis</code></pre>
             </div>
           </div>
 
@@ -978,19 +983,24 @@ function TerritoryFlag({ type, code, size = 24 }: TerritoryFlagProps) {
 
           <div class="component-list" style="margin-top:14px">
             <div class="component-row">
+              <strong>AtomCard <span class="badge official" style="font-size:.68rem;padding:2px 6px">implementado</span></strong>
+              <p>Card do feed do Diário Oficial. Título humano, valor R$, campos estruturados (contratante, objeto, modalidade), chips de pessoa/órgão, glossário inline, texto fiel do documento.</p>
+              <code>components/feed/atom-card.tsx</code>
+            </div>
+            <div class="component-row">
+              <strong>EntityHighlight <span class="badge official" style="font-size:.68rem;padding:2px 6px">implementado</span></strong>
+              <p>Destaca e linka inline: lei/decreto/contrato/CNPJ/glossário + pessoa → /pessoa, órgão → /orgao, processo → /ref/processo-…, artigo (tooltip). Casamento exato com a lista extraída do diário.</p>
+              <code>components/feed/entity-highlight.tsx</code>
+            </div>
+            <div class="component-row">
+              <strong>EntidadeChips <span class="badge official" style="font-size:.68rem;padding:2px 6px">implementado</span></strong>
+              <p>Linha de chips clicáveis "QUEM" (pessoa pública, cargo) e "ÓRGÃO" (sigla) abaixo dos campos do card. Derivados do Civic Content Compiler, não inferidos.</p>
+              <code>components/feed/entidade-chips.tsx</code>
+            </div>
+            <div class="component-row">
               <strong>EntidadeCard</strong>
               <p>Card compacto para vereador, empresa, órgão, contrato, bairro. Tipo, nome, fonte, confiança.</p>
               <code>components/deolho/EntidadeCard</code>
-            </div>
-            <div class="component-row">
-              <strong>EventoPublicoCard</strong>
-              <p>Unidade do radar. Tipo de evento, entidade afetada, timestamp, fonte, confiança, ações.</p>
-              <code>components/deolho/EventoPublicoCard</code>
-            </div>
-            <div class="component-row">
-              <strong>PainelEvidencia</strong>
-              <p>Painel lateral ou drawer com documentos, links oficiais, datas e limitações.</p>
-              <code>components/deolho/PainelEvidencia</code>
             </div>
             <div class="component-row">
               <strong>BlocoLimitacaoDado</strong>
@@ -1552,25 +1562,25 @@ function TerritoryFlag({ type, code, size = 24 }: TerritoryFlagProps) {
               </div>
             </div>
             <div class="wireframe">
-              <h3>Radar — Home</h3>
+              <h3>Feed do Diário — Home <span class="badge official" style="font-size:.68rem;padding:2px 6px">implementado</span></h3>
               <div class="wireframe-stack">
-                <div class="wire strong">TerritorialCarousel — Americana · Monte Libano · Centro…</div>
-                <div class="wire political">EventoPublicoCard — sessão da Câmara</div>
-                <div class="wire">EventoPublicoCard — contrato atualizado</div>
-                <div class="wire attention">EventoPublicoCard — sinal de atenção (com aviso)</div>
-                <div class="wire">Tabs: Tudo · Câmara · Contratos · Obras · Bairros</div>
-                <div class="wire">MobileBottomNav: Início · Radar · + · Câmara · Mapa</div>
+                <div class="wire strong">Filtros: tudo · 💰 dinheiro · 📜 leis · 📃 atos · 🤝 convênios</div>
+                <div class="wire official">AtomCard — contrato/pregão com valor, empresa, pessoa, órgão</div>
+                <div class="wire">AtomCard — portaria/decreto com pessoa citada e cargo</div>
+                <div class="wire">AtomCard — lei com ementa e referências cruzadas</div>
+                <div class="wire">Algoritmo de relevância: valor R$ · CNPJ · freshness · diversidade</div>
+                <div class="wire">273 átomos reais · 60+ PDFs do Diário Oficial de Americana</div>
               </div>
             </div>
             <div class="wireframe">
-              <h3>Sessão da Câmara</h3>
+              <h3>Páginas de entidade <span class="badge official" style="font-size:.68rem;padding:2px 6px">implementado</span></h3>
               <div class="wireframe-stack">
-                <div class="wire political">SessaoCard — header com data, tipo, quórum</div>
-                <div class="wire strong">Pauta: lista de ProjetoLeiCard votados</div>
-                <div class="wire">VotoGrid por projeto (todos os 21 vereadores)</div>
-                <div class="wire">Presença: quem esteve, quem faltou, justificativas</div>
-                <div class="wire">BlocoLimitacaoDado se ata não estiver digitalizada</div>
-                <div class="wire">EvidenciaLink para ata oficial da sessão</div>
+                <div class="wire strong">/pessoa/[slug] — agente público: cargos, papéis, todos os atos</div>
+                <div class="wire strong">/orgao/[slug] — secretaria/autarquia: atos, pessoas, período, valor</div>
+                <div class="wire political">/familias — sobrenomes recorrentes com disclaimer forte</div>
+                <div class="wire political">/familia/[slug] — agentes do sobrenome + todos os atos</div>
+                <div class="wire">/ano/[ano] · /ato/[id] · /ref/[slug] · /explorar</div>
+                <div class="wire">/diario/[slug] — todos os átomos de uma edição</div>
               </div>
             </div>
           </div>
@@ -1663,7 +1673,7 @@ function TerritoryFlag({ type, code, size = 24 }: TerritoryFlagProps) {
     <footer>
       <p>
         DeOlho Interface System — piloto Americana, SP.
-        Dados sintéticos em todos os demos. Componentes em <code>packages/ui/src/components/deolho</code>.
+        Feed real: 273 átomos de 60+ PDFs do Diário Oficial. Componentes do feed em <code>apps/web/src/components/feed</code>.
         Bandeiras de estados: <a href="https://github.com/bgeneto/bandeiras-br">github.com/bgeneto/bandeiras-br</a>.
       </p>
     </footer>
