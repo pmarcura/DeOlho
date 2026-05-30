@@ -34,7 +34,7 @@
     "zod": "^3.25.56"
   },
   "devDependencies": {
-    "@types/node": "^20.19.0",
+    "@types/node": "^25.9.1",
     "@types/pdf-parse": "^1.1.4",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
