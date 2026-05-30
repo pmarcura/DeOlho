@@ -137,10 +137,26 @@ const ATOMS_JSON = path.resolve(
 
 let _cache: AtomsFile | null = null;
 
+// Estrutura vazia para quando os dados ainda não foram coletados (ex.: checkout
+// limpo no CI, ou primeiro deploy antes do pipeline rodar). O app renderiza vazio
+// em vez de quebrar — mesma filosofia do collector ("coleta não falha").
+const VAZIO: AtomsFile = {
+  geradoEm: "",
+  totalAtomos: 0,
+  edicoesProcessadas: 0,
+  porTipo: {} as Record<TipoAto, number>,
+  atomos: [],
+};
+
 async function load(): Promise<AtomsFile> {
   if (_cache) return _cache;
-  const raw = await fs.readFile(ATOMS_JSON, "utf8");
-  _cache = JSON.parse(raw) as AtomsFile;
+  try {
+    const raw = await fs.readFile(ATOMS_JSON, "utf8");
+    _cache = JSON.parse(raw) as AtomsFile;
+  } catch {
+    // atoms.json ausente (não versionado) ou ilegível: degrada para vazio.
+    _cache = VAZIO;
+  }
   return _cache;
 }
 

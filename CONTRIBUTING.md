@@ -8,6 +8,48 @@ Sem fonte, sem afirmação pública.
 
 Toda informação que chega à interface, API, exportação ou documentação pública deve ter origem rastreável ou declarar explicitamente que a fonte não informa aquele dado.
 
+## Rodando o projeto localmente
+
+Pré-requisitos: **Node 22+** e **pnpm 10+** (`npm install -g pnpm`).
+
+```bash
+pnpm install          # instala tudo (monorepo)
+pnpm --filter web dev # sobe a interface em http://localhost:3000
+```
+
+Antes de abrir o PR, rode as mesmas verificações do CI (o porteiro automático
+que roda em todo Pull Request):
+
+```bash
+pnpm -r lint        # estilo de código
+pnpm -r typecheck   # tipos TypeScript
+pnpm -r build       # compila tudo
+```
+
+| Pasta | O que é |
+|---|---|
+| `apps/web` | Interface (Next.js) — o feed cívico que o cidadão vê |
+| `apps/docs` | Design system (HTML estático) |
+| `packages/collectors` | Coleta de dados (Crawlee + Playwright + extração de PDF) |
+| `packages/db` | Schema e acesso ao banco (Drizzle) |
+| `packages/ui` | Componentes compartilhados |
+
+## Fluxo de contribuição (sem permissão de escrita)
+
+O `main` é **protegido**: ninguém faz push direto nele. Toda mudança entra por
+Pull Request, com o CI verde, garantindo que o "principal" esteja sempre estável.
+
+Se você **não** é mantenedor do repositório, o caminho é o padrão open source:
+
+1. **Faça um fork** (botão "Fork" no GitHub).
+2. Crie uma branch no seu fork: `git checkout -b minha-melhoria`.
+3. Faça commits e abra um **Pull Request** para o `main` deste repositório.
+4. O **CI roda automaticamente**. Se ficar 🔴, ajuste até ficar 🟢.
+5. Um mantenedor revisa e faz o merge. 🎉
+
+> Uma das formas mais valiosas de ajudar — mesmo sem código — é abrir uma issue
+> **"🗂️ Propor fonte de dados"** com um novo diário oficial, portal ou API pública.
+
 ## Antes de começar
 
 1. Leia `.planning/PROJECT.md`.

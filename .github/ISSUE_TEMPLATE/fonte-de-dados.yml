@@ -1,0 +1,43 @@
+name: 🗂️ Propor fonte de dados
+description: Uma nova fonte pública para o DeOlho coletar (diário oficial, portal, API…)
+labels: [fonte-de-dados]
+body:
+  - type: input
+    id: nome
+    attributes:
+      label: Nome da fonte
+      placeholder: Ex.: Diário Oficial de Campinas, Portal da Transparência de SP…
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: URL
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de acesso
+      options:
+        - API pública
+        - Página HTML (scraping)
+        - PDF / documento
+        - Planilha / CSV
+        - Não sei
+    validations:
+      required: true
+  - type: input
+    id: municipio
+    attributes:
+      label: Município / estado / âmbito
+      placeholder: Ex.: Americana-SP, estadual, federal
+    validations:
+      required: false
+  - type: textarea
+    id: o-que-tem
+    attributes:
+      label: O que essa fonte tem de relevante?
+      description: Contratos, licitações, sessões da câmara, votações, despesas…
+    validations:
+      required: false
