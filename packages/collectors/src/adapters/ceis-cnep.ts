@@ -17,7 +17,7 @@
  * Uso: PORTAL_TRANSPARENCIA_API_KEY=... pnpm --filter @deolho/collectors collect:ceis [cnep]
  */
 import "dotenv/config";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { getDb, ingestRaw } from "../utils/ingest.js";
 import { CGU_API_BASE } from "../config.js";
 import { normalizarDocumento } from "../utils/documento.js";
@@ -128,6 +128,10 @@ export async function coletarSancoes(
   );
 }
 
+// Idempotente: a CGU não expõe um id estável de sanção, então usamos a
+// chave natural (cadastro + documento + dataInicio + tipoSancao). Re-rodar a
+// coleta passa a atualizar a linha existente em vez de empilhar duplicatas
+// (raw_records continua versionando o payload cru via content_hash).
 async function gravarSancao(
   db: DB,
   cadastro: "ceis" | "cnep",
@@ -139,20 +143,40 @@ async function gravarSancao(
     .from(entities)
     .where(and(eq(entities.kind, "empresa"), eq(entities.documento, doc)))
     .limit(1);
-  await db.insert(sanctions).values({
+  const cadastroUp = cadastro.toUpperCase();
+  const dataInicio = isoData(it.dataInicioSancao);
+  const tipoSancao = it.tipoSancao?.descricaoResumida ?? null;
+  const values = {
     entityId: ent[0]?.id ?? null,
     sourceId: "cgu-transparencia",
-    cadastro: cadastro.toUpperCase(),
+    cadastro: cadastroUp,
     documento: doc,
     nomeSancionado: it.pessoa?.nome ?? it.pessoa?.razaoSocialReceita ?? null,
-    tipoSancao: it.tipoSancao?.descricaoResumida ?? null,
+    tipoSancao,
     orgaoSancionador: it.orgaoSancionador?.nome ?? it.fonteSancao?.nomeExibicao ?? null,
-    dataInicio: isoData(it.dataInicioSancao),
+    dataInicio,
     dataFim: isoData(it.dataFimSancao),
     fundamentacao: it.textoPublicacao ?? null,
     sourceUrl: it.linkPublicacao ?? `${CGU_API_BASE}/${cadastro}`,
     fetchedAt: new Date(),
-  });
+  };
+  const existente = await db
+    .select({ id: sanctions.id })
+    .from(sanctions)
+    .where(
+      and(
+        eq(sanctions.cadastro, cadastroUp),
+        eq(sanctions.documento, doc),
+        dataInicio === null ? isNull(sanctions.dataInicio) : eq(sanctions.dataInicio, dataInicio),
+        tipoSancao === null ? isNull(sanctions.tipoSancao) : eq(sanctions.tipoSancao, tipoSancao),
+      ),
+    )
+    .limit(1);
+  if (existente[0]) {
+    await db.update(sanctions).set(values).where(eq(sanctions.id, existente[0].id));
+  } else {
+    await db.insert(sanctions).values(values);
+  }
 }
 
 if (process.argv[1]?.endsWith("ceis-cnep.ts") || process.argv[1]?.endsWith("ceis-cnep.js")) {

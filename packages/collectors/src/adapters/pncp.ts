@@ -74,25 +74,38 @@ export async function coletarPncp(): Promise<void> {
 
   // Período comum. ATENÇÃO aos filtros do PNCP: /contratos filtra por ÓRGÃO
   // (cnpjOrgao), não por município; /contratacoes/publicacao aceita
-  // codigoMunicipioIbge e EXIGE codigoModalidadeContratacao (iterar 1..14 é o
-  // próximo passo — TODO). O `codigoMunicipio` antigo não era filtro válido.
+  // codigoMunicipioIbge e EXIGE codigoModalidadeContratacao — iteramos as 14
+  // modalidades vigentes (Lei 14.133/21 + legados Lei 8.666/93). O
+  // `codigoMunicipio` antigo não era filtro válido.
   const periodo = { dataInicial: DATA_INICIAL, dataFinal: DATA_FINAL };
   const contratosParams = { ...periodo, cnpjOrgao: AMERICANA.cnpj };
-  const comprasParams = { ...periodo, codigoMunicipioIbge: AMERICANA.ibge };
 
-  // 1. Licitações / compras
+  // 1. Licitações / compras — uma chamada por modalidade.
+  // Códigos PNCP: 1 Leilão eletrônico · 2 Diálogo competitivo · 3 Concurso ·
+  // 4 Concorrência eletrônica · 5 Concorrência presencial · 6 Pregão eletrônico ·
+  // 7 Pregão presencial · 8 Dispensa · 9 Inexigibilidade · 10 Manifestação de
+  // interesse · 11 Pré-qualificação · 12 Credenciamento · 13 Leilão presencial ·
+  // 14 Inaplicabilidade da licitação.
+  const MODALIDADES_PNCP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] as const;
   let compras: PncpCompra[] = [];
-  try {
-    console.log(`[pncp] Coletando licitações — ${AMERICANA.nome} — ${DATA_INICIAL} → ${DATA_FINAL}`);
-    compras = await buscarTodos<PncpCompra>(
-      "contratacoes/publicacao",
-      comprasParams,
-      "licitações"
-    );
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    erros.push(`licitações: ${msg}`);
-    console.error(`[pncp] Licitações erro: ${msg}`);
+  console.log(`[pncp] Coletando licitações — ${AMERICANA.nome} — ${DATA_INICIAL} → ${DATA_FINAL}`);
+  for (const modalidade of MODALIDADES_PNCP) {
+    try {
+      const lote = await buscarTodos<PncpCompra>(
+        "contratacoes/publicacao",
+        {
+          ...periodo,
+          codigoMunicipioIbge: AMERICANA.ibge,
+          codigoModalidadeContratacao: modalidade,
+        },
+        `licitações m${modalidade}`,
+      );
+      compras.push(...lote);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      erros.push(`licitações m${modalidade}: ${msg}`);
+      console.error(`[pncp] Licitações modalidade ${modalidade} erro: ${msg}`);
+    }
   }
 
   // 2. Contratos

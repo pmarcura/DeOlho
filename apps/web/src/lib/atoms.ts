@@ -135,12 +135,31 @@ const ATOMS_JSON = path.resolve(
   "atoms.json",
 );
 
+const VAZIO: AtomsFile = {
+  geradoEm: "",
+  totalAtomos: 0,
+  edicoesProcessadas: 0,
+  porTipo: {
+    lei: 0, decreto: 0, portaria: 0, resolucao: 0,
+    contrato: 0, aditivo: 0, edital: 0, pregao: 0,
+    convite: 0, concorrencia: 0, convenio: 0, ata_registro: 0,
+  },
+  atomos: [],
+};
+
 let _cache: AtomsFile | null = null;
 
+// Defensivo: em checkout fresco (sem rodar o coletor) ou deploy onde
+// packages/collectors/data/ está no .gitignore, atoms.json não existe.
+// Devolve índice vazio em vez de quebrar a home (mesmo padrão de entidades.ts).
 async function load(): Promise<AtomsFile> {
   if (_cache) return _cache;
-  const raw = await fs.readFile(ATOMS_JSON, "utf8");
-  _cache = JSON.parse(raw) as AtomsFile;
+  try {
+    const raw = await fs.readFile(ATOMS_JSON, "utf8");
+    _cache = JSON.parse(raw) as AtomsFile;
+  } catch {
+    _cache = VAZIO;
+  }
   return _cache;
 }
 
