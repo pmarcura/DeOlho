@@ -112,6 +112,94 @@ export async function getEventosStats(): Promise<EstatEventos> {
   }
 }
 
+// ── Algoritmo do feed — dá "vida" à rede social ──────────────────────────────
+/**
+ * Ranking de relevância: sem ele o feed seria 124k pagamentos por data. Pesa
+ * tipo (contrato/sanção no topo, pagamento no fim), valor (log) e recência (leve,
+ * porque os dados se concentram nos últimos meses). Depois aplica diversidade
+ * pra não repetir a mesma categoria em sequência — feed que "respira".
+ */
+export interface EventoRanqueado extends EventoCivico {
+  entidades: { fornecedorDocumento?: string | null; orgaoNome?: string | null } | null;
+}
+
+// Score de relevância (texto SQL reutilizado no select e no row_number).
+const SCORE_SQL = `(
+  case categoria
+    when 'contratacao' then 30 when 'sancao' then 28
+    when 'ato_normativo' then 16 when 'nomeacao_exoneracao' then 14
+    when 'obra_zeladoria' then 14 when 'audiencia_conselho' then 10
+    when 'receita' then 8 when 'pagamento' then 2 else 5 end
+  + least(40, coalesce(ln(greatest(valor, 1)) * 3, 0))
+  + case when data_evento is null then 0
+      when current_date - data_evento < 30 then 20
+      when current_date - data_evento < 90 then 12
+      when current_date - data_evento < 365 then 5 else 0 end
+)`;
+
+/**
+ * Round-robin por categoria: pega 1 de cada categoria por rodada (cada grupo já
+ * vem ordenado por score). Garante que sanções/atos/nomeações apareçam no topo do
+ * feed em vez de serem afogados por contratos — feed variado, que "respira".
+ */
+function diversificar<T extends { categoria: string }>(rows: T[]): T[] {
+  const grupos = new Map<string, T[]>();
+  for (const r of rows) {
+    const g = grupos.get(r.categoria);
+    if (g) g.push(r);
+    else grupos.set(r.categoria, [r]);
+  }
+  const ordem = [...grupos.keys()]; // ordem de primeira aparição = por score
+  const out: T[] = [];
+  let restam = true;
+  while (restam) {
+    restam = false;
+    for (const cat of ordem) {
+      const g = grupos.get(cat)!;
+      if (g.length) {
+        out.push(g.shift()!);
+        restam = true;
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Feed vivo: usa COTAS por categoria (row_number) pra garantir variedade — sem
+ * isso, contratos (score alto) afogariam sanções, atos e nomeações. Depois ordena
+ * por score e diversifica. Quando há filtro de categoria, traz só ela (sem cota).
+ */
+export async function getEventosRanqueados(filtro: FiltroEventos = {}): Promise<EventoRanqueado[]> {
+  const db = getDb();
+  if (!db) return [];
+  const { categoria, limit = 30 } = filtro;
+  const cotaPorCategoria = categoria ? 120 : 14; // sem filtro: até 14 de cada categoria
+  try {
+    const result = await db.execute(sql`
+      select id, categoria, tipo, titulo, resumo, valor::text as valor,
+             source_id as "sourceId", source_url as "sourceUrl",
+             data_evento as "dataEvento", entidades,
+             published_at as "publishedAt", fetched_at as "fetchedAt",
+             limitacoes, trust_type as "trustType"
+      from (
+        select *, ${sql.raw(SCORE_SQL)} as _score,
+          row_number() over (partition by categoria order by ${sql.raw(SCORE_SQL)} desc, data_evento desc nulls last) as _rn
+        from civic_events
+        ${categoria ? sql`where categoria = ${categoria}` : sql``}
+      ) t
+      where _rn <= ${cotaPorCategoria}
+      order by _score desc
+      limit 120
+    `);
+    const rows = (Array.isArray(result) ? result : (result as { rows?: unknown[] }).rows ?? []) as EventoRanqueado[];
+    return diversificar(rows).slice(0, limit);
+  } catch (e) {
+    console.warn(`[eventos] ranking falhou (${e instanceof Error ? e.message : e})`);
+    return [];
+  }
+}
+
 // ── Apresentação legível (linguagem pro cidadão comum) ───────────────────────
 
 export const CATEGORIA_META: Record<

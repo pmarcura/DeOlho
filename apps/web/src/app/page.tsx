@@ -1,26 +1,23 @@
 /**
- * Home — feed cívico de Americana montado por ÁTOMOS reais.
+ * Início — o FEED CÍVICO de Americana, unificado.
  *
- * Stories são o ÚNICO filtro (Pedro: "só as bolinhas, nada de duas formas").
- * Cada post no feed é um ato individual extraído do diário.
- *  - 1 contrato = 1 post (com valor R$ destacado)
- *  - 1 lei = 1 post
- *  - 1 decreto/portaria = 1 post
- *  - 1 pregão/edital = 1 post
+ * Uma rede social viva: cada acontecimento público (contrato, pagamento, ato,
+ * sanção) vira um POST legível e navegável, vindo do banco canônico (civic_events,
+ * ~130 mil eventos das fontes oficiais). O algoritmo de relevância (getEventosRanqueados)
+ * dá vida ao feed — dinheiro e recência sobem, os 124k pagamentos não afogam.
  *
- * Algoritmo de relevância: atos de dinheiro pesam mais, com CNPJ pesa mais,
- * recente pesa mais — ranqueia o feed em vez de só ordenar por data.
+ * Substitui as antigas superfícies separadas (início de átomos + /eventos): agora
+ * é UM lugar só, alimentado automaticamente pelo que os coletores trazem.
  */
-import Link from "next/link";
 import { Eye } from "lucide-react";
 import { AppShell } from "@/components/app-shell/app-shell";
-import { AtomCard } from "@/components/feed/atom-card";
+import { PostCard } from "@/components/feed/post-card";
 import { StoriesRow, type StoryItem } from "@/components/feed/stories-row";
 import { GeoBreadcrumb } from "@/components/feed/geo-breadcrumb";
 import { EmptyState } from "@/components/feed/empty-state";
-import { getAtomsRanqueados, getAtomsStats, type CategoriaFeed } from "@/lib/atoms";
+import { getEventosRanqueados, getEventosStats, type CategoriaEvento } from "@/lib/eventos";
 
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
 
 function saudacao(now = new Date()): string {
   const h = now.getHours();
@@ -30,7 +27,14 @@ function saudacao(now = new Date()): string {
   return "Boa noite";
 }
 
-const CATEGORIAS_VALIDAS: CategoriaFeed[] = ["tudo", "dinheiro", "leis", "atos", "convenios"];
+const CATS_VALIDAS: CategoriaEvento[] = [
+  "contratacao",
+  "pagamento",
+  "ato_normativo",
+  "sancao",
+  "nomeacao_exoneracao",
+  "receita",
+];
 
 interface PageProps {
   searchParams: Promise<{ cat?: string }>;
@@ -38,39 +42,36 @@ interface PageProps {
 
 export default async function HomePage({ searchParams }: PageProps) {
   const sp = await searchParams;
-  const cat: CategoriaFeed = (CATEGORIAS_VALIDAS as readonly string[]).includes(sp.cat ?? "")
-    ? (sp.cat as CategoriaFeed)
-    : "tudo";
+  const cat = (CATS_VALIDAS as readonly string[]).includes(sp.cat ?? "")
+    ? (sp.cat as CategoriaEvento)
+    : undefined;
 
-  const [atoms, stats] = await Promise.all([
-    getAtomsRanqueados({ categoria: cat, limit: 20 }),
-    getAtomsStats(),
+  const [eventos, stats] = await Promise.all([
+    getEventosRanqueados({ categoria: cat, limit: 30 }),
+    getEventosStats(),
   ]);
 
-  // Stories = filtros principais. Sem duplicação com chip bar.
   const stories: StoryItem[] = [
-    { id: "tudo", label: "tudo", href: "/", iniciais: "✨", ativo: cat === "tudo", bg: "bg-foreground/8", fg: "text-foreground", novo: cat !== "tudo" },
-    { id: "dinheiro", label: "dinheiro", href: "/?cat=dinheiro", iniciais: "💰", ativo: cat === "dinheiro" },
-    { id: "leis", label: "leis", href: "/?cat=leis", iniciais: "📜", ativo: cat === "leis" },
-    { id: "atos", label: "atos", href: "/?cat=atos", iniciais: "📃", ativo: cat === "atos" },
-    { id: "convenios", label: "convênios", href: "/?cat=convenios", iniciais: "🤝", ativo: cat === "convenios" },
+    { id: "tudo", label: "tudo", href: "/", iniciais: "✨", ativo: !cat, bg: "bg-foreground/8", fg: "text-foreground", novo: !!cat },
+    { id: "contratacao", label: "contratos", href: "/?cat=contratacao", iniciais: "📋", ativo: cat === "contratacao" },
+    { id: "pagamento", label: "pagamentos", href: "/?cat=pagamento", iniciais: "💸", ativo: cat === "pagamento" },
+    { id: "ato_normativo", label: "atos", href: "/?cat=ato_normativo", iniciais: "📜", ativo: cat === "ato_normativo" },
+    { id: "sancao", label: "sanções", href: "/?cat=sancao", iniciais: "⚠️", ativo: cat === "sancao" },
+    { id: "nomeacao_exoneracao", label: "cargos", href: "/?cat=nomeacao_exoneracao", iniciais: "👤", ativo: cat === "nomeacao_exoneracao" },
   ];
 
   return (
     <AppShell>
-      {/* Saudação */}
       <section className="pt-1">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Eye className="w-3.5 h-3.5 text-[var(--political)]" aria-hidden />
           <span>de olho em americana</span>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight leading-tight mt-1">
-          {saudacao()} 👋
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight leading-tight mt-1">{saudacao()} 👋</h1>
         <p className="text-sm text-foreground/70 mt-0.5">
-          {atoms.length > 0
-            ? `${stats.total} atos extraídos do diário. ${cat === "tudo" ? "Veja o que rolou." : `Filtrando por ${cat}.`}`
-            : "Ainda não temos nada nessa categoria coletado."}
+          {eventos.length > 0
+            ? `${stats.total.toLocaleString("pt-BR")} acontecimentos públicos. ${cat ? "Filtrando." : "Veja o que rolou na cidade."}`
+            : "Conecte o banco (DATABASE_URL) para o feed ganhar vida."}
         </p>
       </section>
 
@@ -84,40 +85,24 @@ export default async function HomePage({ searchParams }: PageProps) {
         />
       </div>
 
-      {/* Stories = único filtro */}
       <section className="mt-4">
-        <StoriesRow items={stories} ariaLabel="Filtrar por categoria" />
+        <StoriesRow items={stories} ariaLabel="Filtrar por tipo de acontecimento" />
       </section>
 
-      {/* Feed atômico ranqueado */}
       <section className="mt-4 flex flex-col gap-4">
-        {atoms.length === 0 ? (
+        {eventos.length === 0 ? (
           <EmptyState
             icone="🪴"
-            titulo="Nenhum ato nessa categoria"
-            descricao="Volte mais tarde — o coletor roda periodicamente e novos atos aparecem aqui."
-            acao={
-              <Link href="/" className="text-sm font-semibold text-[var(--political)] mt-1">
-                voltar pra tudo
-              </Link>
-            }
+            titulo="Nada por aqui ainda"
+            descricao="O coletor roda periodicamente. Se o banco estiver vazio, rode os mapeadores (map:pncp, map:tce, map:diario-atoms)."
           />
         ) : (
-          atoms.map((a) => <AtomCard key={a.id} atom={a} />)
-        )}
-
-        {atoms.length >= 20 && (
-          <Link
-            href={cat === "tudo" ? "/radar" : `/radar?cat=${cat}`}
-            className="inline-flex items-center justify-center gap-1 h-11 rounded-full bg-foreground/5 text-foreground/80 font-medium hover:bg-foreground/10 transition-colors"
-          >
-            ver tudo no radar
-          </Link>
+          eventos.map((e) => <PostCard key={e.id} evento={e} />)
         )}
       </section>
 
       <p className="text-[11px] text-muted-foreground/70 text-center mt-6 mb-2">
-        {stats.total} atos atômicos · {stats.edicoesProcessadas} edições reais do diário
+        {stats.total.toLocaleString("pt-BR")} acontecimentos públicos de Americana · fontes oficiais
       </p>
     </AppShell>
   );
