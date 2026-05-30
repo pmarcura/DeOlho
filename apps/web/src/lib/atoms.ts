@@ -153,8 +153,12 @@ async function load(): Promise<AtomsFile> {
   try {
     const raw = await fs.readFile(ATOMS_JSON, "utf8");
     _cache = JSON.parse(raw) as AtomsFile;
-  } catch {
-    // atoms.json ausente (não versionado) ou ilegível: degrada para vazio.
+  } catch (e) {
+    // Só toleramos o caso "arquivo ainda não gerado" (fresh checkout / primeiro
+    // deploy antes do coletor rodar). JSON malformado, permissão negada, schema
+    // diferente, etc. são regressão real — devem quebrar pra não publicar feed
+    // silenciosamente vazio em produção.
+    if ((e as NodeJS.ErrnoException)?.code !== "ENOENT") throw e;
     _cache = VAZIO;
   }
   return _cache;
