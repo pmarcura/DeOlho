@@ -31,7 +31,7 @@
     "dotenv": "^17.4.2",
     "pdf-parse": "^1.1.1",
     "playwright": "^1.52.0",
-    "zod": "^3.25.56"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20.19.0",
