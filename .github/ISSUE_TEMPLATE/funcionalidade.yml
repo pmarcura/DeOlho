@@ -1,0 +1,29 @@
+name: ✨ Sugerir funcionalidade
+description: Uma ideia para tornar dados públicos mais acessíveis
+labels: [enhancement]
+body:
+  - type: textarea
+    id: ideia
+    attributes:
+      label: Qual é a ideia?
+      description: Descreva a funcionalidade que você imagina.
+    validations:
+      required: true
+  - type: textarea
+    id: problema
+    attributes:
+      label: Que problema isso resolve?
+      description: Como isso ajuda o cidadão comum a entender o que o poder público faz?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - Interface / visualização
+        - Coleta de dados / nova fonte
+        - Agente de IA / análise
+        - Outra
+    validations:
+      required: false
