@@ -13,7 +13,9 @@
  * o caminho; a ingestão completa é um passo focado (não roda neste sandbox).
  */
 import "dotenv/config";
-import { TSE_CDN_BASE } from "../config.js";
+import { AMERICANA, TSE_CDN_BASE } from "../config.js";
+import { recordSourceCoverage } from "../utils/civic.js";
+import { closeDb } from "../utils/ingest.js";
 
 export async function coletarTseDoacoes(): Promise<void> {
   console.log(`[tse] Doações de campanha — fonte: ${TSE_CDN_BASE}/prestacao_contas`);
@@ -22,11 +24,28 @@ export async function coletarTseDoacoes(): Promise<void> {
       "(grande), descompactação, filtragem por SP/Americana e gravação no banco. " +
       "Esqueleto e fonte prontos — próximo passo focado.",
   );
+  await recordSourceCoverage({
+    sourceId: "tse",
+    collector: "tse-doacoes",
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: "doacao-eleitoral",
+    status: "pending",
+    lastAttemptAt: new Date(),
+    lastSuccessAt: null,
+    totalRecords: 0,
+    errorMessage: null,
+    limitations:
+      "Dados do TSE são bulk ZIP; a fonte está identificada, mas a ingestão filtrada para Americana ainda não foi implementada.",
+    metadata: { baseUrl: TSE_CDN_BASE },
+  });
 }
 
 if (process.argv[1]?.endsWith("tse-doacoes.ts") || process.argv[1]?.endsWith("tse-doacoes.js")) {
-  coletarTseDoacoes().catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+  coletarTseDoacoes()
+    .catch((e) => {
+      console.error(e);
+      process.exitCode = 1;
+    })
+    .finally(() => closeDb());
 }

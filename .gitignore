@@ -1,5 +1,9 @@
 # Agentes / config local (não versionar — ver AGENTS.md)
 .claude/
+.claudian/
+
+# Pasta criada por engano na raiz (o app web real é apps/web)
+/web/
 
 # Dependências
 node_modules/

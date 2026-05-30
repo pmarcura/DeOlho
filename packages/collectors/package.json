@@ -15,6 +15,7 @@
     "map:pncp": "tsx src/mappers/pncp.ts",
     "map:tce": "tsx src/mappers/tce-sp.ts",
     "map:diario": "tsx src/mappers/diario-mentions.ts",
+    "map:diario-atoms": "tsx src/mappers/diario-atoms.ts",
     "enrich:socios": "tsx src/enrich/cnpj-socios.ts",
     "collect:transparencia": "tsx src/adapters/transparencia-americana.ts",
     "reconcile": "tsx src/reconcile/entities.ts",

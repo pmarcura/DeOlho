@@ -175,11 +175,11 @@ export default async function ExplorarPage() {
         )}
       </section>
 
-      {/* Pessoas no poder — REAL (agentes públicos citados) */}
+      {/* Agentes públicos citados — REAL */}
       <section className="mb-6">
         <h2 className="text-sm font-semibold mb-2 px-1 flex items-center gap-1.5">
           <Users className="w-4 h-4 text-foreground/70" aria-hidden />
-          quem está no poder
+          agentes públicos citados
         </h2>
         {topPessoas.length === 0 ? (
           <EmptyState icone="🗳️" titulo="Sem pessoas detectadas" descricao="O extrator captura agentes públicos citados em nomeações, exonerações e assinaturas." />
@@ -213,7 +213,7 @@ export default async function ExplorarPage() {
               href="/familias"
               className="inline-flex items-center justify-center w-full h-10 mt-3 rounded-full bg-foreground/5 text-foreground/80 text-sm font-medium hover:bg-foreground/10"
             >
-              sobrenomes no poder →
+              sobrenomes em atos oficiais →
             </Link>
           </>
         )}

@@ -148,6 +148,12 @@ export function gerarTituloHumano(campos: Campos, titulo: string): string | null
       }
       return null;
     }
+
+    case "indefinido": {
+      const assunto = campos.dados.assunto;
+      if (!assunto) return null;
+      return primeiraFrase(assunto).split(/\s+/).slice(0, 12).join(" ");
+    }
   }
 }
 
@@ -193,5 +199,7 @@ export function gerarSubtitulo(campos: Campos): string | null {
       const partes = [p.modalidade, p.estado && p.estado !== "indefinido" ? p.estado : null].filter(Boolean);
       return partes.length > 0 ? partes.join(" · ") : null;
     }
+    case "indefinido":
+      return "Publicação oficial sem classificação automática";
   }
 }

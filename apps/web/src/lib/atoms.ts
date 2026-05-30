@@ -25,7 +25,8 @@ export type TipoAto =
   | "convite"
   | "concorrencia"
   | "convenio"
-  | "ata_registro";
+  | "ata_registro"
+  | "indefinido";
 
 // Campos estruturados extraídos pelo Civic Content Compiler (collectors/compile/).
 export interface CamposContrato {
@@ -88,6 +89,12 @@ export interface OrgaoCitado {
   sigla: string | null;
 }
 
+export interface TerritorioMencionado {
+  tipo: "logradouro" | "bairro" | "equipamento";
+  nome: string;
+  contexto: string;
+}
+
 export interface Atom {
   id: string;
   edicaoSlug: string;
@@ -114,6 +121,8 @@ export interface Atom {
   pessoas?: PessoaCitada[];
   /** Órgãos citados (Secretarias, DAE, Guarda Municipal…). */
   orgaos?: OrgaoCitado[];
+  /** Ruas, bairros ou equipamentos públicos citados literalmente no trecho. */
+  territorios?: TerritorioMencionado[];
 }
 
 interface AtomsFile {
@@ -164,14 +173,14 @@ async function load(): Promise<AtomsFile> {
   return _cache;
 }
 
-/** Categoria visual do feed — agrupamento de tipos por "tema". */
+/** Categoria visual do radar — agrupamento de tipos por tema cívico. */
 export type CategoriaFeed = "tudo" | "dinheiro" | "leis" | "atos" | "convenios";
 
 const POR_CATEGORIA: Record<CategoriaFeed, TipoAto[]> = {
   tudo: [],
   dinheiro: ["contrato", "aditivo", "pregao", "convite", "concorrencia", "ata_registro", "edital"],
   leis: ["lei"],
-  atos: ["decreto", "portaria", "resolucao"],
+  atos: ["decreto", "portaria", "resolucao", "indefinido"],
   convenios: ["convenio"],
 };
 
@@ -285,6 +294,7 @@ export const TIPO_META: Record<
   concorrencia: { label: "Concorrência", emoji: "🏷️", cor: "from-rose-100 to-amber-100", cat: "dinheiro" },
   convenio: { label: "Convênio", emoji: "🤝", cor: "from-emerald-100 to-sky-100", cat: "convenios" },
   ata_registro: { label: "Ata de Preços", emoji: "🪙", cor: "from-emerald-100 to-amber-100", cat: "dinheiro" },
+  indefinido: { label: "Publicação", emoji: "📌", cor: "from-slate-100 to-sky-100", cat: "atos" },
 };
 
 export function tipoLabel(t: TipoAto): string {
@@ -307,6 +317,7 @@ const PESO_TIPO: Record<TipoAto, number> = {
   decreto: 3,
   resolucao: 2,
   portaria: 1,
+  indefinido: 1,
 };
 
 function parsearValor(s: string | null | undefined): number {

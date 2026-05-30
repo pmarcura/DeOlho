@@ -6,7 +6,7 @@ import * as schema from "./schema/index";
 // própria instância a partir da sua DATABASE_URL — sem singleton global.
 export function createDb(connectionString: string, options?: { max?: number }) {
   const client = postgres(connectionString, { max: options?.max ?? 10 });
-  return drizzle(client, { schema });
+  return Object.assign(drizzle(client, { schema }), { $client: client });
 }
 
 export type DB = ReturnType<typeof createDb>;

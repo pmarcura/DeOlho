@@ -6,7 +6,7 @@
  * Nunca: linguagem acusatória, ranking, like ou comentário livre.
  */
 import Link from "next/link";
-import { ArrowUpRight, BookmarkPlus, FileText, ShieldAlert } from "lucide-react";
+import { ArrowUpRight, FileText, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
   ContratoUI,
@@ -15,7 +15,6 @@ import type {
   SinalAtencao,
 } from "@/lib/civic-types";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { TipoInformacaoBadge, ConfiancaBadge, FonteBadge } from "./badges";
 import { EntidadeAvatar } from "./entidade-avatar";
 import { SinalAvisoObrigatorio, BlocoLimitacaoDado } from "./blocos";

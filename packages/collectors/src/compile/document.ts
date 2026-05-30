@@ -29,6 +29,7 @@ const ACT_LABEL: Record<TipoAto, string> = {
   concorrencia: "CONCORR[ÊE]NCIA",
   convenio: "CONV[ÊE]NIO",
   ata_registro: "ATA\\s+DE\\s+REGISTRO\\s+DE\\s+PRE[ÇC]OS?",
+  indefinido: "(?:EXTRATO|AVISO|COMUNICADO|CONVOCA[ÇC][ÃA]O|AUDI[ÊE]NCIA|ORDEM\\s+DE\\s+SERVI[ÇC]O|PROCESSO\\s+ADMINISTRATIVO|TERMO)",
 };
 
 // Cabeçalhos de ato numerado que marcam claramente um NOVO ato (pra corte).

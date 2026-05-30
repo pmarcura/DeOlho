@@ -10,9 +10,11 @@
  * Se o portal usar JavaScript, trocar por PlaywrightCrawler.
  */
 
-import { CheerioCrawler, RequestQueue } from "crawlee";
+import { CheerioCrawler } from "crawlee";
 import { salvar, salvarLatest } from "../utils/save.js";
 import { AMERICANA } from "../config.js";
+import { recordSourceCoverage } from "../utils/civic.js";
+import { closeDb } from "../utils/ingest.js";
 import type { ResultadoColeta } from "../types.js";
 
 interface SessaoLegislativa {
@@ -30,11 +32,7 @@ export async function coletarCamaraAmericana(): Promise<void> {
   const erros: string[] = [];
   const sessoes: SessaoLegislativa[] = [];
 
-  const queue = await RequestQueue.open("camara-americana");
-  await queue.addRequest({ url: `${BASE_URL}/sessoes` });
-
   const crawler = new CheerioCrawler({
-    requestQueue: queue,
     maxRequestsPerCrawl: 50,
     async requestHandler({ $, request, enqueueLinks }) {
       console.log(`[camara-americana] ${request.url}`);
@@ -66,7 +64,7 @@ export async function coletarCamaraAmericana(): Promise<void> {
     },
   });
 
-  await crawler.run();
+  await crawler.run([{ url: `${BASE_URL}/sessoes` }]);
 
   const resultado: ResultadoColeta<SessaoLegislativa> = {
     fonte: "camara-americana",
@@ -81,11 +79,30 @@ export async function coletarCamaraAmericana(): Promise<void> {
   const arq = await salvar(resultado);
   await salvarLatest(resultado);
   console.log(`[camara-americana] ${sessoes.length} itens salvos em ${arq}`);
+
+  const tentativa = new Date();
+  await recordSourceCoverage({
+    sourceId: "camara-americana",
+    collector: "camara-americana",
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: "atividade-legislativa",
+    status: erros.length > 0 ? "partial" : sessoes.length > 0 ? "fresh" : "no_data",
+    lastAttemptAt: tentativa,
+    lastSuccessAt: erros.length > 0 && sessoes.length === 0 ? null : tentativa,
+    totalRecords: sessoes.length,
+    errorMessage: erros.join(" | ") || null,
+    limitations:
+      "Coleta HTML inicial com seletores genéricos; projetos, indicações e votações precisam de mapeamento dedicado do portal legislativo.",
+    metadata: { baseUrl: BASE_URL },
+  });
 }
 
 if (
   process.argv[1]?.endsWith("camara-americana.ts") ||
   process.argv[1]?.endsWith("camara-americana.js")
 ) {
-  coletarCamaraAmericana().catch(console.error);
+  coletarCamaraAmericana()
+    .catch(console.error)
+    .finally(() => closeDb());
 }

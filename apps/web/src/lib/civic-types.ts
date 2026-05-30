@@ -57,6 +57,7 @@ export type TipoEntidade =
 
 // ── Tipos de evento público (unidades do radar) ──────────────────────────────
 export type TipoEventoPublico =
+  | "licitacao_publicada"
   | "contrato_publicado"
   | "contrato_atualizado"
   | "pagamento_registrado"

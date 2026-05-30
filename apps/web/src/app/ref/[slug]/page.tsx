@@ -154,7 +154,7 @@ export default async function RefPage({ params }: PageProps) {
             descricao="Talvez essa referência ainda não tenha sido extraída, ou seja externa ao diário de Americana. O coletor segue raspando."
             acao={
               <Link href="/" className="text-sm font-semibold text-[var(--political)] mt-1">
-                voltar pro feed
+                voltar ao radar
               </Link>
             }
           />

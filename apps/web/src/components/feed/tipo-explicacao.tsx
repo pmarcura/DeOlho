@@ -25,6 +25,7 @@ const EXPLICACOES: Record<TipoAto, string> = {
   concorrencia: "Licitação maior, pra obras e contratos de valor alto, aberta a qualquer empresa.",
   convenio: "Acordo entre a prefeitura e outra entidade (ONG, governo, etc.) pra fazer alguma coisa juntos.",
   ata_registro: "Catálogo de preços fixados. A prefeitura registra valores combinados pra comprar quando precisar — sem nova licitação a cada vez.",
+  indefinido: "Publicação oficial identificada no Diário, mas ainda sem classificação automática segura. Ela aparece com limitação para evitar conclusão sem evidência suficiente.",
 };
 
 export function TipoExplicacao({

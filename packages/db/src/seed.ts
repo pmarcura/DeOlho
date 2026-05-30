@@ -88,6 +88,18 @@ const fontes: NewSource[] = [
     defaultTrustType: "fato_oficial",
   },
   {
+    id: "camara-americana",
+    nome: "Câmara Municipal de Americana",
+    descricao: "Atividade legislativa municipal: sessões, proposições, indicações, requerimentos e votações.",
+    baseUrl: "https://www.camara-americana.sp.gov.br",
+    licenca: "Publicação oficial municipal",
+    cobertura:
+      "Atos e tramitação legislativa da Câmara Municipal de Americana-SP, conforme disponibilidade do portal oficial.",
+    limitacoes:
+      "Coleta inicial usa descoberta HTML; projetos, indicações, requerimentos e votações ainda precisam de mapeadores dedicados por seção.",
+    defaultTrustType: "fato_oficial",
+  },
+  {
     id: "receita-cnpj",
     nome: "Cadastro Nacional da Pessoa Jurídica (Receita Federal via BrasilAPI)",
     descricao: "Dados cadastrais e quadro de sócios (QSA) de empresas.",

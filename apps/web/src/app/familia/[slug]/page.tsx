@@ -62,7 +62,8 @@ export default async function FamiliaPage({ params }: PageProps) {
         <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" aria-hidden />
         <p className="text-[12px] text-amber-900/90 leading-relaxed">
           Sobrenome igual <strong>não comprova parentesco</strong>. Esta é uma visão de
-          coocorrência em atos oficiais — pra investigar, nunca uma conclusão.
+          coocorrência em atos oficiais — para leitura contextual, nunca uma conclusão.
+          Vínculos familiares só aparecem quando houver evidência documental própria.
         </p>
       </div>
 

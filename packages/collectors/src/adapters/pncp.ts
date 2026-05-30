@@ -13,7 +13,8 @@
 
 import { get, sleep } from "../utils/http.js";
 import { salvar, salvarLatest } from "../utils/save.js";
-import { getDb, ingestRaw } from "../utils/ingest.js";
+import { closeDb, getDb, ingestRaw } from "../utils/ingest.js";
+import { recordSourceCoverage } from "../utils/civic.js";
 import {
   AMERICANA,
   DATA_FINAL,
@@ -28,6 +29,38 @@ interface PncpPage<T> {
   totalPaginas: number;
   numeroPagina: number;
   tamanhoPagina: number;
+}
+
+function dataCompactaParaIso(data: string): string {
+  return `${data.slice(0, 4)}-${data.slice(4, 6)}-${data.slice(6, 8)}`;
+}
+
+function contratoNumeroControleSeguro(ct: PncpContrato): string | null {
+  return ct.numeroControlePNCP
+    ? ct.numeroControlePNCP.replace(/[^A-Za-z0-9.-]/g, "-")
+    : null;
+}
+
+function contratoSourceKey(ct: PncpContrato): string {
+  const numeroControle = contratoNumeroControleSeguro(ct);
+  if (numeroControle) return `contrato-${numeroControle}`;
+
+  const numero = ct.numeroContrato ?? ct.numeroContratoEmpenho ?? "sem-numero";
+  return `contrato-${ct.anoContrato}-${numero}-${ct.sequencialContrato}`;
+}
+
+function contratoSourceUrl(ct: PncpContrato): string | null {
+  const controle = ct.numeroControlePNCP?.match(/^(\d+)-2-(\d+)\/(\d{4})$/);
+  if (controle) {
+    const [, cnpj, sequencial, ano] = controle;
+    return `https://pncp.gov.br/app/contratos/${cnpj}/${ano}/${sequencial}`;
+  }
+
+  if (ct.anoContrato && ct.sequencialContrato) {
+    return `https://pncp.gov.br/app/contratos/${AMERICANA.cnpj}/${ct.anoContrato}/${ct.sequencialContrato}`;
+  }
+
+  return null;
 }
 
 async function buscarPagina<T>(
@@ -130,10 +163,15 @@ export async function coletarPncp(): Promise<void> {
     for (const ct of contratos) {
       await ingestRaw(db, {
         sourceId: "pncp",
-        sourceKey: `contrato-${ct.anoContrato}-${ct.numeroContrato}-${ct.sequencialContrato}`,
+        sourceKey: contratoSourceKey(ct),
         recordType: "contrato",
         payload: ct,
-        publishedAt: ct.dataAssinatura ? new Date(ct.dataAssinatura) : null,
+        sourceUrl: contratoSourceUrl(ct),
+        publishedAt: ct.dataPublicacaoPncp
+          ? new Date(ct.dataPublicacaoPncp)
+          : ct.dataAssinatura
+            ? new Date(ct.dataAssinatura)
+            : null,
       });
     }
     console.log(
@@ -176,8 +214,45 @@ export async function coletarPncp(): Promise<void> {
     console.warn(`[pncp] ${erros.length} erros:`);
     erros.forEach((e) => console.warn("  ", e));
   }
+
+  const tentativa = new Date();
+  await recordSourceCoverage({
+    sourceId: "pncp",
+    collector: "pncp",
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: "compra",
+    status: erros.some((e) => e.startsWith("licitações:")) ? "partial" : compras.length > 0 ? "fresh" : "no_data",
+    coverageStart: dataCompactaParaIso(DATA_INICIAL),
+    coverageEnd: dataCompactaParaIso(DATA_FINAL),
+    lastAttemptAt: tentativa,
+    lastSuccessAt: erros.some((e) => e.startsWith("licitações:")) ? null : tentativa,
+    totalRecords: compras.length,
+    errorMessage: erros.find((e) => e.startsWith("licitações:")) ?? null,
+    limitations:
+      "O endpoint de publicações do PNCP exige modalidade; esta coleta ainda usa a consulta disponível para Americana e pode ficar parcial.",
+    metadata: { municipio: AMERICANA.nome, cnpjOrgao: AMERICANA.cnpj },
+  });
+  await recordSourceCoverage({
+    sourceId: "pncp",
+    collector: "pncp",
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: "contrato",
+    status: erros.some((e) => e.startsWith("contratos:")) ? "partial" : contratos.length > 0 ? "fresh" : "no_data",
+    coverageStart: dataCompactaParaIso(DATA_INICIAL),
+    coverageEnd: dataCompactaParaIso(DATA_FINAL),
+    lastAttemptAt: tentativa,
+    lastSuccessAt: erros.some((e) => e.startsWith("contratos:")) ? null : tentativa,
+    totalRecords: contratos.length,
+    errorMessage: erros.find((e) => e.startsWith("contratos:")) ?? null,
+    limitations: "Contratos filtrados pelo CNPJ do órgão municipal no PNCP.",
+    metadata: { municipio: AMERICANA.nome, cnpjOrgao: AMERICANA.cnpj },
+  });
 }
 
 if (process.argv[1]?.endsWith("pncp.ts") || process.argv[1]?.endsWith("pncp.js")) {
-  coletarPncp().catch(console.error);
+  coletarPncp()
+    .catch(console.error)
+    .finally(() => closeDb());
 }

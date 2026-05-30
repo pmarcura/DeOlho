@@ -1,7 +1,7 @@
 /**
  * Loader do índice de ENTIDADES (entidades.json) gerado pelo compiler.
  *
- * Pessoas (agentes públicos), famílias (coocorrência de sobrenome) e órgãos —
+ * Pessoas (agentes públicos), sobrenomes repetidos (coocorrência) e órgãos —
  * cada um com os atomIds onde foi citado, pra montar "ver tudo que conecta com
  * isso". Defensivo: se o arquivo não existir (checkout sem rodar o coletor),
  * devolve índice vazio em vez de quebrar a página.

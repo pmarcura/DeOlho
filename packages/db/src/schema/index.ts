@@ -7,3 +7,8 @@ export * from "./payments";
 export * from "./gazettes";
 export * from "./company-partners";
 export * from "./sanctions";
+export * from "./civic-events";
+export * from "./evidence";
+export * from "./entity-relationships";
+export * from "./money-flows";
+export * from "./source-coverage";

@@ -15,7 +15,7 @@ export function periodoLabel(
   return a ?? b ?? null;
 }
 
-/** "há X anos" a partir do menor ano observado (proxy de tempo no poder). */
+/** "há X anos" a partir do menor ano observado em atos oficiais. */
 export function tempoLabel(anos: number[]): string | null {
   if (!anos || anos.length === 0) return null;
   const min = Math.min(...anos);
