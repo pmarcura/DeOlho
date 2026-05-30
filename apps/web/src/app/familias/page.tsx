@@ -1,13 +1,13 @@
 /**
- * /familias — "quantas famílias estão no poder e há quanto tempo".
+ * /familias — sobrenomes repetidos em atos oficiais.
  *
  * Tratado com HONESTIDADE e ÉTICA (project-deolho.md):
  *  - só agentes públicos em função pública (nunca cidadão comum);
  *  - sobrenome igual NÃO prova parentesco — é coocorrência factual, com fonte;
  *  - sem juízo, sem "score", sem acusação.
  *
- * Duas visões reais: quem mais aparece nos atos (poder de fato) e quais
- * sobrenomes se repetem (sinal a investigar, nunca conclusão).
+ * Duas visões reais: agentes públicos citados em atos e sobrenomes repetidos
+ * como pista fraca, nunca como vínculo familiar documentado.
  */
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -18,7 +18,7 @@ import { periodoLabel, tempoLabel } from "@/lib/periodo";
 
 export const revalidate = 600;
 export const metadata: Metadata = {
-  title: "Sobrenomes no poder — DeOlho",
+  title: "Sobrenomes em atos oficiais — DeOlho",
   description: "Quem ocupa funções públicas em Americana e quais sobrenomes se repetem nos atos oficiais — coocorrência factual, com fonte.",
 };
 
@@ -38,9 +38,9 @@ export default async function FamiliasPage() {
       </Link>
 
       <header className="mb-3">
-        <h1 className="text-2xl font-bold tracking-tight leading-tight">Quem está no poder?</h1>
+        <h1 className="text-2xl font-bold tracking-tight leading-tight">Agentes públicos e sobrenomes citados</h1>
         <p className="text-sm text-foreground/70 mt-0.5">
-          Agentes públicos que mais aparecem no Diário de Americana e sobrenomes que se repetem.
+          Menções em atos oficiais do Diário de Americana, sem inferir parentesco.
         </p>
       </header>
 
@@ -50,7 +50,8 @@ export default async function FamiliasPage() {
         <p className="text-[12px] text-amber-900/90 leading-relaxed">
           <strong>Sobrenome igual não prova parentesco.</strong> Isto é coocorrência factual em
           atos oficiais — um ponto de partida pra investigar, nunca uma acusação. O DeOlho só
-          registra pessoas no exercício de função pública, sempre com a fonte.
+          registra pessoas no exercício de função pública, sempre com a fonte. Vínculo familiar só
+          será exibido quando houver documento público que o comprove.
         </p>
       </div>
 
@@ -132,9 +133,8 @@ export default async function FamiliasPage() {
           </div>
         )}
         <p className="text-[11px] text-muted-foreground/80 mt-3 px-1 leading-relaxed">
-          Hoje os repetidos são sobrenomes comuns (Silva, Oliveira…), quase sempre sem relação.
-          Conforme entram anos de histórico, sobrenomes raros que se repetem em cargos viram
-          sinal de atenção — sempre pra investigar, com a fonte ao lado.
+          Hoje isto é apenas uma visão de sobrenomes repetidos. Vínculos familiares documentados
+          entrarão em uma camada separada, com evidência própria e sem inferência por sobrenome.
         </p>
       </section>
     </AppShell>

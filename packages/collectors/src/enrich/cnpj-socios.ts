@@ -13,10 +13,11 @@
 import "dotenv/config";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { get } from "../utils/http.js";
-import { getDb, ingestRaw } from "../utils/ingest.js";
-import { BRASILAPI_CNPJ_BASE } from "../config.js";
+import { closeDb, getDb, ingestRaw } from "../utils/ingest.js";
+import { AMERICANA, BRASILAPI_CNPJ_BASE } from "../config.js";
 import { normalizarDocumento } from "../utils/documento.js";
 import { entities, companyPartners, type DB } from "@deolho/db";
+import { recordSourceCoverage } from "../utils/civic.js";
 
 interface BrasilApiSocio {
   nome_socio: string;
@@ -69,6 +70,7 @@ export async function enrichSocios(maxEmpresas = 100): Promise<void> {
   console.log(`[enrich:socios] ${empresas.length} empresas com CNPJ a enriquecer`);
 
   let vinculos = 0;
+  let erros = 0;
   for (const e of empresas) {
     const doc = normalizarDocumento(e.documento);
     if (!doc || doc.length !== 14) continue; // só CNPJ
@@ -76,6 +78,7 @@ export async function enrichSocios(maxEmpresas = 100): Promise<void> {
     try {
       data = await fetchCnpj(doc);
     } catch (err) {
+      erros++;
       console.warn(`[enrich:socios] ${doc}: ${err instanceof Error ? err.message : String(err)}`);
       continue;
     }
@@ -91,6 +94,21 @@ export async function enrichSocios(maxEmpresas = 100): Promise<void> {
     }
   }
   console.log(`[enrich:socios] ${vinculos} vínculos de sócios gravados em company_partners`);
+  await recordSourceCoverage({
+    sourceId: "receita-cnpj",
+    collector: "brasilapi-cnpj-socios",
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: "cnpj-qsa",
+    status: erros > 0 && vinculos === 0 ? "partial" : empresas.length > 0 ? "fresh" : "pending",
+    lastAttemptAt: new Date(),
+    lastSuccessAt: empresas.length > 0 && erros < empresas.length ? new Date() : null,
+    totalRecords: vinculos,
+    errorMessage: erros > 0 ? `${erros} CNPJs falharam no enriquecimento` : null,
+    limitations:
+      "QSA é guardado como atributo da empresa; só vira vínculo público quando houver entidade pública documentada e regra explícita.",
+    metadata: { empresasConsultadas: empresas.length, erros },
+  });
 }
 
 if (
@@ -114,9 +132,11 @@ if (
         process.exit(1);
       });
   } else {
-    enrichSocios().catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
+    enrichSocios()
+      .catch((e) => {
+        console.error(e);
+        process.exitCode = 1;
+      })
+      .finally(() => closeDb());
   }
 }

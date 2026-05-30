@@ -14,7 +14,7 @@
  */
 import "dotenv/config";
 import { and, eq } from "drizzle-orm";
-import { getDb } from "../utils/ingest.js";
+import { closeDb, getDb } from "../utils/ingest.js";
 import { baixarPdf, extrairTextoPdf } from "../utils/pdf.js";
 import { extrairCnpjs } from "../utils/documento.js";
 import { gazettes, gazetteMentions, entities } from "@deolho/db";
@@ -86,9 +86,11 @@ if (
         process.exit(1);
       });
   } else {
-    mapearMencoesDiario().catch((e) => {
-      console.error(e);
-      process.exit(1);
-    });
+    mapearMencoesDiario()
+      .catch((e) => {
+        console.error(e);
+        process.exitCode = 1;
+      })
+      .finally(() => closeDb());
   }
 }

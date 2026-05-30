@@ -18,11 +18,12 @@
  */
 import "dotenv/config";
 import { and, eq } from "drizzle-orm";
-import { getDb, ingestRaw } from "../utils/ingest.js";
-import { CGU_API_BASE } from "../config.js";
+import { closeDb, getDb, ingestRaw } from "../utils/ingest.js";
+import { AMERICANA, CGU_API_BASE } from "../config.js";
 import { normalizarDocumento } from "../utils/documento.js";
 import { sleep } from "../utils/http.js";
 import { entities, sanctions, type DB } from "@deolho/db";
+import { recordSourceCoverage, upsertCivicEvent, upsertEvidence } from "../utils/civic.js";
 
 const KEY = process.env.PORTAL_TRANSPARENCIA_API_KEY;
 
@@ -63,6 +64,13 @@ function isoData(br?: string): string | null {
   return br.length >= 10 ? br.slice(0, 10) : null;
 }
 
+function sancaoKey(cadastro: "ceis" | "cnep", doc: string, it: CeisItem): string {
+  const tipo = it.tipoSancao?.descricaoResumida ?? "sem-tipo";
+  const inicio = isoData(it.dataInicioSancao) ?? "sem-inicio";
+  const orgao = it.orgaoSancionador?.nome ?? it.fonteSancao?.nomeExibicao ?? "sem-orgao";
+  return `${cadastro}-${doc}-${inicio}-${tipo}-${orgao}`.replace(/\s+/g, "-").toLowerCase();
+}
+
 export async function coletarSancoes(
   cadastro: "ceis" | "cnep" = "ceis",
   maxPaginas = 300,
@@ -77,6 +85,20 @@ export async function coletarSancoes(
       "[ceis-cnep] defina PORTAL_TRANSPARENCIA_API_KEY (chave gratuita: " +
         "https://portaldatransparencia.gov.br/api-de-dados/cadastrar-email).",
     );
+    await recordSourceCoverage({
+      sourceId: "cgu-transparencia",
+      collector: `cgu-${cadastro}`,
+      territoryIbge: AMERICANA.ibge,
+      uf: AMERICANA.uf,
+      recordType: cadastro,
+      status: "unavailable",
+      lastAttemptAt: new Date(),
+      lastSuccessAt: null,
+      totalRecords: 0,
+      errorMessage: "PORTAL_TRANSPARENCIA_API_KEY ausente",
+      limitations: "A API da CGU exige chave gratuita; sem chave, CEIS/CNEP não são consultados.",
+      metadata: { cadastro },
+    });
     return;
   }
 
@@ -92,17 +114,33 @@ export async function coletarSancoes(
   );
   if (conhecidos.size === 0) {
     console.warn("[ceis-cnep] nenhum fornecedor no banco — rode collect:pncp + map:pncp antes.");
+    await recordSourceCoverage({
+      sourceId: "cgu-transparencia",
+      collector: `cgu-${cadastro}`,
+      territoryIbge: AMERICANA.ibge,
+      uf: AMERICANA.uf,
+      recordType: cadastro,
+      status: "pending",
+      lastAttemptAt: new Date(),
+      lastSuccessAt: null,
+      totalRecords: 0,
+      errorMessage: null,
+      limitations: "A coleta de sanções depende de fornecedores conhecidos no banco.",
+      metadata: { cadastro, fornecedoresConhecidos: 0 },
+    });
     return;
   }
 
   let varridas = 0;
   let casadas = 0;
+  let erroFinal: string | null = null;
   for (let p = 1; p <= maxPaginas; p++) {
     let itens: unknown[];
     try {
       itens = await fetchPagina(cadastro, p);
     } catch (e) {
-      console.warn(`[ceis-cnep] ${e instanceof Error ? e.message : String(e)}`);
+      erroFinal = e instanceof Error ? e.message : String(e);
+      console.warn(`[ceis-cnep] ${erroFinal}`);
       break;
     }
     if (itens.length === 0) break;
@@ -126,6 +164,24 @@ export async function coletarSancoes(
   console.log(
     `[ceis-cnep] ${cadastro.toUpperCase()}: ${casadas} sanções de fornecedores conhecidos (de ${varridas} varridas)`,
   );
+  const tentativa = new Date();
+  const execucaoLimitada = maxPaginas < 300;
+  await recordSourceCoverage({
+    sourceId: "cgu-transparencia",
+    collector: `cgu-${cadastro}`,
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: cadastro,
+    status: erroFinal || execucaoLimitada ? "partial" : casadas > 0 ? "fresh" : "no_data",
+    lastAttemptAt: tentativa,
+    lastSuccessAt: erroFinal && casadas === 0 ? null : tentativa,
+    totalRecords: casadas,
+    errorMessage: erroFinal,
+    limitations:
+      "A varredura guarda sanções somente de fornecedores já conhecidos em Americana; não é busca nacional completa." +
+      (execucaoLimitada ? ` Execução limitada a ${maxPaginas} página(s) nesta rodada.` : ""),
+    metadata: { cadastro, varridas, fornecedoresConhecidos: conhecidos.size, maxPaginas },
+  });
 }
 
 async function gravarSancao(
@@ -139,6 +195,20 @@ async function gravarSancao(
     .from(entities)
     .where(and(eq(entities.kind, "empresa"), eq(entities.documento, doc)))
     .limit(1);
+  const key = sancaoKey(cadastro, doc, it);
+  const existente = await db
+    .select({ id: sanctions.id })
+    .from(sanctions)
+    .where(
+      and(
+        eq(sanctions.sourceId, "cgu-transparencia"),
+        eq(sanctions.cadastro, cadastro.toUpperCase()),
+        eq(sanctions.documento, doc),
+        eq(sanctions.tipoSancao, it.tipoSancao?.descricaoResumida ?? ""),
+      ),
+    )
+    .limit(1);
+  if (!existente[0]) {
   await db.insert(sanctions).values({
     entityId: ent[0]?.id ?? null,
     sourceId: "cgu-transparencia",
@@ -153,12 +223,58 @@ async function gravarSancao(
     sourceUrl: it.linkPublicacao ?? `${CGU_API_BASE}/${cadastro}`,
     fetchedAt: new Date(),
   });
+  }
+
+  const civicEventId = await upsertCivicEvent(db, {
+    sourceId: "cgu-transparencia",
+    sourceKey: key,
+    tipo: "sancao_registrada",
+    categoria: "sancao",
+    titulo: `Sanção oficial registrada no ${cadastro.toUpperCase()}`,
+    resumo: [
+      it.pessoa?.nome ?? it.pessoa?.razaoSocialReceita ?? "Pessoa sancionada",
+      it.tipoSancao?.descricaoResumida ? `Tipo: ${it.tipoSancao.descricaoResumida}.` : null,
+      "Sinal oficial de sanção; não indica irregularidade nova no município por si só.",
+    ].filter(Boolean).join(" "),
+    dataEvento: isoData(it.dataInicioSancao),
+    municipioIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    territorio: { municipio: AMERICANA.nome, ibge: AMERICANA.ibge, uf: AMERICANA.uf },
+    entidades: { entityId: ent[0]?.id ?? null, documento: doc },
+    limitacoes: [
+      {
+        campo: "escopo",
+        mensagem:
+          "A sanção é fato oficial da CGU; o vínculo com Americana só existe quando a empresa também aparece como fornecedor conhecido.",
+      },
+    ],
+    sourceUrl: it.linkPublicacao ?? `${CGU_API_BASE}/${cadastro}`,
+    fetchedAt: new Date(),
+    trustType: "fato_oficial",
+  });
+  await upsertEvidence(db, {
+    evidenceKey: `cgu:${key}:sancao`,
+    civicEventId,
+    sourceId: "cgu-transparencia",
+    sourceKey: key,
+    fieldPath: "$",
+    titulo: `Registro oficial ${cadastro.toUpperCase()} da CGU`,
+    sourceUrl: it.linkPublicacao ?? `${CGU_API_BASE}/${cadastro}`,
+    trecho: it.textoPublicacao ?? it.tipoSancao?.descricaoResumida ?? null,
+    metodoExtracao: "api-cgu",
+    fetchedAt: new Date(),
+    trustType: "fato_oficial",
+  });
 }
 
 if (process.argv[1]?.endsWith("ceis-cnep.ts") || process.argv[1]?.endsWith("ceis-cnep.js")) {
   const cad: "ceis" | "cnep" = process.argv[2] === "cnep" ? "cnep" : "ceis";
-  coletarSancoes(cad).catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+  const maxArg = process.argv.find((arg) => arg.startsWith("--max-pages="));
+  const maxPaginas = maxArg ? Number.parseInt(maxArg.split("=")[1] ?? "", 10) : 300;
+  coletarSancoes(cad, Number.isFinite(maxPaginas) && maxPaginas > 0 ? maxPaginas : 300)
+    .catch((e) => {
+      console.error(e);
+      process.exitCode = 1;
+    })
+    .finally(() => closeDb());
 }

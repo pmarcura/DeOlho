@@ -52,15 +52,20 @@ export interface PncpCompra {
 export interface PncpContrato {
   sequencialContrato: number;
   anoContrato: number;
-  numeroContrato: string;
+  numeroControlePNCP?: string | null;
+  numeroContrato?: string | null;
+  numeroContratoEmpenho?: string | null;
   objetoContrato: string;
   valorInicial: number;
   valorGlobal: number;
   dataVigenciaInicio: string;
   dataVigenciaFim: string;
   dataAssinatura: string;
+  dataPublicacaoPncp?: string | null;
   situacaoContrato: { codigo: number; nome: string };
-  fornecedor: {
+  niFornecedor?: string | null;
+  nomeRazaoSocialFornecedor?: string | null;
+  fornecedor?: {
     cnpjCpf: string;
     nomeRazaoSocial: string;
     tipo: string;
@@ -76,30 +81,36 @@ export interface TceSpDespesa {
   mes: number;
   orgao: string;
   nomeOrgao: string;
-  funcao: string;
-  subfuncao: string;
-  programa: string;
-  acao: string;
-  elemento: string;
-  modalidade: string;
-  credor: string;
+  funcao?: string | null;
+  subfuncao?: string | null;
+  programa?: string | null;
+  acao?: string | null;
+  elemento?: string | null;
+  modalidade?: string | null;
+  credor?: string | null;
   nomeCredor: string;
-  cpfCnpjCredor: string;
+  cpfCnpjCredor: string | null;
   empenho: string;
   valorEmpenhado: number;
   valorLiquidado: number;
   valorPago: number;
+  eventoDespesa?: string | null;
+  valorDespesa?: number | null;
+  dataEmissaoDespesa?: string | null;
 }
 
 export interface TceSpReceita {
   exercicio: number;
   mes: number;
+  orgao: string;
   categoria: string;
   origem: string;
   especie: string;
   rubrica: string;
   valorPrevisto: number;
   valorArrecadado: number;
+  fonteRecurso?: string | null;
+  codigoAplicacao?: string | null;
 }
 
 // --- Querido Diário ---

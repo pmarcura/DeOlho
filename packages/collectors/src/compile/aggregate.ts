@@ -1,10 +1,10 @@
 /**
  * Agregador de ENTIDADES — transforma os átomos compilados num índice de
- * pessoas (agentes públicos), famílias (coocorrência de sobrenome) e órgãos.
+ * pessoas (agentes públicos), sobrenomes repetidos (coocorrência) e órgãos.
  *
  * Responde, de forma factual e com fonte, à pergunta do produto:
- * "quantas famílias estão no poder e há quanto tempo?" — sempre como
- * COOCORRÊNCIA em atos oficiais, NUNCA como prova de parentesco ou acusação.
+ * "quais sobrenomes se repetem nos atos oficiais?" — sempre como COOCORRÊNCIA,
+ * NUNCA como prova de parentesco, família documentada ou acusação.
  *
  * Tudo determinístico, zero LLM, zero custo.
  */
@@ -110,7 +110,7 @@ export function agregarEntidades(atoms: CompiledAtom[]): EntidadesIndex {
   for (const a of atoms) {
     // Ano: data da edição (publicação) ou, na falta, o ano do próprio ato
     // (ex.: contrato 04/2022 sem data de edição → 2022). Dá timeline ao
-    // "há quanto tempo no poder".
+    // período observado nos atos oficiais.
     const anoAto = a.ano && /^\d{4}$/.test(a.ano) ? Number(a.ano) : null;
     const ano = anoDe(a.edicaoDate) ?? anoAto;
     const valor = parsearValor(a.valorMencionado ?? "");
@@ -201,7 +201,7 @@ export function agregarEntidades(atoms: CompiledAtom[]): EntidadesIndex {
   }
   pessoas.sort((a, b) => b.mencoes - a.mencoes);
 
-  // Famílias: agrupa pessoas por sobrenome.
+  // Sobrenomes repetidos: agrupa pessoas por sobrenome sem afirmar parentesco.
   const fMap = new Map<string, FamiliaAgg>();
   for (const p of pessoas) {
     const fslug = slugify(p.sobrenome);

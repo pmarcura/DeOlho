@@ -12,6 +12,8 @@
 
 import { get } from "../utils/http.js";
 import { salvar, salvarLatest } from "../utils/save.js";
+import { recordSourceCoverage } from "../utils/civic.js";
+import { closeDb } from "../utils/ingest.js";
 import {
   AMERICANA,
   DATA_FINAL_ISO,
@@ -72,8 +74,31 @@ export async function coletarQueiridoDiario(): Promise<void> {
   const arq = await salvar(resultado);
   await salvarLatest(resultado);
   console.log(`[querido-diario] ${edicoes.length} edições salvas em ${arq}`);
+
+  const tentativa = new Date();
+  await recordSourceCoverage({
+    sourceId: "querido-diario",
+    collector: "querido-diario",
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: "gazeta",
+    status: erros.length > 0 ? "error" : edicoes.length > 0 ? "fresh" : "no_data",
+    coverageStart: DATA_INICIAL_ISO,
+    coverageEnd: DATA_FINAL_ISO,
+    lastAttemptAt: tentativa,
+    lastSuccessAt: erros.length > 0 ? null : tentativa,
+    totalRecords: edicoes.length,
+    errorMessage: erros.join(" | ") || null,
+    limitations:
+      edicoes.length === 0
+        ? "Americana aparece no Querido Diário, mas a API não retornou edições no período consultado."
+        : null,
+    metadata: { municipio: AMERICANA.nome },
+  });
 }
 
 if (process.argv[1]?.endsWith("querido-diario.ts") || process.argv[1]?.endsWith("querido-diario.js")) {
-  coletarQueiridoDiario().catch(console.error);
+  coletarQueiridoDiario()
+    .catch(console.error)
+    .finally(() => closeDb());
 }

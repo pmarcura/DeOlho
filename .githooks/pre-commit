@@ -1,0 +1,52 @@
+#!/bin/sh
+# ── Bot anti-vazamento (local) ───────────────────────────────────────────────
+# Roda automaticamente a cada `git commit`. Bloqueia o commit se detectar:
+#   1. arquivo de ambiente (.env / .env.local / .env.*) — exceto .env.example
+#   2. a chave da API do Portal da Transparência no conteúdo
+#   3. padrões genéricos de segredo (api key / token / senha com valor real)
+# Última linha de defesa ANTES de o segredo sair da sua máquina.
+#
+# Ative uma vez com:  git config core.hooksPath .githooks
+# Pular num commit específico (use com cuidado):  git commit --no-verify
+
+fail=0
+
+# 1) Arquivos de ambiente staged (exceto .example)
+for f in $(git diff --cached --name-only --diff-filter=ACM); do
+  case "$f" in
+    *.example) : ;;
+    *.env|*.env.*|.env|.env.*)
+      echo "🚫 '$f' é um arquivo de ambiente e NÃO deve ser commitado."
+      echo "   Mantenha segredos em .env.local (já ignorado pelo git)."
+      fail=1
+      ;;
+  esac
+done
+
+# Conteúdo que está sendo adicionado (só linhas novas)
+added="$(git diff --cached -U0 --diff-filter=ACM | grep '^+' | grep -v '^+++')"
+
+# 2) Chave do Portal da Transparência (PORTAL_TRANSPARENCIA_API_KEY = hex)
+if printf '%s' "$added" | grep -iqE "portal_transparencia_api_key[[:space:]]*[:=][[:space:]]*['\"]?[0-9a-fA-F]{16,}"; then
+  echo "🚫 Detectada a CHAVE DA API DO PORTAL DA TRANSPARÊNCIA no commit."
+  echo "   Essa chave é pessoal (sua conta gov.br) — nunca pode ir pro GitHub."
+  fail=1
+fi
+
+# 3) Segredo genérico com valor real (ignora placeholders e process.env)
+if printf '%s' "$added" \
+   | grep -ivE "(your[_-]?|sua[_-]?|seu[_-]?|example|placeholder|dummy|fake|sample|xxx+|<[^>]+>|chave[_-]?aqui|process\.env\.)" \
+   | grep -iqE "\b(api[_-]?key|apikey|secret|token|password|passwd|senha|client[_-]?secret)\b[[:space:]]*[:=][[:space:]]*['\"]?[A-Za-z0-9_./+=-]{12,}"; then
+  echo "⚠️  Possível segredo (api key / token / senha) com valor real no commit."
+  echo "   Confira. Se for placeholder, ajuste o texto; se for real, remova."
+  fail=1
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo ""
+  echo "Commit BLOQUEADO para proteger informação sensível. 🛡️"
+  echo "Se tiver MUITA certeza de que é um falso positivo: git commit --no-verify"
+  exit 1
+fi
+
+exit 0

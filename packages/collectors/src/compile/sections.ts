@@ -44,11 +44,16 @@ export interface CamposPregao {
   estado?: "aberto" | "suspenso" | "anulado" | "homologado" | "deserto" | "indefinido";
 }
 
+export interface CamposIndefinido {
+  assunto?: string;
+}
+
 export type Campos =
   | { tipo: "contrato" | "aditivo"; dados: CamposContrato }
   | { tipo: "lei"; dados: CamposLei }
   | { tipo: "portaria" | "decreto" | "resolucao"; dados: CamposPortaria }
-  | { tipo: "edital" | "pregao" | "concorrencia" | "convite" | "ata_registro" | "convenio"; dados: CamposPregao };
+  | { tipo: "edital" | "pregao" | "concorrencia" | "convite" | "ata_registro" | "convenio"; dados: CamposPregao }
+  | { tipo: "indefinido"; dados: CamposIndefinido };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -215,6 +220,10 @@ export function parsearCampos(tipo: TipoAto, texto: string): Campos {
     case "ata_registro":
     case "convenio":
       return { tipo, dados: parsearPregao(t) };
+    case "indefinido": {
+      const assunto = t.split(/[.;]/)[0]?.slice(0, 160).trim();
+      return { tipo, dados: assunto ? { assunto } : {} };
+    }
   }
 }
 

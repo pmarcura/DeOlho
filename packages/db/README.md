@@ -22,6 +22,11 @@ dia 1** (caríssimos de retrofitar, conforme `.planning/research/FEATURES.md`):
 | `entities` / `entity_references` | IDs canônicos + ponte de resolução |
 | `contracts` | Unidade do MVP (página viva de contrato) + busca FTS/trgm |
 | `contract_events` | Linha do tempo do contrato (CONT-04) |
+| `civic_events` | Unidade pública principal: ato, contrato, pagamento, sanção, limitação |
+| `evidence` | Evidência granular por evento/campo, com trecho, URL e método de extração |
+| `entity_relationships` | Vínculos documentados entre entidades; não usa sobrenome como prova |
+| `money_flows` | Fluxos financeiros normalizados: previsto, contratado, empenhado, pago etc. |
+| `source_coverage` | Estado de cobertura de cada fonte/coletor e suas limitações |
 
 ## Uso
 
@@ -52,5 +57,5 @@ extensão já fica disponível.
 
 ## Ainda não modelado (próximas fases, sobre esta fundação)
 
-`signals` (sinais de atenção), `ai_outputs` (cache de resumos da IA),
-`corrections` (correções da comunidade) e as colunas de embedding pgvector.
+`ai_outputs` (cache de resumos da IA), `corrections` (correções da comunidade),
+jobs `pg-boss` e as colunas de embedding pgvector.

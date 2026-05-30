@@ -29,6 +29,13 @@
       "when": 1779749964200,
       "tag": "0003_short_sentinel",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780115468621,
+      "tag": "0004_awesome_wallop",
+      "breakpoints": true
     }
   ]
 }

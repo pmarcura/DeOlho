@@ -13,6 +13,8 @@
  */
 import "dotenv/config";
 import { AMERICANA, TRANSPARENCIA_AMERICANA_BASE } from "../config.js";
+import { recordSourceCoverage } from "../utils/civic.js";
+import { closeDb } from "../utils/ingest.js";
 
 export async function coletarTransparenciaAmericana(): Promise<void> {
   console.log(
@@ -23,14 +25,31 @@ export async function coletarTransparenciaAmericana(): Promise<void> {
       "no portal — sem execução detalhada a coletar. Reavaliar periodicamente; o mapper para " +
       "payments já está previsto (mesmo padrão do TCE-SP).",
   );
+  await recordSourceCoverage({
+    sourceId: "transparencia-americana",
+    collector: "transparencia-americana",
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: "execucao-orcamentaria",
+    status: "unavailable",
+    lastAttemptAt: new Date(),
+    lastSuccessAt: null,
+    totalRecords: 0,
+    errorMessage: null,
+    limitations:
+      "A seção SIAFIC do portal municipal estava marcada como 'em breve'; despesas com credor ainda não estão disponíveis para coleta estruturada.",
+    metadata: { baseUrl: TRANSPARENCIA_AMERICANA_BASE },
+  });
 }
 
 if (
   process.argv[1]?.endsWith("transparencia-americana.ts") ||
   process.argv[1]?.endsWith("transparencia-americana.js")
 ) {
-  coletarTransparenciaAmericana().catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+  coletarTransparenciaAmericana()
+    .catch((e) => {
+      console.error(e);
+      process.exitCode = 1;
+    })
+    .finally(() => closeDb());
 }

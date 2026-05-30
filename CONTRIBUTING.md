@@ -26,6 +26,19 @@ pnpm -r typecheck   # tipos TypeScript
 pnpm -r build       # compila tudo
 ```
 
+### Proteção anti-vazamento de segredos 🛡️
+
+Ative o hook que bloqueia commits de chaves/API/`.env` **antes** de saírem da
+sua máquina (faça uma vez, ao clonar):
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Nunca commite chaves de API, tokens ou arquivos `.env`. Guarde segredos em
+`.env.local` (já ignorado pelo git). O CI também roda o **gitleaks** em todo PR —
+se um segredo passar, o merge é bloqueado.
+
 | Pasta | O que é |
 |---|---|
 | `apps/web` | Interface (Next.js) — o feed cívico que o cidadão vê |

@@ -88,7 +88,7 @@ export default async function PessoaPage({ params }: PageProps) {
         <Stat icon={<Users2 className="w-4 h-4" />} valor={pessoa.papeis.map((p) => PAPEL_LABEL[p]).slice(0, 1).join("")} label="papel" />
       </div>
 
-      {/* Família */}
+      {/* Sobrenome */}
       <Link
         href={`/familia/${familiaSlug}`}
         className="block rounded-2xl bg-card border border-border/40 shadow-sm px-4 py-3 hover:shadow-md transition-shadow mb-5"
@@ -96,7 +96,7 @@ export default async function PessoaPage({ params }: PageProps) {
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground">sobrenome</p>
         <p className="text-sm font-semibold flex items-center justify-between">
           <span>{pessoa.sobrenome}</span>
-          <span className="text-xs font-normal text-muted-foreground">ver quem mais tem esse sobrenome →</span>
+          <span className="text-xs font-normal text-muted-foreground">ver outras menções do sobrenome →</span>
         </p>
       </Link>
 

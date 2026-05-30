@@ -32,3 +32,65 @@ export const contractEventType = pgEnum("contract_event_type", [
   "alteracao",
   "rescisao",
 ]);
+
+export const civicEventType = pgEnum("civic_event_type", [
+  "licitacao_publicada",
+  "contrato_publicado",
+  "contrato_atualizado",
+  "pagamento_registrado",
+  "receita_registrada",
+  "ato_publicado",
+  "proposta_legislativa",
+  "indicacao_zeladoria",
+  "sancao_registrada",
+  "relacionamento_documentado",
+  "limitacao_detectada",
+  "revisao_aplicada",
+]);
+
+export const civicEventCategory = pgEnum("civic_event_category", [
+  "contratacao",
+  "pagamento",
+  "receita",
+  "obra_zeladoria",
+  "ato_normativo",
+  "nomeacao_exoneracao",
+  "proposta_legislativa",
+  "indicacao_requerimento",
+  "sancao",
+  "audiencia_conselho",
+  "limitacao_fonte",
+  "relacionamento",
+]);
+
+export const relationshipType = pgEnum("relationship_type", [
+  "socio_oficial",
+  "administrador_oficial",
+  "fornecedor",
+  "orgao_responsavel",
+  "doacao_eleitoral_oficial",
+  "sancao_oficial",
+  "mencao_documentada",
+  "representante_legal",
+]);
+
+export const moneyFlowType = pgEnum("money_flow_type", [
+  "previsto",
+  "contratado",
+  "empenhado",
+  "liquidado",
+  "pago",
+  "anulado",
+  "reforcado",
+  "aditado",
+  "receita_arrecadada",
+]);
+
+export const sourceCoverageStatus = pgEnum("source_coverage_status", [
+  "fresh",
+  "partial",
+  "no_data",
+  "unavailable",
+  "error",
+  "pending",
+]);

@@ -23,7 +23,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { CheerioCrawler } from "crawlee";
 import { and, eq } from "drizzle-orm";
-import { getDb, ingestRaw } from "../utils/ingest.js";
+import { closeDb, getDb, ingestRaw } from "../utils/ingest.js";
+import { recordSourceCoverage } from "../utils/civic.js";
 import { salvar, salvarLatest } from "../utils/save.js";
 import { AMERICANA } from "../config.js";
 import { gazettes, type DB } from "@deolho/db";
@@ -231,6 +232,26 @@ export async function coletarDiarioAmericana(opts: ColetaOpts = {}): Promise<voi
   await salvar(resultado);
   await salvarLatest(resultado);
   console.log(`[diario-americana] master agora com ${todas.length} edições`);
+
+  const tentativa = new Date();
+  const datas = todas.map((e) => e.date).filter((d): d is string => Boolean(d)).sort();
+  await recordSourceCoverage({
+    sourceId: "diario-americana",
+    collector: "diario-americana",
+    territoryIbge: AMERICANA.ibge,
+    uf: AMERICANA.uf,
+    recordType: "gazeta",
+    status: erros.length > 0 ? "partial" : todas.length > 0 ? "fresh" : "no_data",
+    coverageStart: datas[0] ?? null,
+    coverageEnd: datas[datas.length - 1] ?? null,
+    lastAttemptAt: tentativa,
+    lastSuccessAt: erros.length > 0 && novas.length === 0 ? null : tentativa,
+    totalRecords: todas.length,
+    errorMessage: erros.join(" | ") || null,
+    limitations:
+      "Cobertura baseada no portal oficial do Diário de Americana; datas ausentes em algumas edições são lacuna da própria página.",
+    metadata: { novas: novas.length, backfill, mesesIncremental },
+  });
 }
 
 async function upsertGazette(db: DB, sourceKey: string, e: EdicaoDiario): Promise<void> {
@@ -263,8 +284,10 @@ if (
   process.argv[1]?.endsWith("diario-americana.js")
 ) {
   const backfill = process.argv.includes("--backfill");
-  coletarDiarioAmericana({ backfill }).catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+  coletarDiarioAmericana({ backfill })
+    .catch((e) => {
+      console.error(e);
+      process.exitCode = 1;
+    })
+    .finally(() => closeDb());
 }

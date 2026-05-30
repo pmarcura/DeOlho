@@ -9,7 +9,7 @@
  * capturamos cidadão comum. Todos os registros aqui são `pessoa_publica` no
  * exercício/investidura de função pública — exatamente o que o Diário publica.
  *
- * O agrupamento por SOBRENOME ("famílias no poder") é coocorrência factual em
+ * O agrupamento por SOBRENOME é coocorrência factual em
  * atos oficiais, com fonte — NÃO é prova de parentesco nem acusação. A UI
  * carrega esse disclaimer.
  */

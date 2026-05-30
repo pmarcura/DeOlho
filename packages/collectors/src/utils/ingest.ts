@@ -31,6 +31,12 @@ export function getDb(): DB | null {
   return _db;
 }
 
+export async function closeDb(): Promise<void> {
+  if (!_db) return;
+  await _db.$client.end({ timeout: 5 });
+  _db = undefined;
+}
+
 /** sha256 do payload serializado — dedup + detecção de mudança (DATA-04). */
 export function contentHash(payload: unknown): string {
   return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
@@ -66,7 +72,21 @@ export async function ingestRaw(db: DB, input: IngestInput): Promise<void> {
 }
 
 /** Ingestão em lote. Retorna quantos registros foram processados. */
-export async function ingestMany(db: DB, inputs: IngestInput[]): Promise<number> {
-  for (const input of inputs) await ingestRaw(db, input);
+export async function ingestMany(db: DB, inputs: IngestInput[], chunkSize = 500): Promise<number> {
+  for (let i = 0; i < inputs.length; i += chunkSize) {
+    const chunk = inputs.slice(i, i + chunkSize).map((input): NewRawRecord => ({
+      sourceId: input.sourceId,
+      sourceKey: input.sourceKey,
+      recordType: input.recordType,
+      payload: input.payload,
+      contentHash: contentHash(input.payload),
+      sourceUrl: input.sourceUrl ?? null,
+      publishedAt: input.publishedAt ?? null,
+      fetchedAt: input.fetchedAt ?? new Date(),
+    }));
+    if (chunk.length > 0) {
+      await db.insert(rawRecords).values(chunk).onConflictDoNothing();
+    }
+  }
   return inputs.length;
 }

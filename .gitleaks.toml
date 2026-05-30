@@ -1,0 +1,38 @@
+# Configuração do gitleaks — o "bot" anti-vazamento do DeOlho.
+# Estende as regras padrão (cobrem AWS, GitHub, Google, Stripe, JWT, etc.)
+# e adiciona regras específicas para o nosso contexto (chave do Portal da
+# Transparência e arquivos de ambiente).
+title = "DeOlho — proteção anti-segredo"
+
+[extend]
+useDefault = true
+
+# ── Regras específicas do projeto ────────────────────────────────────────────
+
+[[rules]]
+id = "portal-transparencia-api-key"
+description = "Chave da API do Portal da Transparência (conta gov.br)"
+# Pega PORTAL_TRANSPARENCIA_API_KEY = <hex de 16+ chars> (formato da chave do portal)
+regex = '''(?i)portal_transparencia_api_key\s*[:=]\s*['"]?[0-9a-f]{16,}['"]?'''
+keywords = ["portal_transparencia_api_key"]
+
+[[rules]]
+id = "generic-env-secret"
+description = "Atribuição de segredo (api key, token, senha) com valor real"
+regex = '''(?i)\b(api[_-]?key|apikey|secret|token|password|passwd|senha|client[_-]?secret)\b\s*[:=]\s*['"]?[a-z0-9_\-./+=]{12,}['"]?'''
+keywords = ["api_key","apikey","secret","token","password","passwd","senha"]
+
+# ── Allowlist: o que NÃO é vazamento (placeholders, exemplos, docs) ───────────
+
+[allowlist]
+description = "Placeholders e arquivos de exemplo — não são segredos reais"
+paths = [
+  '''\.env\.example$''',
+  '''\.gitleaks\.toml$''',
+  '''(^|/)CONTRIBUTING\.md$''',
+  '''(^|/)\.github/''',
+]
+regexes = [
+  '''(?i)(your[_-]?|sua[_-]?|seu[_-]?|change[_-]?me|example|placeholder|dummy|fake|test|sample|xxx+|<[^>]+>|chave[_-]?aqui|cole[_-]?aqui|\.\.\.)''',
+  '''(?i)process\.env\.''',
+]

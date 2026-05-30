@@ -20,6 +20,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { baixarPdf, extrairTextoPdf } from "../utils/pdf.js";
 import { extrairCnpjs } from "../utils/documento.js";
+import { extrairTerritorios, type TerritorioMention } from "../utils/territory.js";
 import { compilarLote } from "../compile/index.js";
 import { agregarEntidades } from "../compile/aggregate.js";
 
@@ -48,7 +49,8 @@ export type TipoAto =
   | "convite"
   | "concorrencia"
   | "convenio"
-  | "ata_registro";
+  | "ata_registro"
+  | "indefinido";
 
 export interface Atom {
   /** Estável e único: <edicao>-<tipo>-<numero>-<ano>. */
@@ -68,6 +70,8 @@ export interface Atom {
   cnpjsMencionados: string[];
   /** "R$ 1.240.000,00" — só pra tipos que tipicamente trazem valor. */
   valorMencionado: string | null;
+  /** Territórios citados literalmente no trecho: rua, bairro ou equipamento público. */
+  territorios: TerritorioMention[];
 }
 
 const TIPOS: Array<{ tipo: TipoAto; padroes: RegExp[] }> = [
@@ -153,6 +157,7 @@ function labelTipo(tipo: TipoAto): string {
     concorrencia: "Concorrência",
     convenio: "Convênio",
     ata_registro: "Ata de Registro de Preços",
+    indefinido: "Publicação",
   }[tipo];
 }
 
@@ -179,6 +184,50 @@ function valorMaisProximo(texto: string, posicao: number): string | null {
   const janela = texto.slice(posicao, fim);
   const m = janela.match(VALOR_RE);
   return m ? `R$ ${m[1]}` : null;
+}
+
+const SEGMENTO_RE =
+  /\b(?:EXTRATO\s+DE\s+(?:CONTRATO|TERMO\s+ADITIVO|ATA)|AVISO\s+DE\s+(?:LICITA[ÇC][ÃA]O|SUSPENS[ÃA]O|HOMOLOGA[ÇC][ÃA]O)|COMUNICADO|CONVOCA[ÇC][ÃA]O|AUDI[ÊE]NCIA\s+P[ÚU]BLICA|ORDEM\s+DE\s+SERVI[ÇC]O|PROCESSO\s+ADMINISTRATIVO|TERMO\s+DE\s+(?:HOMOLOGA[ÇC][ÃA]O|RATIFICA[ÇC][ÃA]O)|CONSELHO\s+MUNICIPAL)\b/g;
+
+function segmentoJaCoberto(posicao: number, conhecidos: Atom[]): boolean {
+  return conhecidos.some((a) => Math.abs(a.posicao - posicao) < 240);
+}
+
+function extrairSegmentosIndefinidos(
+  texto: string,
+  edicaoSlug: string,
+  edicaoDate: string | null,
+  conhecidos: Atom[],
+): Atom[] {
+  const out: Atom[] = [];
+  let m: RegExpExecArray | null;
+  let seq = 1;
+  SEGMENTO_RE.lastIndex = 0;
+  while ((m = SEGMENTO_RE.exec(texto))) {
+    if (segmentoJaCoberto(m.index, conhecidos)) continue;
+    const resumo = trechoEmTornoDe(texto, m.index, 40, 1300);
+    const territorios = extrairTerritorios(resumo);
+    const cnpjs = extrairCnpjs(resumo);
+    const valorMencionado = valorMaisProximo(texto, m.index);
+    if (territorios.length === 0 && cnpjs.length === 0 && !valorMencionado) continue;
+
+    const numero = String(seq++).padStart(3, "0");
+    out.push({
+      id: `${edicaoSlug}-publicacao-${numero}`.replace(/[^\w-]/g, "-").toLowerCase(),
+      edicaoSlug,
+      edicaoDate,
+      tipo: "indefinido",
+      numero,
+      ano: edicaoDate?.slice(0, 4) ?? null,
+      titulo: `Publicação ${numero}`,
+      resumo,
+      posicao: m.index,
+      cnpjsMencionados: cnpjs,
+      valorMencionado,
+      territorios,
+    });
+  }
+  return out;
 }
 
 function extrairAtomosDoTexto(
@@ -225,11 +274,12 @@ function extrairAtomosDoTexto(
           posicao,
           cnpjsMencionados: cnpjs,
           valorMencionado,
+          territorios: extrairTerritorios(resumo),
         });
       }
     }
   }
-  return out;
+  return [...out, ...extrairSegmentosIndefinidos(texto, edicaoSlug, edicaoDate, out)];
 }
 
 /** Baixa + extrai uma edição. Retorna null em falha (pra NÃO cachear e retentar depois). */
