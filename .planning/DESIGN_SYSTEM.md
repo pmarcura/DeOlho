@@ -36,6 +36,8 @@ Agentes devem consultar esses arquivos antes de alterar UI, componentes, navega�
 | stories | atualizações recentes |
 | explorar | navegar por entidades |
 
+Reações estruturadas permitidas para objetos públicos: `apoio`, `parcial`, `contra`, `faltou informação`. Elas representam opinião do usuário e nunca podem aparecer como fato, fonte, evidência ou sinal de atenção.
+
 ## Estrutura de pastas recomendada
 
 ```text
@@ -185,6 +187,7 @@ Criar em `packages/ui/src/components/deolho`:
 - `ContextualActionDrawer` no mobile;
 - painel lateral de evidências no desktop, aberto quando o usuário seleciona evidência;
 - `sonner` para feedback curto, sem tom sensacionalista.
+- ações sociais permitidas apenas em objetos públicos: acompanhar, reagir de forma estruturada e compartilhar; contribuição contextual curta exige moderação antes de publicação.
 
 O shell não deve depender de dados reais. Usar fixtures sintéticas claramente marcadas até a ingestão existir.
 
@@ -292,6 +295,7 @@ Dado incompleto: bloco de limitação no card
 - Limitações devem usar `BlocoLimitacaoDado`.
 - Sinais de atenção devem usar `SinalAtencaoCard` e o aviso obrigatório.
 - Não criar comentários livres, likes, ranking moral ou interface de denúncia sensacionalista.
+- Não gamificar reputação pública de usuário; hábitos e pontos devem ser privados e focados em leitura, evidência aberta e contribuição contextual útil.
 - Todo componente cívico deve ter Storybook com estados: padrão, carregando, vazio, erro, dado incompleto e fonte atrasada quando fizer sentido.
 
 ## O que deve ir em `packages/ui`

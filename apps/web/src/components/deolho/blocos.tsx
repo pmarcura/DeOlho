@@ -14,15 +14,19 @@ import { FonteBadge } from "./badges";
 // Sempre rotulado, nunca parece fato oficial.
 export function BlocoExplicacaoIA({
   texto,
+  titulo = "Explicação por IA",
   fontesUsadas,
   limitacoes,
   geradoEm,
+  meta,
   className,
 }: {
   texto: string;
+  titulo?: string;
   fontesUsadas?: { fonte: FonteId; label?: string }[];
   limitacoes?: string[];
   geradoEm?: string;
+  meta?: string[];
   className?: string;
 }) {
   return (
@@ -36,10 +40,19 @@ export function BlocoExplicacaoIA({
       <div className="flex items-center gap-1.5">
         <Bot className="w-4 h-4 text-violet-700" aria-hidden />
         <span className="text-[11px] font-semibold uppercase tracking-wide text-violet-800">
-          Explicação por IA
+          {titulo}
         </span>
       </div>
-      <p className="text-sm leading-relaxed text-violet-950/85">
+      {meta?.length ? (
+        <div className="flex flex-wrap gap-1">
+          {meta.map((item) => (
+            <span key={item} className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] text-violet-900/75 ring-1 ring-violet-200/60">
+              {item}
+            </span>
+          ))}
+        </div>
+      ) : null}
+      <p className="whitespace-pre-line text-sm leading-relaxed text-violet-950/85">
         {texto}
       </p>
       {(fontesUsadas?.length || limitacoes?.length) && (

@@ -17,6 +17,7 @@ Use este checklist em todo PR que altera UI, componentes, docs de design system 
 - [ ] Explicação por IA está visualmente separada de fato oficial.
 - [ ] Sinal de atenção contém o aviso `Sinal de atenção não indica irregularidade`.
 - [ ] Nenhuma UI cria score de corrupção, ranking moral ou acusação automática.
+- [ ] Reações e contribuições de usuário aparecem como opinião/contribuição, nunca como fato ou evidência.
 
 ## Estados
 
@@ -52,6 +53,7 @@ Use este checklist em todo PR que altera UI, componentes, docs de design system 
 - [ ] Sem tom partidário.
 - [ ] Sem termos `post`, `like`, `comentário livre` ou `seguir` na UI.
 - [ ] Limitações dizem o que falta e por quê.
+- [ ] Mapa ou grafo de conexões não sugere culpa por proximidade visual.
 
 ## Handoff
 

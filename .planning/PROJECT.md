@@ -51,9 +51,15 @@ Transformar um contrato público difícil de entender em uma página clara, rast
 - [ ] **OSS-02**: Pipeline de CI/CD aberto e reproduzível
 - [ ] **OSS-03**: Vault Obsidian público (via Obsidian Publish) com decisões, specs e contexto do projeto
 
+**Fundação Social-Cívica — v0**
+- [ ] **SOC-01**: Reações cívicas usam enum fechado (`apoio`, `parcial`, `contra`, `faltou informação`) e são sempre opinião de usuário, nunca fato oficial
+- [ ] **SOC-02**: Contribuições contextuais curtas entram com moderação antes de publicação
+- [ ] **SOC-03**: Acompanhar entidades e hábitos privados podem existir sem ranking público ou competição moral
+- [ ] **GRAPH-01**: Mapa de conexões usa apenas nós e arestas documentadas, cada aresta com fonte, evidência e confiança
+
 ### Out of Scope
 
-- **Feed social / comentários abertos** — risco de virar arena política antes de ter moderação adequada; entra em v2 com regras estruturadas
+- **Feed social / comentários abertos sem moderação** — risco de virar arena política; a direção permitida é social-cívica com reações estruturadas, contribuições contextuais moderadas e evidência obrigatória
 - **Chat com IA como feature principal** — a IA serve para explicar e resumir, não para ser o produto em si
 - **Dados em "tempo real"** — fontes públicas não atualizam instantaneamente; prometer isso é desonesto
 - **Dados municipais genéricos (v1)** — Americana-SP é o piloto municipal; outras prefeituras entram depois de provar a tese com Americana
@@ -125,6 +131,8 @@ Transformar um contrato público difícil de entender em uma página clara, rast
 | Público-alvo amplo desde v1 (jornalistas + cidadãos + devs) | Não sacrificar profundidade por simplicidade nem vice-versa — três perfis têm necessidades complementares | — Pending |
 | Sem comentários abertos em v1 | Risco de desinformação e perseguição antes de moderação madura — comunidade estruturada vem depois | — Pending |
 | Separar pessoa pública × cidadão comum desde a arquitetura | Obrigação jurídica e ética — não é feature opcional | — Pending |
+| Grafo de conexões começa como read model PostgreSQL | O banco já possui `entities` e `entity_relationships`; Neo4j só entra se consultas profundas ou analytics justificarem nova infraestrutura | — Proposed 2026-05-30 |
+| Social-cívico não é rede social aberta | Reações são estruturadas, comentários são contribuições moderadas e gamificação é privada para não incentivar acusação ou competição moral | — Proposed 2026-05-30 |
 
 ## Evolution
 

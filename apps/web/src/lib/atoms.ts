@@ -1,7 +1,7 @@
 /**
  * Loader server-side dos ÁTOMOS extraídos do Diário de Americana.
  *
- * Cada átomo é uma unidade de conteúdo do feed cívico (lei, decreto, portaria,
+ * Cada átomo é uma unidade de conteúdo do radar cívico (lei, decreto, portaria,
  * contrato, pregão, etc.) com posição no texto, número, resumo e CNPJs/valores
  * detectados na vizinhança. O extrator (packages/collectors/src/extract/atoms.ts)
  * gera atoms.json a partir dos 60 PDFs reais.
@@ -165,7 +165,7 @@ async function load(): Promise<AtomsFile> {
   } catch (e) {
     // Só toleramos o caso "arquivo ainda não gerado" (fresh checkout / primeiro
     // deploy antes do coletor rodar). JSON malformado, permissão negada, schema
-    // diferente, etc. são regressão real — devem quebrar pra não publicar feed
+    // diferente, etc. são regressão real — devem quebrar pra não publicar radar
     // silenciosamente vazio em produção.
     if ((e as NodeJS.ErrnoException)?.code !== "ENOENT") throw e;
     _cache = VAZIO;
@@ -233,7 +233,7 @@ export async function getAtomsPorCnpj(cnpj: string): Promise<Atom[]> {
   return data.atomos.filter((a) => a.cnpjsMencionados.includes(doc));
 }
 
-/** Átomos por lista de ids, preservando a ordem cronológica do feed. */
+/** Átomos por lista de ids, preservando a ordem cronológica do radar. */
 export async function getAtomsPorIds(ids: string[]): Promise<Atom[]> {
   const data = await load();
   const set = new Set(ids);
@@ -302,7 +302,7 @@ export function tipoLabel(t: TipoAto): string {
 }
 
 // ── Algoritmo de relevância ──────────────────────────────────────────────────
-// O feed não é só "cronológico cego". Atos de dinheiro pesam mais, com CNPJ
+// O radar não é só "cronológico cego". Atos de dinheiro pesam mais, com CNPJ
 // pesa mais, recente pesa mais. Resultado: o usuário vê o que importa primeiro.
 const PESO_TIPO: Record<TipoAto, number> = {
   contrato: 30,
@@ -358,7 +358,7 @@ function scoreAtomo(a: Atom, hojeMs = Date.now()): number {
 /**
  * Versão ranqueada com DIVERSIDADE: depois de ordenar por score, aplica uma
  * penalidade leve em átomos do mesmo tipo/empresa consecutivos. Resultado:
- * o feed mistura conteúdos em vez de mostrar 5 contratos seguidos da mesma
+ * o radar mistura conteúdos em vez de mostrar 5 contratos seguidos da mesma
  * empresa.
  */
 export async function getAtomsRanqueados(

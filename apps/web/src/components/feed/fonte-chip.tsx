@@ -1,5 +1,5 @@
 /**
- * FonteChip — fonte inline, discreta. Substitui o FonteBadge berrante no feed.
+ * FonteChip — fonte inline, discreta. Alternativa compacta ao FonteBadge.
  *
  * Estilo: "@handle" sutil, sem bloco de cor. Vira link quando há url. Usado
  * principalmente DENTRO do EventoCard pra não competir com o conteúdo.

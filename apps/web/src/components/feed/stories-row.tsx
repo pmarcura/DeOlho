@@ -1,6 +1,8 @@
 /**
- * StoriesRow — fila horizontal de círculos no topo, ao estilo das stories do
- * Instagram, mas para CIDADES, BAIRROS e TEMAS (não pessoas).
+ * StoriesRow — trilha horizontal de filtros cívicos.
+ *
+ * O nome do componente é legado; na interface ele representa categorias,
+ * territórios e temas públicos, não stories sociais ou pessoas.
  *
  * Visual: avatar redondo com anel suave (ou gradiente quente quando "novo
  * conteúdo"). Label embaixo. Scroll horizontal nativo mobile com snap.
@@ -16,9 +18,9 @@ export interface StoryItem {
   href: string;
   /** Inicial / sigla pra desenhar dentro do círculo quando não há ícone. */
   iniciais?: string;
-  /** Quando true, mostra anel gradiente quente — indicando conteúdo novo. */
+  /** Quando true, mostra anel gradiente quente — indicando atualização recente. */
   novo?: boolean;
-  /** Quando true, marca como categoria ativa do feed (ring escuro). */
+  /** Quando true, marca como categoria ativa do radar (ring escuro). */
   ativo?: boolean;
   /** Override de paleta determinística. */
   bg?: string;

@@ -1,7 +1,7 @@
 /**
- * /radar — feed completo de átomos (sem limite), ordenado por relevância.
+ * /radar — lista completa de átomos (sem limite), ordenada por relevância.
  *
- * Stories são o único filtro — mesma estrutura que a Home.
+ * A trilha horizontal é o único filtro — mesma estrutura que a Home.
  */
 import type { Metadata } from "next";
 import Link from "next/link";

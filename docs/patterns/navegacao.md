@@ -37,6 +37,7 @@ Ações permitidas:
 
 - acompanhar entidade;
 - ver evidência;
+- reagir de forma estruturada em objeto público;
 - reportar erro estruturado;
 - contribuir contexto;
 - exportar CSV/JSON;
@@ -49,6 +50,8 @@ Ações proibidas:
 - comentar livremente;
 - acusar;
 - denunciar sem evidência.
+
+Reações estruturadas e contribuições contextuais não substituem evidência. A interface deve deixar claro quando algo é opinião do usuário.
 
 ## Drawer de ações
 
@@ -74,3 +77,7 @@ Links para entidade relacionada devem deixar claro:
 - confiança ou limitação.
 
 Não criar relação implícita apenas por proximidade visual.
+
+## Mapa de conexões
+
+`/explorar` pode evoluir para mapa de conexões, mas a navegação precisa manter alternativa em lista. Cada aresta visível deve exibir tipo de vínculo, fonte, confiança e caminho para evidência. Expansão de rede deve ser controlada por profundidade e filtros para evitar que proximidade visual pareça acusação.

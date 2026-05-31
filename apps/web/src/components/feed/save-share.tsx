@@ -1,11 +1,10 @@
 "use client";
 
 /**
- * Save + Share — Instagram-style ações secundárias do card.
+ * Save + Share — acoes secundarias para objetos publicos.
  *
- * Save (acompanhar) = bookmark local agora; quando houver pseudônimo verificado
- * vira persistente. Share = Web Share API quando disponível, copia URL no
- * clipboard como fallback. Tudo client-side e otimista.
+ * Acompanhar = bookmark local agora; quando houver pseudonimo verificado vira
+ * persistente. Compartilhar usa Web Share API ou copia URL como fallback.
  */
 import { useState } from "react";
 import { Bookmark, Share2 } from "lucide-react";
