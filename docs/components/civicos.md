@@ -174,7 +174,7 @@ Props de domínio persistente não devem ser acopladas diretamente ao banco. Use
 | O que é | Bloco visual para explicação gerada por IA a partir de fontes conhecidas. |
 | Quando usar | Resumos em português simples, explicação de termos e perguntas cívicas. |
 | Quando não usar | Para fato oficial, acusação, inferência sem fonte ou decisão pública. |
-| Props | `texto`, `fontesUsadas`, `modelo`, `geradoEm`, `limites`, `disclaimer`. |
+| Props | `texto`, `titulo`, `fontesUsadas`, `geradoEm`, `meta`, `limitacoes`, `className`. |
 | Estados | Padrão, carregando, sem fontes suficientes, erro, revisão pendente. |
 | Exemplo | `Explicação gerada a partir dos campos oficiais disponíveis.` |
 | Acessibilidade | Label `Explicação por IA` deve aparecer antes do texto. |
@@ -271,6 +271,36 @@ Props de domínio persistente não devem ser acopladas diretamente ao banco. Use
 | Erros comuns | Permitir comentário livre; misturar ação cívica com entretenimento. |
 | Regras para agentes | Ações sensíveis precisam explicar consequência antes de continuar. |
 | Storybook | `/?path=/docs/deolho-contextualactiondrawer--docs` |
+
+## ReacaoCivica
+
+| Campo | Definição |
+|-------|-----------|
+| O que é | Controle de reação estruturada para objetos públicos verificáveis. |
+| Quando usar | Evento público, contrato, ato, documento ou página de entidade que admita opinião de usuário sem confundir com fato. |
+| Quando não usar | Em pessoa física comum, pessoa pública como alvo individual, sinal de culpa, ranking ou julgamento moral. |
+| Props | `contagem`, `className`; enum fechado: `apoio`, `parcial`, `contra`, `faltou_informacao`. |
+| Estados | Sem reação, reação selecionada, contagem local, persistência pendente. |
+| Exemplo | Usuário marca `faltou_informacao` em um contrato com evidência incompleta. |
+| Acessibilidade | Botões com `aria-pressed`, label textual e ícone; não depender só de cor. |
+| Erros comuns | Tratar reação como evidência; permitir reações em pessoas; usar como ranking de suspeita. |
+| Regras para agentes | Reações são opinião de usuário e devem ser visualmente separadas de fonte/confiança. |
+| Storybook | Futuro `/?path=/docs/deolho-reacaocivica--docs` |
+
+## ContribuicaoContextual
+
+| Campo | Definição |
+|-------|-----------|
+| O que é | Comentário curto e moderado, vinculado a evento, entidade ou evidência. |
+| Quando usar | Para pergunta, contexto local ou correção com fonte indicada. |
+| Quando não usar | Debate livre, acusação, denúncia sem fonte ou exposição de dado pessoal sensível. |
+| Props | `contexto`, `texto`, `fonteOpcional`, `status`, `moderacao`. |
+| Estados | Rascunho, pendente, aprovado, rejeitado, removido por moderação. |
+| Exemplo | `A fonte municipal não informa a escola atendida; alguém encontrou documento complementar?` |
+| Acessibilidade | Campo com limite claro de caracteres, erro legível e confirmação de envio. |
+| Erros comuns | Publicar automaticamente; confundir contribuição com fato oficial. |
+| Regras para agentes | Estado inicial público persistente deve ser `pending`; nada vira visível sem moderação. |
+| Storybook | Futuro `/?path=/docs/deolho-contribuicaocontextual--docs` |
 
 ## UniversalCommandSearch
 

@@ -1,5 +1,5 @@
 /**
- * EventoCard — card principal do feed, vibe Instagram.
+ * EventoCard — card de evento publico com interacoes civicas estruturadas.
  *
  * Estrutura:
  *  - Cabeçalho com avatar do "autor" público (prefeitura, câmara, etc.),
@@ -7,10 +7,9 @@
  *  - Bloco visual grande (cor + emoji/ícone) — substituto da foto.
  *  - Título conversacional e resumo curto.
  *  - CTA opcional (Abrir PDF, Ver detalhes).
- *  - Rodapé com ReacaoCivica + SaveShare.
+ *  - Rodape com ReacaoCivica + SaveShare.
  *
- * Mobile-first, generoso em padding, rounded-3xl. Sem grids de badges
- * empilhados — confiança aparece como ícone sutil no cabeçalho.
+ * Mobile-first, generoso em padding. Sem ranking moral e sem comentario livre.
  */
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
@@ -47,7 +46,7 @@ export interface EventoCardProps {
   href?: string;
   cta?: { label: string; href: string; externo?: boolean };
   fonte?: { label: string; url?: string };
-  reacoes?: { ver?: number; duvida?: number; revisao?: number };
+  reacoes?: { apoio?: number; parcial?: number; contra?: number; faltou_informacao?: number };
   /** Compartilhamento — link absoluto preferível. */
   shareUrl?: string;
   className?: string;

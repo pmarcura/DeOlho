@@ -1,6 +1,6 @@
 /**
  * AtomCard premium — usa campos compilados (tituloHumano, subtitulo, campos
- * estruturados, glossário, complexidade) pra dar uma postagem REALMENTE
+ * estruturados, glossário, complexidade) para dar um evento público realmente
  * legível ao invés do trecho cru do PDF.
  *
  * Hierarquia:

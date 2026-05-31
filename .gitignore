@@ -35,3 +35,6 @@ Thumbs.db
 
 # Obsidian — vault local é camada de pensamento, não versionada (ver OBSIDIAN.md)
 .obsidian/
+
+# Obsidian Bases (lixo local)
+*.base

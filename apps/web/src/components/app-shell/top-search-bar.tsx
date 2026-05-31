@@ -70,7 +70,7 @@ export function TopSearchBar() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="flex-1 flex items-center gap-2 px-3 h-9 rounded-full bg-muted/80 text-muted-foreground text-sm hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+            className="flex min-w-0 flex-1 items-center gap-2 px-3 h-9 rounded-full bg-muted/80 text-muted-foreground text-sm hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
             aria-label="Abrir busca universal"
           >
             <Search className="w-4 h-4 shrink-0" aria-hidden />

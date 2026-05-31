@@ -1,8 +1,8 @@
 /**
  * TrustHint — confiança da fonte como ÍCONE sutil, não chip berrante.
  *
- * Substitui o TipoInformacaoBadge no FEED Instagram-style. A intenção é deixar
- * a confiança presente e clicável sem dominar a hierarquia visual do card.
+ * Alternativa compacta ao TipoInformacaoBadge em superfícies densas. A intenção
+ * é deixar a confiança presente e clicável sem dominar a hierarquia visual.
  *
  * Quando precisar de label completo, usar TipoInformacaoBadge (em páginas de
  * detalhe técnicas).

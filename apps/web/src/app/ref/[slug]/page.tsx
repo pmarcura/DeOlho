@@ -1,7 +1,7 @@
 /**
  * /ref/[slug] — "tudo que se correlaciona com esta referência".
  *
- * Quando um post no feed cita "Lei nº 6.274/2019", o usuário clica e
+ * Quando um evento público cita "Lei nº 6.274/2019", o usuário clica e
  * cai aqui: a lista de todos os átomos (no diário inteiro) que tocam essa
  * lei. Resposta direta ao pedido do Pedro: "clicar e ver tudo que
  * correlaciona com essa informação, com resumo breve".

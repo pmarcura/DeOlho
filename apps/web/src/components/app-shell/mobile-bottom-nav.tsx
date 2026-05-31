@@ -4,9 +4,8 @@
  * MobileBottomNav — navegação inferior do mobile.
  *
  * Itens: Início · Radar · (+) · Explorar · Mapa
- * O botão "+" abre o ContextualActionDrawer (não é "criar post" — é ações
- * permitidas por rota: acompanhar, reportar erro, contribuir contexto,
- * exportar, citar página).
+ * Quando o botão "+" voltar, ele deve abrir ações permitidas por rota:
+ * acompanhar, reportar erro, contribuir contexto, exportar, citar página.
  */
 import Link from "next/link";
 import { usePathname } from "next/navigation";

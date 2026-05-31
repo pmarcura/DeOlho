@@ -111,6 +111,27 @@ function resumo(atom: Atom): string {
   return atom.subtitulo ?? atom.textoDocumento ?? atom.resumoLimpo ?? atom.resumo;
 }
 
+function limitacoes(atom: Atom): Array<{ campo: string; mensagem: string; tipo?: string; fonte?: string }> | null {
+  const out: Array<{ campo: string; mensagem: string; tipo?: string; fonte?: string }> = [];
+  if (atom.tipo === "indefinido") {
+    out.push({
+      campo: "tipo",
+      mensagem: "A publicação foi segmentada, mas ainda não foi classificada com segurança.",
+      tipo: "dado_ausente",
+      fonte: "diario-americana",
+    });
+  }
+  if (!atom.edicaoDate) {
+    out.push({
+      campo: "data pública",
+      mensagem: "O Diário Oficial de Americana não informou data para esta publicação; ela não deve ser tratada como recente.",
+      tipo: "dado_ausente",
+      fonte: "diario-americana",
+    });
+  }
+  return out.length > 0 ? out : null;
+}
+
 export async function mapearAtomosDiario(): Promise<void> {
   const db = getDb();
   if (!db) {
@@ -152,9 +173,7 @@ export async function mapearAtomosDiario(): Promise<void> {
         pessoas: atom.pessoas ?? [],
         orgaos: atom.orgaos ?? [],
       },
-      limitacoes: atom.tipo === "indefinido"
-        ? [{ campo: "tipo", mensagem: "A publicação foi segmentada, mas ainda não foi classificada com segurança." }]
-        : null,
+      limitacoes: limitacoes(atom),
       sourceUrl: url,
       publishedAt: atom.edicaoDate ? new Date(atom.edicaoDate) : null,
       fetchedAt: null,

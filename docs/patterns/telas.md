@@ -13,7 +13,7 @@ Cada padrão de tela deve ser implementado primeiro com dados sintéticos marcad
 | Componentes usados | `TerritorialCarousel`, `EventoPublicoCard`, `EntidadeCard`, `UniversalCommandSearch`, `MobileBottomNav`, `FloatingActionButton`. |
 | Estados obrigatórios | Carregando, vazio, erro, fonte atrasada, dado incompleto. |
 | O que não fazer | Hero marketing, feed de posts, curtidas, comentários livres, ranking moral. |
-| Checklist de PR | Mostra dados sintéticos; cada card tem tipo/fonte/confiança; mobile não depende de hover; estados estão implementados. |
+| Checklist de PR | Mostra dados sintéticos quando aplicável; em `mais recentes`, abre com resumo local do mês antes da lista; cada card tem tipo/fonte/confiança, mini-ficha de contexto, evidência e mídia visual neutra; mobile não depende de hover; estados estão implementados. |
 
 ## Radar de mudanças públicas
 
@@ -52,7 +52,7 @@ Cada padrão de tela deve ser implementado primeiro com dados sintéticos marcad
 | Componentes usados | `ContratoCard`, `EvidenciaLink`, `PainelEvidencia`, `BlocoExplicacaoIA`, `BlocoLimitacaoDado`, `SinalAtencaoCard`. |
 | Estados obrigatórios | Carregando, contrato não encontrado, payload parcial, fonte atrasada, campo contraditório. |
 | O que não fazer | Inferir irregularidade por valor, fornecedor, prazo ou órgão. |
-| Checklist de PR | Campos têm fonte; resumo IA cita base usada; export preserva metadados; sinais têm método e aviso. |
+| Checklist de PR | Campos têm fonte; leitura IA/local cita base usada; Wikipedia é contexto e não evidência; export preserva metadados; sinais têm método e aviso. |
 
 ## Página de empresa
 
@@ -106,6 +106,19 @@ Cada padrão de tela deve ser implementado primeiro com dados sintéticos marcad
 | O que não fazer | Chat principal, busca que ranqueia suspeita, resultado sem tipo/fonte. |
 | Checklist de PR | Resultado tem tipo; dados públicos têm fonte; teclado funciona; vazio é útil. |
 
+## Mapa de conexões
+
+| Campo | Diretriz |
+|-------|----------|
+| Objetivo | Visualizar entidades públicas e vínculos documentados sem transformar conexão em acusação. |
+| Usuário principal | Jornalista, pesquisador, cidadão engajado ou contribuidor investigando relações verificáveis. |
+| Layout desktop | Grafo compacto à esquerda/centro, lista de relações e painel de evidência à direita. |
+| Layout mobile | Lista de relações primeiro; grafo como visualização complementar com expansão controlada. |
+| Componentes usados | `EntidadeCard`, `FonteBadge`, `ConfiancaBadge`, `EvidenciaLink`, `BlocoLimitacaoDado`, futuro `GraphCanvas`. |
+| Estados obrigatórios | Carregando, sem relações, fonte parcial, aresta sem evidência ocultada, erro de expansão. |
+| O que não fazer | Renderizar rede completa por padrão; sugerir nepotismo ou conflito sem regra objetiva; usar espessura/cor como acusação. |
+| Checklist de PR | Toda aresta tem fonte/evidência; profundidade tem limite; há alternativa textual acessível. |
+
 ## Painel de fonte
 
 | Campo | Diretriz |
@@ -117,7 +130,7 @@ Cada padrão de tela deve ser implementado primeiro com dados sintéticos marcad
 | Componentes usados | `PainelEvidencia`, `EvidenciaLink`, `BlocoLimitacaoDado`, `Table`. |
 | Estados obrigatórios | Sem evidência, fonte indisponível, atrasada, parcial, erro. |
 | O que não fazer | Esconder link oficial; depender de tooltip; misturar IA como fonte. |
-| Checklist de PR | Datas estão visíveis; links têm labels; limitações explicam impacto. |
+| Checklist de PR | Datas estão visíveis; links têm labels; limitações explicam impacto; a ficha pública responde o que aconteceu, por que/objeto, quem está envolvido, quando, onde e o que foi divulgado oficialmente. |
 
 ## Página de erro
 

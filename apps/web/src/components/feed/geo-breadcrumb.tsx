@@ -3,7 +3,7 @@
  *
  * Mobile-first: chips conectados por chevron, scroll horizontal se passar da
  * largura. Cada nível clicável volta o foco pra aquela camada. O nível ativo
- * vem em destaque suave (sem cor primary forte, pra não competir com o feed).
+ * vem em destaque suave (sem cor primary forte, pra não competir com o radar).
  */
 import Link from "next/link";
 import { ChevronRight, MapPin } from "lucide-react";

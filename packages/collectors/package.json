@@ -16,6 +16,8 @@
     "map:tce": "tsx src/mappers/tce-sp.ts",
     "map:diario": "tsx src/mappers/diario-mentions.ts",
     "map:diario-atoms": "tsx src/mappers/diario-atoms.ts",
+    "format:posts": "tsx src/agents/format-posts.ts",
+    "sync:civic": "pnpm run map:pncp && pnpm run map:tce && pnpm run map:diario-atoms && pnpm run format:posts -- --limit=80",
     "enrich:socios": "tsx src/enrich/cnpj-socios.ts",
     "collect:transparencia": "tsx src/adapters/transparencia-americana.ts",
     "reconcile": "tsx src/reconcile/entities.ts",
