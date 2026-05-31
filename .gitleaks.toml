@@ -18,14 +18,19 @@ keywords = ["portal_transparencia_api_key"]
 
 [[rules]]
 id = "generic-env-secret"
-description = "Atribuição de segredo (api key, token, senha) com valor real"
-regex = '''(?i)\b(api[_-]?key|apikey|secret|token|password|passwd|senha|client[_-]?secret)\b\s*[:=]\s*['"]?[a-z0-9_\-./+=]{12,}['"]?'''
+description = "Atribuição de segredo (api key, token, senha) com valor literal entre aspas"
+# Exige ASPAS no valor: segredos hardcoded são strings literais ("abc123...").
+# Referências de código como `= process.env.OPENAI_API_KEY` (sem aspas) não casam.
+regex = '''(?i)\b(api[_-]?key|apikey|secret|token|password|passwd|senha|client[_-]?secret)\b\s*[:=]\s*['"][a-z0-9_\-./+=]{12,}['"]'''
 keywords = ["api_key","apikey","secret","token","password","passwd","senha"]
 
 # ── Allowlist: o que NÃO é vazamento (placeholders, exemplos, docs) ───────────
 
 [allowlist]
-description = "Placeholders e arquivos de exemplo — não são segredos reais"
+description = "Placeholders, exemplos e referências de código — não são segredos reais"
+# Testa a LINHA inteira (não só o trecho casado): assim `process.env.X` e
+# placeholders em qualquer posição da linha são corretamente ignorados.
+regexTarget = "line"
 paths = [
   '''\.env\.example$''',
   '''\.gitleaks\.toml$''',
@@ -34,5 +39,6 @@ paths = [
 ]
 regexes = [
   '''(?i)(your[_-]?|sua[_-]?|seu[_-]?|change[_-]?me|example|placeholder|dummy|fake|test|sample|xxx+|<[^>]+>|chave[_-]?aqui|cole[_-]?aqui|\.\.\.)''',
-  '''(?i)process\.env\.''',
+  '''process\.env\.''',
+  '''import\.meta\.env\.''',
 ]
