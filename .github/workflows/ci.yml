@@ -52,7 +52,7 @@ jobs:
           fetch-depth: 0 # histórico completo para o gitleaks varrer todos os commits
 
       - name: Gitleaks (varredura de segredos)
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Grátis para repositórios públicos e pessoais (não precisa de licença).
