@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@deolho/db": "workspace:*",
-    "crawlee": "^3.12.1",
+    "crawlee": "^3.17.0",
     "drizzle-orm": "^0.45.2",
     "dotenv": "^17.4.2",
     "pdf-parse": "^1.1.1",
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/node": "^20.19.0",
     "@types/pdf-parse": "^1.1.4",
-    "tsx": "^4.19.4",
+    "tsx": "^4.22.4",
     "typescript": "^5.8.3"
   }
 }
